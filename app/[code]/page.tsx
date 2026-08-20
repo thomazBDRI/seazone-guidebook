@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import QRCode from "qrcode";
 import { cache } from "react";
+import { AmenitiesSection } from "@/components/guide/amenities-section";
 import { ArrivalSection } from "@/components/guide/arrival-section";
 import { Hero } from "@/components/guide/hero";
+import { RulesSection } from "@/components/guide/rules-section";
 import { SiteFooter } from "@/components/guide/site-footer";
 import { TopBar } from "@/components/guide/top-bar";
 import {
@@ -75,6 +77,8 @@ export default async function GuidePage({ params }: PageProps) {
       />
       <main>
         <ArrivalSection property={property} wifiQr={wifiQr} />
+        <RulesSection property={property} />
+        <AmenitiesSection property={property} />
       </main>
       <SiteFooter />
     </>

@@ -253,29 +253,3 @@ plano Hobby, então não há nada para configurar fora do código. Basta apontar
 repositório e definir `SUPABASE_URL`, `SUPABASE_SECRET_KEY` e
 `OPENROUTER_API_KEY` nas variáveis de ambiente do projeto.
 
-## Limitações e próximos passos
-
-Honestamente, o que ficou de fora ou merece atenção:
-
-- **Sem camada de cache.** Cada request busca o imóvel e o guia no Supabase.
-  Para seis imóveis é irrelevante; num catálogo real, o guia persistido é
-  conteúdo imutável e pediria cache com invalidação por código.
-- **Modelos gratuitos têm rate limit sem aviso.** A geração tem orçamento de
-  tempo, limite de tentativas e fallback para o conhecimento do modelo, e o
-  chat degrada para uma mensagem que encaminha ao anfitrião — mas em produção
-  o caminho é modelo pago com fallback, não gratuito com paciência.
-- **O QR do Wi-Fi só funciona apontando a câmera de outro aparelho**, já que o
-  hóspede tende a abrir o guia no próprio celular. Conectar direto pelo toque
-  exigiria integração nativa.
-- **A regeneração do guia só acontece a partir de uma linha `failed`** (o botão
-  de tentar novamente a apaga antes de gerar de novo). Não existe painel para
-  forçar a regeneração de um guia `ready` — proposital, dado o requisito de não
-  regenerar, mas um ambiente real precisaria de uma rota administrativa.
-- **Sem autenticação.** Quem tem o código tem o guia. É o modelo do produto
-  (link na confirmação da reserva), mas o código é curto e adivinhável; um
-  identificador longo por reserva seria o passo seguinte.
-- **A geração do guia é coberta por teste unitário, não E2E.** Os imóveis
-  semeados já têm guia `ready` em pt-BR e a suíte E2E não deve alterar o banco para
-  forçar o estado `pending`.
-- **Acessibilidade e performance não foram medidas.** Navegação por teclado,
-  landmarks e contraste foram cuidados à mão, sem verificação automatizada.

@@ -106,6 +106,56 @@ describe("buildChatMessages", () => {
     expect(prompt).toContain("Em agosto o mar é frio");
   });
 
+  it("grounds the services the property offers, notes included", () => {
+    // "posso fazer early check-in?" / "consigo late checkout?" /
+    // "quero ficar mais uma semana, tem desconto?"
+    const prompt = systemPrompt();
+
+    expect(prompt).toContain("Quer entrar antes das 15:00? Fale com Ana Paula");
+    expect(prompt).toContain("Check-out cedo demais? Pergunte a Ana Paula");
+    expect(prompt).toContain("desconto nas diárias adicionais");
+
+    const gramado = systemPrompt(grm001);
+    expect(gramado).toContain("Precisa sair mais tarde? Combine com Carlos");
+    // the host-authored note travels verbatim next to the sentence
+    expect(gramado).toContain(
+      "(Transfer particular até Canela e Gramado centro — combine com Carlos)",
+    );
+  });
+
+  it("closes the services list so an absent service can be denied", () => {
+    // FLN001 offers no late check-out and no transfer
+    const prompt = systemPrompt();
+
+    expect(prompt).toMatch(/esta lista é completa/i);
+    expect(prompt).toMatch(/NÃO é oferecido neste imóvel/);
+    expect(prompt).not.toContain("Precisa sair mais tarde");
+    expect(prompt).not.toContain("Transfer do aeroporto");
+  });
+
+  it("says so plainly when the property offers nothing on request", () => {
+    const bare = systemPrompt({ ...fln001, services: {} });
+
+    expect(bare).toContain("não oferece nenhum serviço extra");
+    expect(bare).toMatch(/não está disponível neste imóvel/);
+    expect(bare).not.toContain("Quer entrar antes das");
+    // a service switched off reads the same as one never mentioned
+    expect(
+      systemPrompt({ ...fln001, services: { early_checkin: false } }),
+    ).toContain("não oferece nenhum serviço extra");
+  });
+
+  it("carries the emergency numbers and who to call about the property", () => {
+    const prompt = systemPrompt();
+
+    expect(prompt).toContain("SAMU 192 · Bombeiros 193 · Polícia 190");
+    expect(prompt).toMatch(/fale primeiro com Ana Paula/);
+
+    const english = systemPrompt(fln001, guide, ask("hi"), "en");
+    expect(english).toContain("Ambulance 192 · Fire 193 · Police 190");
+    expect(english).toContain("Want to get in before 15:00? Ask Ana Paula");
+  });
+
   it("answers pet policy from the property, not from a canned rule", () => {
     expect(systemPrompt(grm001)).toContain(
       "Animais de estimação são bem-vindos",

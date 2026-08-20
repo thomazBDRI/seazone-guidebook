@@ -10,6 +10,7 @@ import { ExperienceSection } from "@/components/guide/experience-section";
 import { Hero } from "@/components/guide/hero";
 import { HostSection } from "@/components/guide/host-section";
 import { RulesSection } from "@/components/guide/rules-section";
+import { ServicesSection } from "@/components/guide/services-section";
 import { SiteFooter } from "@/components/guide/site-footer";
 import { TocNav } from "@/components/guide/toc-nav";
 import { TopBar } from "@/components/guide/top-bar";
@@ -18,6 +19,7 @@ import {
   formatTime,
   locationLine,
   phoneDigits,
+  serviceLines,
 } from "@/lib/domain/display";
 import { GuideContentSchema } from "@/lib/domain/guide";
 import { wifiQrPayload } from "@/lib/domain/wifi";
@@ -69,6 +71,15 @@ export default async function GuidePage({ params }: PageProps) {
       : null;
   const guideContent = parsedContent?.success ? parsedContent.data : null;
 
+  // a property that offers nothing on request skips the section entirely,
+  // emergency row included, rather than shipping a heading with one card
+  const hasServices =
+    serviceLines(
+      property.services,
+      { hostName: property.host_name, checkIn: property.check_in_time },
+      locale,
+    ).length > 0;
+
   // generated here (not in the browser) so the password never travels twice
   const wifiQr =
     property.wifi_network && property.wifi_password
@@ -99,11 +110,14 @@ export default async function GuidePage({ params }: PageProps) {
         }
         locale={locale}
       />
-      <TocNav locale={locale} />
+      <TocNav locale={locale} hasServices={hasServices} />
       <main>
         <ArrivalSection property={property} locale={locale} wifiQr={wifiQr} />
         <RulesSection property={property} locale={locale} />
         <AmenitiesSection property={property} locale={locale} />
+        {hasServices ? (
+          <ServicesSection property={property} locale={locale} />
+        ) : null}
         {guideContent ? (
           <ExperienceSection
             content={guideContent}

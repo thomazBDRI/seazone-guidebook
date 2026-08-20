@@ -11,6 +11,7 @@ const SECTIONS = [
   { id: "acesso", icon: "key-round" },
   { id: "regras", icon: "clipboard-check" },
   { id: "comodidades", icon: "sofa" },
+  { id: "servicos", icon: "concierge-bell" },
   { id: "experiencias", icon: "sparkles" },
   { id: "contato", icon: "phone" },
 ] as const;
@@ -18,10 +19,19 @@ const SECTIONS = [
 /** Distance kept between the rail and a dark section edge. */
 const PAD = 22;
 
-export function TocNav({ locale }: { locale: Locale }) {
+type TocNavProps = {
+  locale: Locale;
+  /** The services section only renders for a property that offers some. */
+  hasServices: boolean;
+};
+
+export function TocNav({ locale, hasServices }: TocNavProps) {
   const messages = getMessages(locale);
   const label = (id: (typeof SECTIONS)[number]["id"]) =>
     messages.toc.sections[id];
+  const sections = SECTIONS.filter(
+    (section) => section.id !== "servicos" || hasServices,
+  );
   const rail = useRef<HTMLElement>(null);
   const [active, setActive] = useState<string>(SECTIONS[0].id);
   const [open, setOpen] = useState(false);
@@ -114,7 +124,7 @@ export function TocNav({ locale }: { locale: Locale }) {
         >
           {messages.toc.label}
         </span>
-        {SECTIONS.map((section) => {
+        {sections.map((section) => {
           const isActive = section.id === active;
           return (
             <a
@@ -164,7 +174,7 @@ export function TocNav({ locale }: { locale: Locale }) {
         {open ? (
           <div className="border-t border-border bg-[hsla(225,70%,99%,.98)]">
             <div className="mx-auto flex max-w-[1080px] flex-col px-[clamp(16px,4vw,40px)] pb-3.5 pt-2">
-              {SECTIONS.map((section) => (
+              {sections.map((section) => (
                 <a
                   key={section.id}
                   href={`#${section.id}`}

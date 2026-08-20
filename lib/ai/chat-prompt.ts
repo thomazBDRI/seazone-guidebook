@@ -8,9 +8,11 @@ import {
   formatTime,
   locationLine,
   ruleLines,
+  serviceLines,
 } from "@/lib/domain/display";
 import type { GuideContent } from "@/lib/domain/guide";
 import type { Property } from "@/lib/domain/property";
+import { getMessages } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
 
 /**
@@ -94,10 +96,43 @@ function dataBlock(property: Property, locale: Locale): string {
     `Comodidades: ${amenityList(property.amenities, locale)
       .map((amenity) => amenity.label)
       .join(", ")}`,
+    servicesBlock(property, locale),
+    emergencyLine(property, locale),
     `Anfitrião(ã) responsável: ${property.host_name} — WhatsApp ${formatPhone(property.host_phone)}`,
   ].filter((line): line is string => line !== null);
 
   return [DATA_OPEN, ...lines, DATA_CLOSE].join("\n");
+}
+
+/**
+ * Services the host offers on request, plus the instruction that makes the
+ * absence of a service answerable: the list is closed, so "early check-in?" on
+ * a property that does not offer it gets an honest no instead of a guess.
+ */
+function servicesBlock(property: Property, locale: Locale): string {
+  const lines = serviceLines(
+    property.services,
+    { hostName: property.host_name, checkIn: property.check_in_time },
+    locale,
+  );
+
+  if (lines.length === 0) {
+    return "Serviços a pedido: este imóvel não oferece nenhum serviço extra. Se o hóspede pedir early check-in, late check-out, extensão da estadia, limpeza durante a estadia, guarda de bagagem, transfer ou qualquer outro serviço, diga com franqueza que não está disponível neste imóvel e ofereça confirmar com o anfitrião.";
+  }
+
+  const items = lines.map((line) =>
+    line.note ? `- ${line.sentence} (${line.note})` : `- ${line.sentence}`,
+  );
+
+  return [
+    "Serviços a pedido (esta lista é completa — qualquer serviço que não esteja aqui NÃO é oferecido neste imóvel; diga isso com franqueza e ofereça confirmar com o anfitrião, nunca prometa o que não está listado):",
+    ...items,
+  ].join("\n");
+}
+
+function emergencyLine(property: Property, locale: Locale): string {
+  const emergency = getMessages(locale).services.emergency;
+  return `Emergências: ${emergency.numbers}. ${emergency.note(property.host_name)}`;
 }
 
 function parkingLine(property: Property): string {

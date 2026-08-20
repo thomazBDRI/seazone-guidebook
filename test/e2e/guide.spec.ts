@@ -36,6 +36,26 @@ test.describe("FLN001", () => {
     ).toBeVisible();
   });
 
+  test("renders the services the property offers on request", async ({
+    page,
+  }) => {
+    const services = page.locator("#servicos");
+    await expect(
+      services.getByRole("heading", { name: "Precisa de algo?" }),
+    ).toBeVisible();
+
+    // the sentence is composed from the row: services jsonb + check_in_time +
+    // host_name, none of them written in the markup
+    await expect(
+      services.getByText(
+        "Quer entrar antes das 15:00? Fale com Ana Paula — sujeito à disponibilidade.",
+      ),
+    ).toBeVisible();
+    await expect(
+      services.getByText("SAMU 192 · Bombeiros 193 · Polícia 190"),
+    ).toBeVisible();
+  });
+
   test("renders the persisted experiences guide", async ({ page }) => {
     const experiences = page.locator("#experiencias");
     await expect(experiences).toBeVisible();

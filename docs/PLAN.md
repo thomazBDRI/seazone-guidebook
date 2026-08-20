@@ -290,20 +290,37 @@ Conventional Commits, small steps, committed as we go.
     (the Hobby ceiling) and no `next/image` remote host is needed, since photo
     URLs come from the database. Recorded in the README's Deploy section.
 
-**E8 — Guest services & catalog depth**
-- `feat(db): add guest services to properties` — data-driven `services` jsonb
-  (early check-in / late check-out arranged with the host, extend-stay discount
-  via the Seazone team, mid-stay cleaning, luggage storage, airport transfer)
-  rendered through a dictionary like amenities, host name interpolated.
-- `feat(guide): add services section` — localized "Precisa de algo?" section
-  with an emergency-numbers row (SAMU 192 · Bombeiros 193 · Polícia 190);
-  services also enter the chat data block so the assistant answers them —
-  including honestly stating when a service is not offered.
-- `feat(db): seed six properties with varied coverage` — four new units with
-  real geocodable addresses (beachfront casa in Bombinhas, studio without
+**E8 — Guest services & catalog depth** ✅
+- ~~`feat(db): add guest services to properties`~~ — data-driven `services`
+  jsonb (early check-in / late check-out arranged with the host, extend-stay
+  discount via the Seazone team, mid-stay cleaning, luggage storage, airport
+  transfer) rendered through a dictionary like amenities, host name
+  interpolated. A value of `true` takes the dictionary's default sentence; a
+  string is a host-authored note rendered as written, so an unusual arrangement
+  needs no deploy. The domain schema defaults and catches the column, which is
+  what kept production serving while the migration waited on its human gate.
+- ~~`feat(guide): add services section`~~ — localized "Precisa de algo?"
+  section with an emergency-numbers row (SAMU 192 · Bombeiros 193 · Polícia
+  190); services also enter the chat data block so the assistant answers them
+  — including honestly stating when a service is not offered. A property that
+  offers nothing skips the whole section and loses its TOC entry with it, so no
+  anchor is ever dead. The "not offered" half needed the prompt to say more
+  than that the list is closed: the model first answered "não há informação
+  sobre early check-in", so the rule now forbids that hedge outright — the
+  absence of a service from a closed list *is* the information.
+- ~~`feat(db): seed six properties with varied coverage`~~ — four new units
+  with real geocodable addresses (beachfront casa in Bombinhas, studio without
   parking in Balneário Camboriú, cabana in Praia do Rosa, doorman apartamento
   in Jurerê) exercising every conditional path; the home index and lazy
-  per-locale guides pick new rows up with no code changes.
+  per-locale guides pick new rows up with no code changes. Every address was
+  checked against Nominatim before landing — the pipeline geocodes it, so an
+  invented street would quietly describe the wrong neighbourhood without
+  failing anything.
+
+  Spanish needed one rename: `es.ts` translated "comodidades" as "Servicios",
+  colliding with the section that now owns the word. Amenities became
+  "Comodidades" (already used in `home.subtitle`) and a test asserts the two
+  TOC labels differ in every locale.
 
 **E9 — Brand alignment pass**
 - `feat(ui): adopt the real seazone logo` (topbar, footer, favicon).

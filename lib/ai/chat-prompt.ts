@@ -117,7 +117,7 @@ function servicesBlock(property: Property, locale: Locale): string {
   );
 
   if (lines.length === 0) {
-    return "Serviços a pedido: este imóvel não oferece nenhum serviço extra. Se o hóspede pedir early check-in, late check-out, extensão da estadia, limpeza durante a estadia, guarda de bagagem, transfer ou qualquer outro serviço, diga com franqueza que não está disponível neste imóvel e ofereça confirmar com o anfitrião.";
+    return `Serviços a pedido: este imóvel não oferece nenhum serviço extra. ${CLOSED_LIST_RULE}`;
   }
 
   const items = lines.map((line) =>
@@ -125,10 +125,19 @@ function servicesBlock(property: Property, locale: Locale): string {
   );
 
   return [
-    "Serviços a pedido (esta lista é completa — qualquer serviço que não esteja aqui NÃO é oferecido neste imóvel; diga isso com franqueza e ofereça confirmar com o anfitrião, nunca prometa o que não está listado):",
+    `Serviços a pedido — lista completa e fechada. ${CLOSED_LIST_RULE}`,
     ...items,
   ].join("\n");
 }
+
+/**
+ * Without the "do not say you lack information" clause the model hedges
+ * ("não há informação sobre early check-in") instead of answering: the absence
+ * of a service from a closed list IS the information, and a guest deciding
+ * whether to book an earlier flight needs the no, not a maybe.
+ */
+const CLOSED_LIST_RULE =
+  "Qualquer serviço que não apareça na lista abaixo NÃO é oferecido neste imóvel — inclusive early check-in, late check-out, extensão da estadia, limpeza durante a estadia, guarda de bagagem e transfer. Se o hóspede pedir um deles, responda que esse serviço não está disponível neste imóvel e que ele pode confirmar com o anfitrião; não diga que faltam informações e nunca prometa o que não está listado.";
 
 function emergencyLine(property: Property, locale: Locale): string {
   const emergency = getMessages(locale).services.emergency;

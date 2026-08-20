@@ -127,10 +127,25 @@ describe("buildChatMessages", () => {
     // FLN001 offers no late check-out and no transfer
     const prompt = systemPrompt();
 
-    expect(prompt).toMatch(/esta lista é completa/i);
+    expect(prompt).toMatch(/lista completa e fechada/i);
     expect(prompt).toMatch(/NÃO é oferecido neste imóvel/);
     expect(prompt).not.toContain("Precisa sair mais tarde");
     expect(prompt).not.toContain("Transfer do aeroporto");
+  });
+
+  it("forbids the hedge that a missing service is missing information", () => {
+    // the model answered "não há informação sobre early check-in" until the
+    // closed list said outright that the absence is the answer
+    const cases: Record<string, boolean | string>[] = [
+      {},
+      { airport_transfer: true },
+    ];
+    for (const services of cases) {
+      const prompt = systemPrompt({ ...fln001, services });
+      expect(prompt).toMatch(/não diga que faltam informações/);
+      expect(prompt).toMatch(/não está disponível neste imóvel/);
+      expect(prompt).toContain("inclusive early check-in");
+    }
   });
 
   it("says so plainly when the property offers nothing on request", () => {

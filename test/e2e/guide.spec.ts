@@ -76,7 +76,11 @@ test.describe("FLN001", () => {
   test("links the guest to the host on whatsapp", async ({ page }) => {
     const whatsapp = page.locator('a[href="https://wa.me/5548991234567"]');
     await expect(whatsapp.first()).toBeVisible();
-    await expect(page.getByText("Ana Paula")).toBeVisible();
+    // scoped to the contact card: the host name also appears in the services
+    // sentences ("Fale com Ana Paula"), which is not what this test is about
+    await expect(
+      page.locator("#contato").getByText("Ana Paula", { exact: true }),
+    ).toBeVisible();
   });
 });
 

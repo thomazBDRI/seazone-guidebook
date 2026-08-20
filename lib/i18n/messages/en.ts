@@ -145,6 +145,9 @@ const en: Messages = {
       extend_stay: "Extend your stay",
       midstay_cleaning: "Extra cleaning",
       luggage_storage: "Luggage storage",
+      grocery_stocking: "Stocked fridge",
+      special_occasion: "Special occasion setup",
+      extra_bedding: "Crib or extra bed",
       airport_transfer: "Airport transfer",
     },
     cta: {
@@ -267,6 +270,12 @@ const en: Messages = {
         `Extra cleaning during your stay? Just ask ${host}.`,
       luggage_storage: ({ host }) =>
         `Late flight? Leave your bags with ${host} and enjoy the day.`,
+      grocery_stocking: ({ host }) =>
+        `Arrive to a full fridge: ask ${host} to pre-stock your groceries.`,
+      special_occasion: ({ host }) =>
+        `Birthday, honeymoon or a surprise? ${host} can set up the decoration.`,
+      extra_bedding: ({ host }) =>
+        `Need a crib or an extra bed? Ask ${host} about availability.`,
       airport_transfer: ({ host }) =>
         `Airport transfer: check prices and times with ${host}.`,
     },

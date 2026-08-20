@@ -162,10 +162,49 @@ export function accessTypeDisplay(type: string | null): AmenityDisplay {
   );
 }
 
+/** Digits only, as required by wa.me links. */
+export function phoneDigits(phone: string): string {
+  return phone.replace(/\D/g, "");
+}
+
+/** "+5548991234567" → "+55 48 99123-4567" (unknown shapes pass through). */
+export function formatPhone(phone: string): string {
+  const match = /^(\d{2})(\d{2})(\d{4,5})(\d{4})$/.exec(phoneDigits(phone));
+  return match ? `+${match[1]} ${match[2]} ${match[3]}-${match[4]}` : phone;
+}
+
+/** "Ana Paula" → "AP" (avatar fallback when there is no photo). */
+export function hostInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "";
+  const letters = parts.length === 1 ? [parts[0]] : [parts[0], parts.at(-1)];
+  return letters.map((part) => part?.charAt(0).toUpperCase() ?? "").join("");
+}
+
 /** Full display address, e.g. "Rua Lauro Linhares, 589 — Apto 301". */
 export function addressLine(
   property: Pick<Property, "street" | "number" | "complement">,
 ): string {
   const base = `${property.street}, ${property.number}`;
   return property.complement ? `${base} — ${property.complement}` : base;
+}
+
+/** "Trindade, Florianópolis — SC" */
+export function locationLine(
+  property: Pick<Property, "neighborhood" | "city" | "state">,
+): string {
+  return `${property.neighborhood}, ${property.city} — ${property.state}`;
+}
+
+/**
+ * Geocoding-friendly address for maps and ride apps: no complement (an
+ * apartment number only confuses geocoders) and the plain "City - ST" form.
+ */
+export function mapAddress(
+  property: Pick<
+    Property,
+    "street" | "number" | "neighborhood" | "city" | "state"
+  >,
+): string {
+  return `${property.street}, ${property.number}, ${property.neighborhood}, ${property.city} - ${property.state}`;
 }

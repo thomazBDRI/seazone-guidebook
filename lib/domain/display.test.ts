@@ -4,7 +4,12 @@ import {
   addressLine,
   amenityDisplay,
   amenityList,
+  formatPhone,
   formatTime,
+  hostInitials,
+  locationLine,
+  mapAddress,
+  phoneDigits,
   ruleLines,
 } from "@/lib/domain/display";
 import { fln001, grm001 } from "@/test/fixtures/property";
@@ -101,5 +106,47 @@ describe("addressLine", () => {
 
   it("omits the complement when null", () => {
     expect(addressLine(grm001)).toBe("Rua das Hortênsias, 220");
+  });
+});
+
+describe("locationLine", () => {
+  it("joins neighborhood, city and state", () => {
+    expect(locationLine(fln001)).toBe("Trindade, Florianópolis — SC");
+  });
+});
+
+describe("mapAddress", () => {
+  it("drops the complement so geocoders find the building", () => {
+    expect(mapAddress(fln001)).toBe(
+      "Rua Lauro Linhares, 589, Trindade, Florianópolis - SC",
+    );
+  });
+});
+
+describe("phoneDigits", () => {
+  it("strips everything but digits", () => {
+    expect(phoneDigits("+55 48 99123-4567")).toBe("5548991234567");
+  });
+});
+
+describe("formatPhone", () => {
+  it("formats mobile and landline numbers", () => {
+    expect(formatPhone("+5548991234567")).toBe("+55 48 99123-4567");
+    expect(formatPhone("+554832234567")).toBe("+55 48 3223-4567");
+  });
+
+  it("passes through unexpected shapes", () => {
+    expect(formatPhone("ligue para a anfitriã")).toBe("ligue para a anfitriã");
+  });
+});
+
+describe("hostInitials", () => {
+  it("takes the first and last name initials", () => {
+    expect(hostInitials("Ana Paula")).toBe("AP");
+    expect(hostInitials("Carlos Eduardo Nunes")).toBe("CN");
+  });
+
+  it("handles a single name", () => {
+    expect(hostInitials("Ana")).toBe("A");
   });
 });

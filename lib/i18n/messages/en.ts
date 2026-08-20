@@ -139,6 +139,24 @@ const en: Messages = {
     title: "Need anything else?",
     description:
       "Arrange it directly with whoever looks after the place — all subject to availability.",
+    titles: {
+      early_checkin: "Arrive earlier",
+      late_checkout: "Leave later",
+      extend_stay: "Extend your stay",
+      midstay_cleaning: "Extra cleaning",
+      luggage_storage: "Luggage storage",
+      airport_transfer: "Airport transfer",
+    },
+    cta: {
+      host: (firstName: string) => `Message ${firstName}`,
+      seazone: "Message Seazone",
+    },
+    prefill: {
+      host: ({ host, property, code, service }) =>
+        `Hi ${host}! I'm staying at ${property} (${code}) and I'd like to know about: ${service}.`,
+      seazone: ({ property, code }) =>
+        `Hi! I'm staying at ${property} (${code}) and I'd like to extend my stay.`,
+    },
     emergency: {
       title: "Emergencies",
       numbers: "Ambulance 192 · Fire 193 · Police 190",

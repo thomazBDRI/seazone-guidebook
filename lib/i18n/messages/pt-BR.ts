@@ -149,6 +149,40 @@ const ptBR = {
     title: "Precisa de algo?",
     description:
       "Combine direto com quem cuida do imóvel — tudo sujeito a disponibilidade.",
+    /** Card headline per service key; the sentence below it does the selling. */
+    titles: {
+      early_checkin: "Chegue mais cedo",
+      late_checkout: "Saia mais tarde",
+      extend_stay: "Estenda sua estadia",
+      midstay_cleaning: "Limpeza extra",
+      luggage_storage: "Guarda de bagagem",
+      airport_transfer: "Transfer do aeroporto",
+    },
+    cta: {
+      /** First name only: the button sits next to the host's own sentence. */
+      host: (firstName: string) => `Falar com ${firstName}`,
+      seazone: "Falar com a Seazone",
+    },
+    /**
+     * Text the WhatsApp link carries already typed, so whoever answers knows
+     * the property and the request before the first reply.
+     */
+    prefill: {
+      host: ({
+        host,
+        property,
+        code,
+        service,
+      }: {
+        host: string;
+        property: string;
+        code: string;
+        service: string;
+      }) =>
+        `Olá ${host}! Estou no ${property} (${code}) e gostaria de saber sobre: ${service}.`,
+      seazone: ({ property, code }: { property: string; code: string }) =>
+        `Olá! Estou no ${property} (${code}) e quero estender minha estadia.`,
+    },
     emergency: {
       title: "Emergências",
       numbers: "SAMU 192 · Bombeiros 193 · Polícia 190",

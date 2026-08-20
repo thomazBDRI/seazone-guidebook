@@ -123,6 +123,20 @@ describe("buildChatMessages", () => {
     );
   });
 
+  it("pitches each service with the escalation path shown on its card", () => {
+    // the page gives every offer a button; the assistant has to send the guest
+    // down the same path, host or Seazone team, never the other one
+    const prompt = systemPrompt();
+
+    expect(prompt).toContain(
+      "Chegue mais cedo — Quer entrar antes das 15:00? Fale com Ana Paula — sujeito à disponibilidade. Como pedir: fale com Ana Paula pelo WhatsApp.",
+    );
+    expect(prompt).toContain(
+      "Estenda sua estadia — Quer ficar mais dias? Fale com o time Seazone e ganhe desconto nas diárias adicionais. Como pedir: fale com o time Seazone pelo WhatsApp, não com o anfitrião.",
+    );
+    expect(prompt).toMatch(/aparece no guia com um botão de contato/);
+  });
+
   it("closes the services list so an absent service can be denied", () => {
     // FLN001 offers no late check-out and no transfer
     const prompt = systemPrompt();

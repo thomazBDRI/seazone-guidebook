@@ -11,8 +11,8 @@ const SECTIONS = [
   { id: "acesso", icon: "key-round" },
   { id: "regras", icon: "clipboard-check" },
   { id: "comodidades", icon: "sofa" },
-  { id: "servicos", icon: "concierge-bell" },
   { id: "experiencias", icon: "sparkles" },
+  { id: "servicos", icon: "concierge-bell" },
   { id: "contato", icon: "phone" },
 ] as const;
 

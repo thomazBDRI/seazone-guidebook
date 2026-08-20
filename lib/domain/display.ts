@@ -172,10 +172,18 @@ export function amenityList(
 export type ServiceLine = {
   key: string;
   icon: string;
-  /** Localized sentence for a known service; the humanized key otherwise. */
-  sentence: string;
+  /** Offer headline; the humanized key when the catalog does not know it. */
+  title: string;
+  /** Localized pitch. Null for an unknown key — the title is all we have. */
+  sentence: string | null;
   /** Text authored on the row, shown as written — never translated. */
   note: string | null;
+  /**
+   * Who the guest has to talk to. Extending a stay is priced by the Seazone
+   * team; everything else is arranged with the host, so the card's button and
+   * the assistant both have to point at the same person.
+   */
+  fulfilledBy: "host" | "seazone";
 };
 
 /** What the sentence templates may interpolate. */
@@ -196,6 +204,9 @@ const SERVICE_ICONS: Record<string, string> = {
 
 const SERVICE_ORDER = Object.keys(SERVICE_ICONS);
 
+/** Services the Seazone team fulfils instead of the host. */
+const SEAZONE_SERVICES = new Set(["extend_stay"]);
+
 type ServiceTemplates = Record<
   string,
   ((context: { host: string; checkIn: string }) => string) | undefined
@@ -211,7 +222,9 @@ export function serviceLines(
   { hostName, checkIn }: ServiceContext,
   locale: Locale,
 ): ServiceLine[] {
-  const templates: ServiceTemplates = getMessages(locale).domain.services;
+  const messages = getMessages(locale);
+  const templates: ServiceTemplates = messages.domain.services;
+  const titles: Dictionary = messages.services.titles;
   const context = { host: hostName, checkIn: formatTime(checkIn) };
 
   return Object.keys(services)
@@ -223,8 +236,12 @@ export function serviceLines(
       return {
         key,
         icon: SERVICE_ICONS[key] ?? "concierge-bell",
-        sentence: template ? template(context) : humanize(key),
+        title: titles[key] ?? humanize(key),
+        sentence: template ? template(context) : null,
         note: typeof value === "string" ? value : null,
+        fulfilledBy: SEAZONE_SERVICES.has(key)
+          ? ("seazone" as const)
+          : ("host" as const),
       };
     });
 }
@@ -279,6 +296,11 @@ export function phoneDigits(phone: string): string {
 export function formatPhone(phone: string): string {
   const match = /^(\d{2})(\d{2})(\d{4,5})(\d{4})$/.exec(phoneDigits(phone));
   return match ? `+${match[1]} ${match[2]} ${match[3]}-${match[4]}` : phone;
+}
+
+/** "Ana Paula" → "Ana" (a button that says the full name reads formal). */
+export function firstName(name: string): string {
+  return name.trim().split(/\s+/)[0] ?? name;
 }
 
 /** "Ana Paula" → "AP" (avatar fallback when there is no photo). */

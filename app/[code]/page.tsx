@@ -116,9 +116,6 @@ export default async function GuidePage({ params }: PageProps) {
         <ArrivalSection property={property} locale={locale} wifiQr={wifiQr} />
         <RulesSection property={property} locale={locale} />
         <AmenitiesSection property={property} locale={locale} />
-        {hasServices ? (
-          <ServicesSection property={property} locale={locale} />
-        ) : null}
         {guideContent ? (
           <ExperienceSection
             content={guideContent}
@@ -135,6 +132,11 @@ export default async function GuidePage({ params }: PageProps) {
             locale={locale}
           />
         )}
+        {/* the offers land after the guest has read the region guide and is
+            thinking about the stay, right before the contact card */}
+        {hasServices ? (
+          <ServicesSection property={property} locale={locale} />
+        ) : null}
         <HostSection
           hostName={property.host_name}
           hostPhone={property.host_phone}

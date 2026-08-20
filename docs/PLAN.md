@@ -348,6 +348,31 @@ Conventional Commits, small steps, committed as we go.
 - Screenshot review done at 1440 and 390 on `/` and `/FLN001`, plus the dark
   experiences section and the footer.
 
+**E10 — Rules cards & revenue-oriented services** ✅
+- ~~`feat(guide): render stay rules as cards`~~ — the "durante sua estadia"
+  list shared a card with the check-in/check-out times and read as a footnote
+  to them; each rule now gets its own white card in the same grid the
+  amenities use (2 columns, 1 below 880px), with the "Horários" card unchanged
+  beside it. The forbidden-rule slash over the icon stays the only marker:
+  the sentence already says no, so no red/green enters the section.
+- ~~`feat(guide): make services sell`~~ — every service became an offer card:
+  localized title, the sentence as the pitch, the host-authored note verbatim
+  below it, and one CTA button. Host-fulfilled services open WhatsApp with the
+  host (green) and stay extension opens the Seazone line (blue), both with the
+  request already typed — property name and code included, so whoever answers
+  does not have to ask which unit it is. `SEAZONE_WHATSAPP` moved to
+  `lib/domain/seazone.ts`, shared with the 404 that already used the number.
+  The section moved below the AI region guide, right before the contact card
+  (guest reads, gets interested, then finds the button), with the TOC rail and
+  the mobile bar reordered to match; the anchor is still `#servicos`.
+
+  `serviceLines` grew `title` and `fulfilledBy`, and `sentence` is now null for
+  a key the catalog does not know — its humanized title plus the host's note is
+  everything we can honestly show. The chat prompt's services block carries the
+  same title and the same escalation path per line ("Como pedir: fale com
+  {host} pelo WhatsApp" vs "com o time Seazone"), so the assistant pitches the
+  button the page shows instead of sending an extension request to the host.
+
 ## 10. Decisions
 
 Nothing is open here anymore; both entries were open questions at planning time.

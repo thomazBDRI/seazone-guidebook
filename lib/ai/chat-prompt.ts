@@ -108,6 +108,11 @@ function dataBlock(property: Property, locale: Locale): string {
  * Services the host offers on request, plus the instruction that makes the
  * absence of a service answerable: the list is closed, so "early check-in?" on
  * a property that does not offer it gets an honest no instead of a guess.
+ *
+ * Each line carries the same title and the same escalation path the guest sees
+ * on the card's button, so the assistant sells the service instead of
+ * describing it — and never sends the guest to the host for a stay extension
+ * only the Seazone team can price.
  */
 function servicesBlock(property: Property, locale: Locale): string {
   const lines = serviceLines(
@@ -120,12 +125,19 @@ function servicesBlock(property: Property, locale: Locale): string {
     return `Serviços a pedido: este imóvel não oferece nenhum serviço extra. ${CLOSED_LIST_RULE}`;
   }
 
-  const items = lines.map((line) =>
-    line.note ? `- ${line.sentence} (${line.note})` : `- ${line.sentence}`,
-  );
+  const items = lines.map((line) => {
+    const detail = [line.sentence, line.note ? `(${line.note})` : null]
+      .filter(Boolean)
+      .join(" ");
+    const path =
+      line.fulfilledBy === "seazone"
+        ? "fale com o time Seazone pelo WhatsApp, não com o anfitrião"
+        : `fale com ${property.host_name} pelo WhatsApp`;
+    return `- ${line.title}${detail ? ` — ${detail}` : ""} Como pedir: ${path}.`;
+  });
 
   return [
-    `Serviços a pedido — lista completa e fechada. ${CLOSED_LIST_RULE}`,
+    `Serviços a pedido — lista completa e fechada. ${CLOSED_LIST_RULE} Cada serviço abaixo aparece no guia com um botão de contato: quando o hóspede se interessar por um deles, convide-o a pedir e repita o caminho do "Como pedir" daquela linha.`,
     ...items,
   ].join("\n");
 }

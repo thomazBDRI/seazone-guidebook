@@ -140,6 +140,24 @@ const es: Messages = {
     title: "¿Necesitas algo más?",
     description:
       "Acuérdalo directamente con quien cuida el alojamiento — todo sujeto a disponibilidad.",
+    titles: {
+      early_checkin: "Llega más temprano",
+      late_checkout: "Sal más tarde",
+      extend_stay: "Amplía tu estancia",
+      midstay_cleaning: "Limpieza extra",
+      luggage_storage: "Guarda de equipaje",
+      airport_transfer: "Traslado del aeropuerto",
+    },
+    cta: {
+      host: (firstName: string) => `Hablar con ${firstName}`,
+      seazone: "Hablar con Seazone",
+    },
+    prefill: {
+      host: ({ host, property, code, service }) =>
+        `¡Hola ${host}! Estoy en ${property} (${code}) y me gustaría saber sobre: ${service}.`,
+      seazone: ({ property, code }) =>
+        `¡Hola! Estoy en ${property} (${code}) y quiero ampliar mi estancia.`,
+    },
     emergency: {
       title: "Emergencias",
       numbers: "Ambulancia 192 · Bomberos 193 · Policía 190",

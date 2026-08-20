@@ -106,11 +106,26 @@ describe("serviceLines", () => {
       {
         key: "early_checkin",
         icon: "clock",
+        title: "Chegue mais cedo",
         sentence:
           "Quer entrar antes das 15:00? Fale com Ana Paula — sujeito à disponibilidade.",
         note: null,
+        fulfilledBy: "host",
       },
     ]);
+  });
+
+  it("routes only the stay extension to the seazone team", () => {
+    const byKey = Object.fromEntries(
+      lines({ early_checkin: true, extend_stay: true, pet_sitting: true }).map(
+        (line) => [line.key, line.fulfilledBy],
+      ),
+    );
+    expect(byKey).toEqual({
+      early_checkin: "host",
+      extend_stay: "seazone",
+      pet_sitting: "host",
+    });
   });
 
   it("keeps the sentence and carries the row's text as the note", () => {
@@ -143,6 +158,14 @@ describe("serviceLines", () => {
       "luggage",
       "plane",
     ]);
+    expect(all.map((line) => line.title)).toEqual([
+      "Chegue mais cedo",
+      "Saia mais tarde",
+      "Estenda sua estadia",
+      "Limpeza extra",
+      "Guarda de bagagem",
+      "Transfer do aeroporto",
+    ]);
     expect(all.map((line) => line.sentence)).toEqual([
       "Quer entrar antes das 15:00? Fale com Ana Paula — sujeito à disponibilidade.",
       "Precisa sair mais tarde? Combine com Ana Paula — sujeito à disponibilidade.",
@@ -160,8 +183,11 @@ describe("serviceLines", () => {
       {
         key: "pet_sitting",
         icon: "concierge-bell",
-        sentence: "Pet sitting",
+        title: "Pet sitting",
+        // no template to pitch it with: the host-authored note is the offer
+        sentence: null,
         note: "Combinamos com a Bia, R$ 80 a diária",
+        fulfilledBy: "host",
       },
     ]);
     expect(lines({ pet_sitting: true })[0].note).toBeNull();
@@ -220,8 +246,10 @@ describe("serviceLines", () => {
       expect(lines({ pet_sitting: true }, locale)[0]).toEqual({
         key: "pet_sitting",
         icon: "concierge-bell",
-        sentence: "Pet sitting",
+        title: "Pet sitting",
+        sentence: null,
         note: null,
+        fulfilledBy: "host",
       });
     }
   });

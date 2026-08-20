@@ -36,7 +36,7 @@ test.describe("FLN001", () => {
     ).toBeVisible();
   });
 
-  test("renders the services the property offers on request", async ({
+  test("sells the services the property offers on request", async ({
     page,
   }) => {
     const services = page.locator("#servicos");
@@ -47,10 +47,30 @@ test.describe("FLN001", () => {
     // the sentence is composed from the row: services jsonb + check_in_time +
     // host_name, none of them written in the markup
     await expect(
+      services.getByRole("heading", { name: "Chegue mais cedo" }),
+    ).toBeVisible();
+    await expect(
       services.getByText(
         "Quer entrar antes das 15:00? Fale com Ana Paula — sujeito à disponibilidade.",
       ),
     ).toBeVisible();
+
+    // each offer ends on a button, and the extension goes to Seazone rather
+    // than to the host: the prefill carries the property the guest is reading
+    const hostCta = services.getByRole("link", { name: "Falar com Ana" });
+    await expect(hostCta.first()).toBeVisible();
+    expect(await hostCta.first().getAttribute("href")).toContain(
+      encodeURIComponent(
+        "(FLN001) e gostaria de saber sobre: Chegue mais cedo",
+      ),
+    );
+    const seazoneCta = services.getByRole("link", {
+      name: "Falar com a Seazone",
+    });
+    expect(await seazoneCta.getAttribute("href")).toContain(
+      `wa.me/554891234567?text=${encodeURIComponent("Olá! Estou no")}`,
+    );
+
     await expect(
       services.getByText("SAMU 192 · Bombeiros 193 · Polícia 190"),
     ).toBeVisible();

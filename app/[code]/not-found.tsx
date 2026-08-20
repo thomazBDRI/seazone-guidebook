@@ -3,11 +3,9 @@ import { BrandLockup, WhatsAppIcon } from "@/components/guide/brand";
 import { Icon } from "@/components/guide/icon";
 import { LanguageSwitcher } from "@/components/guide/language-switcher";
 import { ActionLink } from "@/components/ui/action-link";
+import { SEAZONE_WHATSAPP } from "@/lib/domain/seazone";
 import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n/server";
-
-/** Seazone's own support line (the guest has no host to reach here). */
-const SUPPORT_WHATSAPP = "554891234567";
 
 /** The code shown as a working example, and the one the CTA links to. */
 const EXAMPLE_CODE = "FLN001";
@@ -56,7 +54,7 @@ export default async function PropertyNotFound() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <ActionLink
-              href={`https://wa.me/${SUPPORT_WHATSAPP}`}
+              href={`https://wa.me/${SEAZONE_WHATSAPP}`}
               target="_blank"
               rel="noopener"
               className="px-6 py-[13px] text-[14.5px] shadow-[0_10px_30px_-8px_hsla(220,100%,50%,.5)] hover:shadow-[0_10px_30px_-8px_hsla(220,100%,50%,.5)]"

@@ -26,7 +26,7 @@ const EnvSchema = z.object({
   OPENROUTER_GUIDE_MODEL: z
     .string()
     .min(1)
-    .default("nvidia/nemotron-3-ultra-550b-a55b:free"),
+    .default("nvidia/nemotron-3-super-120b-a12b:free"),
   /**
    * Chat needs a different profile from guide generation: first token in under
    * a second and no reasoning preamble, since the guest watches it type. The

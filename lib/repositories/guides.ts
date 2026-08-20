@@ -1,17 +1,26 @@
 import "server-only";
 
 import { type GuideRow, GuideRowSchema } from "@/lib/domain/guide";
+import type { Locale } from "@/lib/i18n/locales";
 import { supabase } from "@/lib/supabase/server";
 
-const COLUMNS = "property_id, status, content, model, error, generated_at";
+/**
+ * One guide row per (property, locale): each language is generated once and
+ * persisted on its own, so reading the guide in another language never
+ * rewrites the one already generated.
+ */
+const COLUMNS =
+  "property_id, locale, status, content, model, error, generated_at";
 
 export async function getGuideByPropertyId(
   propertyId: string,
+  locale: Locale,
 ): Promise<GuideRow | null> {
   const { data, error } = await supabase
     .from("experience_guides")
     .select(COLUMNS)
     .eq("property_id", propertyId)
+    .eq("locale", locale)
     .maybeSingle();
 
   if (error) {
@@ -23,16 +32,17 @@ export async function getGuideByPropertyId(
 /**
  * Generation lock: inserts the `pending` row; returns true only for the
  * caller that actually inserted it (concurrent callers get false and should
- * poll). Backed by the primary key on property_id.
+ * poll). Backed by the primary key on (property_id, locale).
  */
 export async function tryAcquireGenerationLock(
   propertyId: string,
+  locale: Locale,
 ): Promise<boolean> {
   const { data, error } = await supabase
     .from("experience_guides")
     .upsert(
-      { property_id: propertyId, status: "pending" },
-      { onConflict: "property_id", ignoreDuplicates: true },
+      { property_id: propertyId, locale, status: "pending" },
+      { onConflict: "property_id,locale", ignoreDuplicates: true },
     )
     .select("property_id");
 
@@ -44,6 +54,7 @@ export async function tryAcquireGenerationLock(
 
 export async function markGuideReady(
   propertyId: string,
+  locale: Locale,
   content: unknown,
   model: string,
 ): Promise<void> {
@@ -57,7 +68,8 @@ export async function markGuideReady(
       generated_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
-    .eq("property_id", propertyId);
+    .eq("property_id", propertyId)
+    .eq("locale", locale);
 
   if (error) {
     throw new Error(`guide save failed: ${error.message}`);
@@ -66,6 +78,7 @@ export async function markGuideReady(
 
 export async function markGuideFailed(
   propertyId: string,
+  locale: Locale,
   message: string,
 ): Promise<void> {
   const { error } = await supabase
@@ -75,7 +88,8 @@ export async function markGuideFailed(
       error: message,
       updated_at: new Date().toISOString(),
     })
-    .eq("property_id", propertyId);
+    .eq("property_id", propertyId)
+    .eq("locale", locale);
 
   if (error) {
     throw new Error(`guide fail-mark failed: ${error.message}`);
@@ -83,11 +97,15 @@ export async function markGuideFailed(
 }
 
 /** Allows a retry after a failed generation (deletes only failed rows). */
-export async function clearFailedGuide(propertyId: string): Promise<void> {
+export async function clearFailedGuide(
+  propertyId: string,
+  locale: Locale,
+): Promise<void> {
   const { error } = await supabase
     .from("experience_guides")
     .delete()
     .eq("property_id", propertyId)
+    .eq("locale", locale)
     .eq("status", "failed");
 
   if (error) {

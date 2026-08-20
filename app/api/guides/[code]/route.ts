@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { generateGuide } from "@/lib/ai/guide-pipeline";
+import { getLocale } from "@/lib/i18n/server";
 import {
   clearFailedGuide,
   getGuideByPropertyId,
@@ -36,28 +37,35 @@ export async function POST(_request: NextRequest, context: Context) {
   const property = await getPropertyByCode(code.data);
   if (!property) return notFound();
 
-  const existing = await getGuideByPropertyId(property.id);
+  // the guide is written in the language the guest is reading the page in;
+  // taken from the cookie server-side, never from the request body
+  const locale = await getLocale();
+
+  const existing = await getGuideByPropertyId(property.id, locale);
   if (existing?.status === "ready") {
     return Response.json({ status: "ready" });
   }
   if (existing?.status === "failed") {
     // let the guest retry a failed generation
-    await clearFailedGuide(property.id);
+    await clearFailedGuide(property.id, locale);
   }
 
-  const acquired = await tryAcquireGenerationLock(property.id);
+  const acquired = await tryAcquireGenerationLock(property.id, locale);
   if (!acquired) {
     return Response.json({ status: "pending" });
   }
 
   try {
     const { content, model } = await generateGuide(property);
-    await markGuideReady(property.id, content, model);
+    await markGuideReady(property.id, locale, content, model);
     return Response.json({ status: "ready" });
   } catch (cause) {
     const message = (cause as Error).message ?? "unknown error";
-    console.error(`guide generation failed for ${property.code}:`, cause);
-    await markGuideFailed(property.id, message.slice(0, 1000));
+    console.error(
+      `guide generation failed for ${property.code} (${locale}):`,
+      cause,
+    );
+    await markGuideFailed(property.id, locale, message.slice(0, 1000));
     // the internal reason stays in the logs and the failed row
     return Response.json(
       { status: "failed", message: "guide generation failed" },
@@ -74,7 +82,7 @@ export async function GET(_request: NextRequest, context: Context) {
   const property = await getPropertyByCode(code.data);
   if (!property) return notFound();
 
-  const guide = await getGuideByPropertyId(property.id);
+  const guide = await getGuideByPropertyId(property.id, await getLocale());
   return Response.json({ status: guide?.status ?? "absent" });
 }
 

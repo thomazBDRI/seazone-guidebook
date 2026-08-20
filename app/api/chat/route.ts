@@ -63,17 +63,16 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "not_found" }, { status: 404 });
   }
 
-  const guide = await getGuideByPropertyId(property.id);
+  // server-side, never a body field: the locale decides both what the
+  // assistant says and which generated guide grounds it
+  const locale = await getLocale();
+  const guide = await getGuideByPropertyId(property.id, locale);
   // an unreadable payload is treated as "no guide yet": the assistant still
   // answers everything that comes from the property row
   const parsed =
     guide?.status === "ready"
       ? GuideContentSchema.safeParse(guide.content)
       : null;
-
-  // server-side, never a body field: the locale decides what the assistant
-  // says, so a client must not be able to set it per request
-  const locale = await getLocale();
 
   const messages = buildChatMessages({
     property,

@@ -4,6 +4,7 @@ import {
   jsonb,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   time,
   timestamp,
@@ -77,23 +78,31 @@ export const guideStatus = pgEnum("guide_status", [
 ]);
 
 /**
- * AI experiences guide: generated once per property on first access and
- * persisted. The `pending` row doubles as the generation lock
- * (insert ... on conflict do nothing — only the winner runs the pipeline).
+ * AI experiences guide: generated once per property and locale on first
+ * access, then persisted. The composite primary key is what makes each
+ * language a guide of its own while keeping "generate only once" true — the
+ * `pending` row doubles as the generation lock (insert ... on conflict do
+ * nothing — only the winner runs the pipeline).
  */
-export const experienceGuides = pgTable("experience_guides", {
-  propertyId: uuid("property_id")
-    .primaryKey()
-    .references(() => properties.id, { onDelete: "cascade" }),
-  status: guideStatus("status").notNull(),
-  content: jsonb("content"),
-  model: text("model"),
-  error: text("error"),
-  generatedAt: timestamp("generated_at", { withTimezone: true }),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-}).enableRLS();
+export const experienceGuides = pgTable(
+  "experience_guides",
+  {
+    propertyId: uuid("property_id")
+      .notNull()
+      .references(() => properties.id, { onDelete: "cascade" }),
+    /** One of lib/i18n LOCALES; rows written before i18n are pt-BR. */
+    locale: text("locale").notNull().default("pt-BR"),
+    status: guideStatus("status").notNull(),
+    content: jsonb("content"),
+    model: text("model"),
+    error: text("error"),
+    generatedAt: timestamp("generated_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [primaryKey({ columns: [table.propertyId, table.locale] })],
+).enableRLS();

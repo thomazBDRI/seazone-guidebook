@@ -9,6 +9,7 @@ const tryAcquireGenerationLock = vi.fn();
 const markGuideReady = vi.fn();
 const markGuideFailed = vi.fn();
 const clearFailedGuide = vi.fn();
+const getLocale = vi.fn();
 
 vi.mock("@/lib/ai/guide-pipeline", () => ({
   generateGuide: (...args: unknown[]) => generateGuide(...args),
@@ -17,6 +18,8 @@ vi.mock("@/lib/ai/guide-pipeline", () => ({
 vi.mock("@/lib/repositories/properties", () => ({
   getPropertyByCode: (...args: unknown[]) => getPropertyByCode(...args),
 }));
+
+vi.mock("@/lib/i18n/server", () => ({ getLocale: () => getLocale() }));
 
 vi.mock("@/lib/repositories/guides", () => ({
   getGuideByPropertyId: (...args: unknown[]) => getGuideByPropertyId(...args),
@@ -40,6 +43,7 @@ async function body(response: Response) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  getLocale.mockResolvedValue("pt-BR");
   getPropertyByCode.mockResolvedValue(fln001);
   getGuideByPropertyId.mockResolvedValue(null);
   tryAcquireGenerationLock.mockResolvedValue(true);
@@ -57,6 +61,7 @@ describe("POST /api/guides/[code]", () => {
     expect(generateGuide).toHaveBeenCalledWith(fln001);
     expect(markGuideReady).toHaveBeenCalledWith(
       fln001.id,
+      "pt-BR",
       GUIDE_CONTENT,
       "test-model",
     );
@@ -87,7 +92,7 @@ describe("POST /api/guides/[code]", () => {
 
     const response = await POST(request, context("FLN001"));
 
-    expect(clearFailedGuide).toHaveBeenCalledWith(fln001.id);
+    expect(clearFailedGuide).toHaveBeenCalledWith(fln001.id, "pt-BR");
     expect(await body(response)).toEqual({ status: "ready" });
     expect(generateGuide).toHaveBeenCalledTimes(1);
   });
@@ -107,7 +112,23 @@ describe("POST /api/guides/[code]", () => {
     });
     expect(markGuideFailed).toHaveBeenCalledWith(
       fln001.id,
+      "pt-BR",
       expect.stringContaining("openrouter returned 429"),
+    );
+  });
+
+  it("keeps each locale as its own guide, lock included", async () => {
+    getLocale.mockResolvedValue("en");
+
+    await POST(request, context("FLN001"));
+
+    expect(getGuideByPropertyId).toHaveBeenCalledWith(fln001.id, "en");
+    expect(tryAcquireGenerationLock).toHaveBeenCalledWith(fln001.id, "en");
+    expect(markGuideReady).toHaveBeenCalledWith(
+      fln001.id,
+      "en",
+      GUIDE_CONTENT,
+      "test-model",
     );
   });
 
@@ -145,6 +166,14 @@ describe("GET /api/guides/[code]", () => {
         status,
       });
     }
+  });
+
+  it("polls the locale the guest is reading in", async () => {
+    getLocale.mockResolvedValue("es");
+
+    await GET(request, context("FLN001"));
+
+    expect(getGuideByPropertyId).toHaveBeenCalledWith(fln001.id, "es");
   });
 
   it("reports absent when there is no row at all", async () => {

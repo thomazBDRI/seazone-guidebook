@@ -60,7 +60,7 @@ export default async function GuidePage({ params }: PageProps) {
   if (!property) notFound();
 
   const messages = getMessages(locale);
-  const guide = await getGuideByPropertyId(property.id);
+  const guide = await getGuideByPropertyId(property.id, locale);
   // an unreadable payload is treated as "not generated yet" rather than
   // crashing the whole guide over one bad column
   const parsedContent =

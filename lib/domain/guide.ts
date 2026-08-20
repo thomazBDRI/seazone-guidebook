@@ -9,6 +9,7 @@ export type GuideStatus = z.infer<typeof GuideStatusSchema>;
  */
 export const GuideRowSchema = z.object({
   property_id: z.uuid(),
+  locale: z.string(),
   status: GuideStatusSchema,
   content: z.unknown().nullable(),
   model: z.string().nullable(),

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { openChat } from "./helpers";
+import { openChat, openGuide } from "./helpers";
 
 /**
  * Phone-only layout checks. The guide is delivered as a link in a booking
@@ -12,7 +12,7 @@ test.describe("mobile layout", () => {
   test("renders the guide with the section bar and a reachable assistant", async ({
     page,
   }, testInfo) => {
-    await page.goto("/FLN001");
+    await openGuide(page, "/FLN001");
 
     await expect(
       page.getByRole("heading", {

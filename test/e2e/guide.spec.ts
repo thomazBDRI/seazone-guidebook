@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { openGuide } from "./helpers";
 
 /**
  * Guide page against the live seeded database (read-only): every value
@@ -7,7 +8,7 @@ import { expect, test } from "@playwright/test";
  */
 test.describe("FLN001", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/FLN001");
+    await openGuide(page, "/FLN001");
   });
 
   test("renders the property identity and arrival data", async ({ page }) => {

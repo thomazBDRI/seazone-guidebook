@@ -1,6 +1,17 @@
 import { expect, type Locator, type Page } from "@playwright/test";
 
 /**
+ * Navigates and asserts the page actually rendered.
+ *
+ * Without the status check, a 500 from the database layer shows up as an
+ * unrelated locator timeout further down the test.
+ */
+export async function openGuide(page: Page, path: string): Promise<void> {
+  const response = await page.goto(path);
+  expect(response?.status(), `${path} did not render`).toBe(200);
+}
+
+/**
  * Opens the chat widget and returns its dialog.
  *
  * The guide page is server-rendered, so the button exists before React has

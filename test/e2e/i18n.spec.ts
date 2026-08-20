@@ -15,7 +15,13 @@ test.describe("language switcher", () => {
     await expect(
       page.getByRole("button", { name: "Tire dúvidas com a IA" }),
     ).toBeVisible();
-    await expect(page.getByText("Chegada & acesso").first()).toBeVisible();
+    // the section heading, not the TOC rail link of the same name: the rail
+    // stays hidden until the hero scrolls past
+    await expect(
+      page
+        .locator("#acesso")
+        .getByRole("heading", { name: "Chegada & acesso" }),
+    ).toBeVisible();
     await expect(
       page.getByText("Não é permitido animais de estimação"),
     ).toBeVisible();
@@ -39,7 +45,11 @@ test.describe("language switcher", () => {
     await expect(
       page.getByRole("button", { name: "Ask the AI assistant" }),
     ).toBeVisible();
-    await expect(page.getByText("Arrival & access").first()).toBeVisible();
+    await expect(
+      page
+        .locator("#acesso")
+        .getByRole("heading", { name: "Arrival & access" }),
+    ).toBeVisible();
     await expect(page.getByText("During your stay")).toBeVisible();
     await expect(page.getByText("Pets are not allowed")).toBeVisible();
     await expect(
@@ -69,7 +79,11 @@ test.describe("language switcher", () => {
 
     await openGuide(page, "/FLN001");
     await expect(page.locator("html")).toHaveAttribute("lang", "es");
-    await expect(page.getByText("Llegada y acceso").first()).toBeVisible();
+    await expect(
+      page
+        .locator("#acesso")
+        .getByRole("heading", { name: "Llegada y acceso" }),
+    ).toBeVisible();
     await expect(page.getByText("No se admiten mascotas")).toBeVisible();
 
     const response = await page.goto("/XYZ999");

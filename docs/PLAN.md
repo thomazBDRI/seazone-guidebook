@@ -290,6 +290,30 @@ Conventional Commits, small steps, committed as we go.
     (the Hobby ceiling) and no `next/image` remote host is needed, since photo
     URLs come from the database. Recorded in the README's Deploy section.
 
+**E8 — Guest services & catalog depth**
+- `feat(db): add guest services to properties` — data-driven `services` jsonb
+  (early check-in / late check-out arranged with the host, extend-stay discount
+  via the Seazone team, mid-stay cleaning, luggage storage, airport transfer)
+  rendered through a dictionary like amenities, host name interpolated.
+- `feat(guide): add services section` — localized "Precisa de algo?" section
+  with an emergency-numbers row (SAMU 192 · Bombeiros 193 · Polícia 190);
+  services also enter the chat data block so the assistant answers them —
+  including honestly stating when a service is not offered.
+- `feat(db): seed six properties with varied coverage` — four new units with
+  real geocodable addresses (beachfront casa in Bombinhas, studio without
+  parking in Balneário Camboriú, cabana in Praia do Rosa, doorman apartamento
+  in Jurerê) exercising every conditional path; the home index and lazy
+  per-locale guides pick new rows up with no code changes.
+
+**E9 — Brand alignment pass**
+- `feat(ui): adopt the real seazone logo` (topbar, footer, favicon).
+- `refactor(ui): replace glass surfaces with solid components` — essentials
+  strip, hero secondary CTA and dark-section chips move to solid surfaces in
+  the brand language; topbar and left rail stay as they are.
+- `fix(ui): unify ai entry points on coral` — the chat FAB matches the hero
+  CTA so the assistant has one recognizable color.
+- Screenshot review (desktop + 390px) before delivery.
+
 ## 10. Decisions
 
 Nothing is open here anymore; both entries were open questions at planning time.

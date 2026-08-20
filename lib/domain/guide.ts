@@ -17,3 +17,28 @@ export const GuideRowSchema = z.object({
 });
 
 export type GuideRow = z.infer<typeof GuideRowSchema>;
+
+const PlaceSchema = z.object({
+  name: z.string(),
+  distance: z.string(),
+  description: z.string(),
+});
+
+/** Guide payload the experiences section renders (parsed, never trusted). */
+export const GuideContentSchema = z.object({
+  welcome_message: z.string(),
+  restaurants: z.array(PlaceSchema),
+  attractions: z.array(PlaceSchema),
+  essentials: z.array(
+    z.object({
+      name: z.string(),
+      type: z.string(),
+      distance: z.string(),
+      description: z.string(),
+    }),
+  ),
+  seasonal_tip: z.string(),
+});
+
+export type GuideContent = z.infer<typeof GuideContentSchema>;
+export type GuidePlace = z.infer<typeof PlaceSchema>;

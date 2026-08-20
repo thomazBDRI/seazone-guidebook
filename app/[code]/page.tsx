@@ -4,6 +4,10 @@ import QRCode from "qrcode";
 import { cache } from "react";
 import { AmenitiesSection } from "@/components/guide/amenities-section";
 import { ArrivalSection } from "@/components/guide/arrival-section";
+import {
+  ExperienceSection,
+  ExperienceSkeleton,
+} from "@/components/guide/experience-section";
 import { Hero } from "@/components/guide/hero";
 import { RulesSection } from "@/components/guide/rules-section";
 import { SiteFooter } from "@/components/guide/site-footer";
@@ -14,7 +18,9 @@ import {
   locationLine,
   phoneDigits,
 } from "@/lib/domain/display";
+import { GuideContentSchema } from "@/lib/domain/guide";
 import { wifiQrPayload } from "@/lib/domain/wifi";
+import { getGuideByPropertyId } from "@/lib/repositories/guides";
 import { getPropertyByCode } from "@/lib/repositories/properties";
 
 /** Deduplicates the lookup between generateMetadata and the page render. */
@@ -49,6 +55,15 @@ export default async function GuidePage({ params }: PageProps) {
   const property = await loadProperty(code);
   if (!property) notFound();
 
+  const guide = await getGuideByPropertyId(property.id);
+  // an unreadable payload is treated as "not generated yet" rather than
+  // crashing the whole guide over one bad column
+  const parsedContent =
+    guide?.status === "ready"
+      ? GuideContentSchema.safeParse(guide.content)
+      : null;
+  const guideContent = parsedContent?.success ? parsedContent.data : null;
+
   // generated here (not in the browser) so the password never travels twice
   const wifiQr =
     property.wifi_network && property.wifi_password
@@ -79,6 +94,19 @@ export default async function GuidePage({ params }: PageProps) {
         <ArrivalSection property={property} wifiQr={wifiQr} />
         <RulesSection property={property} />
         <AmenitiesSection property={property} />
+        {guideContent ? (
+          <ExperienceSection
+            content={guideContent}
+            neighborhood={property.neighborhood}
+            city={property.city}
+            generatedAt={guide?.generated_at ?? null}
+          />
+        ) : (
+          <ExperienceSkeleton
+            neighborhood={property.neighborhood}
+            city={property.city}
+          />
+        )}
       </main>
       <SiteFooter />
     </>

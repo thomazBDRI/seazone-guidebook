@@ -372,6 +372,21 @@ Conventional Commits, small steps, committed as we go.
   same title and the same escalation path per line ("Como pedir: fale com
   {host} pelo WhatsApp" vs "com o time Seazone"), so the assistant pitches the
   button the page shows instead of sending an extension request to the host.
+- ~~`feat(guide): close the services section on direct booking`~~ — the
+  emergency strip left the section (UI, all three catalogs and the prompt's
+  emergency line): the section is pure revenue now, and "problem in the
+  property → talk to the host" survives as chat behaviour through the generic
+  unknown-data fallback, which already routes the guest to the host. In its
+  place a full-width closing card, always rendered with the section and read
+  from the catalogs rather than from the property row, sells the next stay at
+  seazone.com.br — the guest hits it right after reading everything the current
+  stay can still give them. `servicesBlock` gained the matching rule, marked
+  explicitly as outside the closed list so it does not weaken the honest "not
+  offered" answers, and forbidding invented prices or availability.
+
+  `luggage_storage` was rewritten: "Check-out cedo demais?" sold an early
+  checkout, which is a different (unoffered) product — it now opens on the late
+  flight the service actually solves.
 
 ## 10. Decisions
 

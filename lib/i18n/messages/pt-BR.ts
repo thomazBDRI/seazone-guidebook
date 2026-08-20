@@ -183,11 +183,11 @@ const ptBR = {
       seazone: ({ property, code }: { property: string; code: string }) =>
         `Olá! Estou no ${property} (${code}) e quero estender minha estadia.`,
     },
-    emergency: {
-      title: "Emergências",
-      numbers: "SAMU 192 · Bombeiros 193 · Polícia 190",
-      note: (hostName: string) =>
-        `Para problemas no imóvel — vazamento, falta de energia, fechadura travada — fale primeiro com ${hostName}.`,
+    /** Closes the section: the guest is already in a buying mood here. */
+    directBooking: {
+      title: "Já pensando na próxima viagem?",
+      body: "Reserve direto com a Seazone e garanta condições exclusivas na sua próxima estadia.",
+      cta: "Reservar na Seazone",
     },
   },
 
@@ -301,7 +301,7 @@ const ptBR = {
       midstay_cleaning: ({ host }: { host: string }) =>
         `Limpeza extra durante a estadia? Peça a ${host}.`,
       luggage_storage: ({ host }: { host: string }) =>
-        `Check-out cedo demais? Pergunte a ${host} sobre guarda de bagagem.`,
+        `Voo só de noite? Deixe as malas guardadas com ${host} e aproveite o dia.`,
       airport_transfer: ({ host }: { host: string }) =>
         `Transfer do aeroporto: consulte ${host} sobre valores e horários.`,
     },

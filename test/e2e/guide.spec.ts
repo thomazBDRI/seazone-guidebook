@@ -71,9 +71,11 @@ test.describe("FLN001", () => {
       `wa.me/554891234567?text=${encodeURIComponent("Olá! Estou no")}`,
     );
 
-    await expect(
-      services.getByText("SAMU 192 · Bombeiros 193 · Polícia 190"),
-    ).toBeVisible();
+    // the section closes on the next booking instead of on emergency numbers
+    const booking = services.getByRole("link", { name: "Reservar na Seazone" });
+    await expect(booking).toBeVisible();
+    expect(await booking.getAttribute("href")).toBe("https://seazone.com.br");
+    await expect(services.getByText("SAMU", { exact: false })).toHaveCount(0);
   });
 
   test("renders the persisted experiences guide", async ({ page }) => {

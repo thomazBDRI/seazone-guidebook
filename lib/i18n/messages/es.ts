@@ -158,11 +158,10 @@ const es: Messages = {
       seazone: ({ property, code }) =>
         `¡Hola! Estoy en ${property} (${code}) y quiero ampliar mi estancia.`,
     },
-    emergency: {
-      title: "Emergencias",
-      numbers: "Ambulancia 192 · Bomberos 193 · Policía 190",
-      note: (hostName: string) =>
-        `Para problemas en el alojamiento — una fuga, un corte de luz, una cerradura atascada — habla primero con ${hostName}.`,
+    directBooking: {
+      title: "¿Ya pensando en el próximo viaje?",
+      body: "Reserva directo con Seazone y consigue condiciones exclusivas en tu próxima estancia.",
+      cta: "Reservar con Seazone",
     },
   },
 
@@ -270,7 +269,7 @@ const es: Messages = {
       midstay_cleaning: ({ host }) =>
         `¿Limpieza extra durante la estancia? Pídesela a ${host}.`,
       luggage_storage: ({ host }) =>
-        `¿Sales demasiado temprano? Pregúntale a ${host} por la guarda de equipaje.`,
+        `¿Vuelo de noche? Deja las maletas con ${host} y aprovecha el día.`,
       airport_transfer: ({ host }) =>
         `Traslado del aeropuerto: consulta precios y horarios con ${host}.`,
     },

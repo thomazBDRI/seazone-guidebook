@@ -12,7 +12,6 @@ import {
 } from "@/lib/domain/display";
 import type { GuideContent } from "@/lib/domain/guide";
 import type { Property } from "@/lib/domain/property";
-import { getMessages } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
 
 /**
@@ -97,7 +96,6 @@ function dataBlock(property: Property, locale: Locale): string {
       .map((amenity) => amenity.label)
       .join(", ")}`,
     servicesBlock(property, locale),
-    emergencyLine(property, locale),
     `Anfitrião(ã) responsável: ${property.host_name} — WhatsApp ${formatPhone(property.host_phone)}`,
   ].filter((line): line is string => line !== null);
 
@@ -122,7 +120,7 @@ function servicesBlock(property: Property, locale: Locale): string {
   );
 
   if (lines.length === 0) {
-    return `Serviços a pedido: este imóvel não oferece nenhum serviço extra. ${CLOSED_LIST_RULE}`;
+    return `Serviços a pedido: este imóvel não oferece nenhum serviço extra. ${CLOSED_LIST_RULE}\n${DIRECT_BOOKING_RULE}`;
   }
 
   const items = lines.map((line) => {
@@ -139,6 +137,7 @@ function servicesBlock(property: Property, locale: Locale): string {
   return [
     `Serviços a pedido — lista completa e fechada. ${CLOSED_LIST_RULE} Cada serviço abaixo aparece no guia com um botão de contato: quando o hóspede se interessar por um deles, convide-o a pedir e repita o caminho do "Como pedir" daquela linha.`,
     ...items,
+    DIRECT_BOOKING_RULE,
   ].join("\n");
 }
 
@@ -151,10 +150,14 @@ function servicesBlock(property: Property, locale: Locale): string {
 const CLOSED_LIST_RULE =
   "Qualquer serviço que não apareça na lista abaixo NÃO é oferecido neste imóvel — inclusive early check-in, late check-out, extensão da estadia, limpeza durante a estadia, guarda de bagagem e transfer. Se o hóspede pedir um deles, responda que esse serviço não está disponível neste imóvel e que ele pode confirmar com o anfitrião; não diga que faltam informações e nunca prometa o que não está listado.";
 
-function emergencyLine(property: Property, locale: Locale): string {
-  const emergency = getMessages(locale).services.emergency;
-  return `Emergências: ${emergency.numbers}. ${emergency.note(property.host_name)}`;
-}
+/**
+ * The one offer that is not per-property: booking the next stay. It sits with
+ * the services because it answers the same kind of question, and the guide
+ * closes on the same pitch — but it is not part of the closed list above, so
+ * it says so explicitly instead of leaning on that rule.
+ */
+const DIRECT_BOOKING_RULE =
+  "Reserva direta (vale para qualquer imóvel, não faz parte da lista fechada acima): se o hóspede falar de voltar, de uma próxima viagem, de estender para outra data, de indicar a Seazone ou de reservar de novo, convide-o a reservar direto com a Seazone em seazone.com.br, onde há condições exclusivas. Nunca invente preços, descontos, datas ou disponibilidade.";
 
 function parkingLine(property: Property): string {
   if (!property.has_parking_spot)

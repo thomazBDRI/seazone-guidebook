@@ -64,13 +64,17 @@ describe("message catalogs", () => {
     }
   });
 
-  it("keeps the emergency numbers identical in every locale", () => {
+  it("pitches the next booking in every locale", () => {
     for (const locale of LOCALES) {
-      const { numbers, note } = getMessages(locale).services.emergency;
-      // the words around them translate; 192/193/190 are what you dial
-      expect(numbers).toMatch(/192.+193.+190/);
-      expect(note("Ana Paula")).toContain("Ana Paula");
+      const { directBooking } = getMessages(locale).services;
+      // the closing card is always rendered, so a locale without its own copy
+      // would sell the next stay in Portuguese
+      expect(directBooking.cta).toContain("Seazone");
+      expect(directBooking.body.length).toBeGreaterThan(20);
     }
+    expect(getMessages("en").services.directBooking.title).toBe(
+      "Already thinking about the next trip?",
+    );
   });
 
   it("interpolates and pluralizes per language", () => {

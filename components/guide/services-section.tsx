@@ -5,7 +5,7 @@ import { ActionLink } from "@/components/ui/action-link";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { firstName, phoneDigits, serviceLines } from "@/lib/domain/display";
 import type { Property } from "@/lib/domain/property";
-import { SEAZONE_WHATSAPP } from "@/lib/domain/seazone";
+import { SEAZONE_WEBSITE, SEAZONE_WHATSAPP } from "@/lib/domain/seazone";
 import { getMessages } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
 
@@ -15,8 +15,8 @@ type ServicesSectionProps = { property: Property; locale: Locale };
  * What the guest can ask for on top of the booking — every card is an offer
  * with one button, because a service nobody knows how to request is revenue
  * left on the table. The cards come from the property's `services` column; the
- * emergency strip below them is the same for every stay and lives in the
- * catalogs, not in the database.
+ * direct-booking card that closes the section is the same for every stay and
+ * lives in the catalogs, not in the database.
  *
  * Rendered only when the property offers at least one service — see
  * `hasServices` on the guide page, which also decides the TOC entry.
@@ -107,17 +107,31 @@ export function ServicesSection({ property, locale }: ServicesSectionProps) {
         })}
       </div>
 
-      <div className="mt-3 flex items-start gap-[13px] rounded-lg border border-border bg-sea-mist px-[18px] py-4">
-        <Icon
-          name="circle-alert"
-          className="mt-px size-[19px] flex-none text-slate-icon"
-        />
-        <p className="text-[13px] leading-snug text-muted-foreground">
-          <b className="font-bold text-foreground">
-            {messages.emergency.title}: {messages.emergency.numbers}
-          </b>{" "}
-          — {messages.emergency.note(property.host_name)}
-        </p>
+      {/* the guest reaches this after reading what the stay can still give
+          them, which is the cheapest moment to sell the next booking */}
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-primary/25 bg-sea-light px-[22px] py-5">
+        <div className="flex items-center gap-[15px]">
+          <span className="grid size-11 flex-none place-items-center rounded-[12px] bg-navy text-white">
+            <Icon name="calendar-check" className="size-[21px]" />
+          </span>
+          <div>
+            <h3 className="text-[17px] font-bold tracking-[-.01em]">
+              {messages.directBooking.title}
+            </h3>
+            <p className="mt-0.5 max-w-[52ch] text-[13.5px] leading-snug text-muted-foreground">
+              {messages.directBooking.body}
+            </p>
+          </div>
+        </div>
+        <ActionLink
+          href={SEAZONE_WEBSITE}
+          target="_blank"
+          rel="noopener"
+          className="px-6 max-[560px]:w-full"
+        >
+          {messages.directBooking.cta}
+          <Icon name="arrow-right" />
+        </ActionLink>
       </div>
     </GuideSection>
   );

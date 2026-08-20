@@ -18,7 +18,9 @@ describe("ServicesSection", () => {
     expect(html).toContain(
       "Quer entrar antes das 15:00? Fale com Ana Paula — sujeito à disponibilidade.",
     );
-    expect(html).toContain("Check-out cedo demais? Pergunte a Ana Paula");
+    expect(html).toContain(
+      "Voo só de noite? Deixe as malas guardadas com Ana Paula",
+    );
     // not offered by FLN001, so it has no card
     expect(html).not.toContain("Precisa sair mais tarde");
     expect(html).not.toContain("Saia mais tarde");
@@ -55,14 +57,24 @@ describe("ServicesSection", () => {
     );
   });
 
-  it("closes with the emergency numbers and who to call about the property", () => {
-    const html = render(fln001);
+  it("closes on the direct-booking card, whatever the property offers", () => {
+    for (const property of [fln001, grm001]) {
+      const html = render(property);
 
-    expect(html).toContain("SAMU 192 · Bombeiros 193 · Polícia 190");
-    expect(html).toContain("fale primeiro com Ana Paula");
+      expect(html).toContain("Já pensando na próxima viagem?");
+      expect(html).toContain('href="https://seazone.com.br"');
+      expect(html).toContain("Reservar na Seazone");
+    }
   });
 
-  it("localizes the heading, the offers, the buttons and the emergency row", () => {
+  it("leaves the emergency numbers out: the section only sells now", () => {
+    const html = render(fln001);
+
+    expect(html).not.toContain("SAMU");
+    expect(html).not.toContain("192");
+  });
+
+  it("localizes the heading, the offers, the buttons and the closing card", () => {
     const english = render(fln001, "en");
     expect(english).toContain("Need anything else?");
     expect(english).toContain("Arrive earlier");
@@ -71,13 +83,13 @@ describe("ServicesSection", () => {
     expect(english).toContain("Message Seazone");
     // the prefill travels url-encoded (the apostrophe is html-escaped too)
     expect(english).toContain(encodeURIComponent("extend my stay."));
-    expect(english).toContain("Ambulance 192 · Fire 193 · Police 190");
+    expect(english).toContain("Book with Seazone");
 
     const spanish = render(fln001, "es");
     expect(spanish).toContain("¿Necesitas algo más?");
     expect(spanish).toContain("Llega más temprano");
     expect(spanish).toContain("¿Quieres entrar antes de las 15:00?");
     expect(spanish).toContain("Hablar con Ana");
-    expect(spanish).toContain("Ambulancia 192 · Bomberos 193 · Policía 190");
+    expect(spanish).toContain("Reservar con Seazone");
   });
 });

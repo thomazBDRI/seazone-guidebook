@@ -112,7 +112,7 @@ describe("buildChatMessages", () => {
     const prompt = systemPrompt();
 
     expect(prompt).toContain("Quer entrar antes das 15:00? Fale com Ana Paula");
-    expect(prompt).toContain("Check-out cedo demais? Pergunte a Ana Paula");
+    expect(prompt).toContain("Voo só de noite? Deixe as malas guardadas");
     expect(prompt).toContain("desconto nas diárias adicionais");
 
     const gramado = systemPrompt(grm001);
@@ -174,14 +174,19 @@ describe("buildChatMessages", () => {
     ).toContain("não oferece nenhum serviço extra");
   });
 
-  it("carries the emergency numbers and who to call about the property", () => {
-    const prompt = systemPrompt();
+  it("pitches booking direct for a next stay, whatever the property offers", () => {
+    for (const services of [fln001.services, {}]) {
+      const prompt = systemPrompt({ ...fln001, services });
+      expect(prompt).toContain("seazone.com.br");
+      expect(prompt).toMatch(/não faz parte da lista fechada acima/);
+      expect(prompt).toMatch(/Nunca invente preços, descontos, datas/);
+    }
+  });
 
-    expect(prompt).toContain("SAMU 192 · Bombeiros 193 · Polícia 190");
-    expect(prompt).toMatch(/fale primeiro com Ana Paula/);
-
+  it("grounds the services in the language the guest is reading", () => {
     const english = systemPrompt(fln001, guide, ask("hi"), "en");
-    expect(english).toContain("Ambulance 192 · Fire 193 · Police 190");
+
+    expect(english).toContain("Arrive earlier");
     expect(english).toContain("Want to get in before 15:00? Ask Ana Paula");
   });
 

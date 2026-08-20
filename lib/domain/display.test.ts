@@ -171,7 +171,7 @@ describe("serviceLines", () => {
       "Precisa sair mais tarde? Combine com Ana Paula — sujeito à disponibilidade.",
       "Quer ficar mais dias? Fale com o time Seazone e ganhe desconto nas diárias adicionais.",
       "Limpeza extra durante a estadia? Peça a Ana Paula.",
-      "Check-out cedo demais? Pergunte a Ana Paula sobre guarda de bagagem.",
+      "Voo só de noite? Deixe as malas guardadas com Ana Paula e aproveite o dia.",
       "Transfer do aeroporto: consulte Ana Paula sobre valores e horários.",
     ]);
   });

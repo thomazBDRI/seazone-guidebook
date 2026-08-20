@@ -6,3 +6,6 @@
  * booked by the Seazone team rather than arranged with the host.
  */
 export const SEAZONE_WHATSAPP = "554891234567";
+
+/** Where a guest books the next stay without an intermediary taking a cut. */
+export const SEAZONE_WEBSITE = "https://seazone.com.br";

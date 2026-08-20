@@ -73,7 +73,7 @@ export default async function GuidePage({ params }: PageProps) {
   const guideContent = parsedContent?.success ? parsedContent.data : null;
 
   // a property that offers nothing on request skips the section entirely,
-  // emergency row included, rather than shipping a heading with one card
+  // direct-booking card included, rather than shipping a heading and a CTA
   const hasServices =
     serviceLines(
       property.services,

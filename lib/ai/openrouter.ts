@@ -3,7 +3,7 @@ import "server-only";
 import { createSseDeltaParser } from "@/lib/ai/stream";
 import { env } from "@/lib/env";
 
-const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
+const ENDPOINT = `${env.OPENROUTER_BASE_URL.replace(/\/+$/, "")}/chat/completions`;
 const DEFAULT_TIMEOUT_MS = 45_000;
 /** Stays under the chat route's 60s maxDuration. */
 const DEFAULT_STREAM_TIMEOUT_MS = 50_000;

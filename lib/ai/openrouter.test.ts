@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/env", () => ({
   env: {
     OPENROUTER_API_KEY: "test-key",
+    OPENROUTER_BASE_URL: "https://openrouter.ai/api/v1",
     OPENROUTER_GUIDE_MODEL: "test/default-model:free",
   },
 }));

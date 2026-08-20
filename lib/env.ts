@@ -13,6 +13,15 @@ const EnvSchema = z.object({
   SUPABASE_URL: z.url(),
   SUPABASE_SECRET_KEY: z.string().min(1),
   OPENROUTER_API_KEY: z.string().min(1),
+  /**
+   * Points the client at a different OpenAI-compatible host. Only the E2E
+   * suite uses it, pointing at a local stub so tests never depend on a live
+   * model — production leaves it unset.
+   */
+  OPENROUTER_BASE_URL: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.url().default("https://openrouter.ai/api/v1"),
+  ),
   /** Swappable so a rate-limited free model can be replaced without a deploy. */
   OPENROUTER_GUIDE_MODEL: z
     .string()
@@ -34,6 +43,7 @@ export const env = EnvSchema.parse({
   SUPABASE_URL: process.env.SUPABASE_URL,
   SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY,
   OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+  OPENROUTER_BASE_URL: process.env.OPENROUTER_BASE_URL,
   OPENROUTER_GUIDE_MODEL: process.env.OPENROUTER_GUIDE_MODEL,
   OPENROUTER_CHAT_MODEL: process.env.OPENROUTER_CHAT_MODEL,
 });

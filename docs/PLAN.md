@@ -246,18 +246,35 @@ Conventional Commits, small steps, committed as we go.
 30. ~~`ci: add e2e job with artifact upload`~~
 31. ~~`ci: add ai reviewer job over diff and e2e artifacts`~~
 
-**E6.5 — i18n (pt-BR / en / es)**
-- `feat(i18n): extract ui strings to locale dictionaries` — no hardcoded
-  strings in components; typed message catalog (pt-BR is the source of truth),
-  locale resolved from a cookie with pt-BR default.
-- `feat(i18n): localize domain dictionaries` — rule sentences, amenity labels,
-  access types and date/phone formatting per locale.
-- `feat(i18n): add language switcher (PT · EN · ES)` — in the topbar, like the
-  reference site.
-- `feat(i18n): localize ai content per locale` — chat answers in the active
-  language (prompt instruction); experience guides become per-locale rows
-  (extend experience_guides PK to (property_id, locale)) so each language is
-  still generated only once and persisted.
+**E6.5 — i18n (pt-BR / en / es)** ✅
+- ~~`feat(i18n): add typed locale catalogs and cookie-based locale`~~ — the
+  pt-BR catalog defines the `Messages` type en and es are checked against, so a
+  missing translation is a build error; the locale is a first-party cookie
+  (pt-BR default) read server-side, never a segment in the URL — a guest gets
+  one link and it has to keep working in any language.
+- ~~`feat(i18n): localize domain dictionaries`~~ — rule sentences, amenity
+  labels, access types and the essentials type tag per locale. Times, phones
+  and addresses take no locale: they read the same in every language.
+- ~~`feat(i18n): extract component strings to catalogs`~~ — no guest-facing
+  string left inline. Client components take a `locale` prop and resolve their
+  own messages: catalog entries are functions, and functions cannot cross the
+  server/client boundary as props.
+- ~~`feat(i18n): add language switcher to the topbar`~~ — the mockup's
+  decorative "PT · EN · ES", now writing the cookie through a zod-validated
+  POST /api/locale and refreshing the route. Also on the 404 header.
+- ~~`feat(db): store experience guides per locale`~~ — `locale` column and a
+  (property_id, locale) primary key, so each language is generated once and
+  persisted on its own; the pending-row lock is unchanged, just per locale.
+  The generated SQL needed hand-ordering (drizzle-kit emits the composite key
+  before the column and cannot name the constraint it drops).
+- ~~`feat(i18n): localize guide generation and chat`~~ — the guide is written
+  in the language it is stored under, and the assistant answers in the language
+  the guest is reading while still mirroring a guest who writes in another. The
+  prompts stay authored in Portuguese with only the target language
+  parameterized: one set of guardrails to review instead of three translations.
+  The essentials `type` keeps its Portuguese schema literals — it is data,
+  translated at display time.
+- ~~`test(i18n): cover catalogs, dictionaries and locale switching`~~
 
 **E7 — Polish & delivery**
 32. ~~`docs: add readme with architecture and decisions (pt-br)`~~

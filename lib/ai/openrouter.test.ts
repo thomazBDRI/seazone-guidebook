@@ -8,7 +8,7 @@ vi.mock("@/lib/env", () => ({
   },
 }));
 
-const { createCompletion, OpenRouterError } = await import(
+const { createCompletion, OpenRouterError, streamCompletion } = await import(
   "@/lib/ai/openrouter"
 );
 
@@ -169,5 +169,92 @@ describe("createCompletion", () => {
     await expect(
       createCompletion({ messages: MESSAGES }),
     ).rejects.toBeInstanceOf(OpenRouterError);
+  });
+});
+
+/** Serves the given SSE chunks as a streamed body. */
+function streamWith(chunks: string[], status = 200) {
+  const encoder = new TextEncoder();
+  const fetchMock = vi.fn().mockResolvedValue({
+    ok: status >= 200 && status < 300,
+    status,
+    text: async () => chunks.join(""),
+    body: new ReadableStream<Uint8Array>({
+      start(controller) {
+        for (const chunk of chunks) controller.enqueue(encoder.encode(chunk));
+        controller.close();
+      },
+    }),
+  });
+  vi.stubGlobal("fetch", fetchMock);
+  return fetchMock;
+}
+
+function frame(content: string) {
+  return `data: ${JSON.stringify({ choices: [{ delta: { content } }] })}\n\n`;
+}
+
+async function collect(deltas: AsyncGenerator<string>) {
+  const received: string[] = [];
+  for await (const delta of deltas) received.push(delta);
+  return received;
+}
+
+describe("streamCompletion", () => {
+  it("yields the content deltas as they arrive", async () => {
+    streamWith([
+      frame("A senha "),
+      frame("é floripa2024."),
+      "data: [DONE]\n\n",
+    ]);
+
+    const { deltas } = await streamCompletion({ messages: MESSAGES });
+
+    await expect(collect(deltas)).resolves.toEqual([
+      "A senha ",
+      "é floripa2024.",
+    ]);
+  });
+
+  it("asks for a stream, and for reasoning it never shows the guest", async () => {
+    const fetchMock = streamWith([frame("ok")]);
+
+    await streamCompletion({ messages: MESSAGES, model: "test/chat:free" });
+
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(body.stream).toBe(true);
+    expect(body.model).toBe("test/chat:free");
+    expect(body.reasoning).toEqual({ effort: "low", exclude: true });
+    expect(body.messages).toEqual(MESSAGES);
+  });
+
+  it("fails before any token when the upstream rejects the request", async () => {
+    streamWith(["quota exhausted"], 429);
+
+    await expect(
+      streamCompletion({ messages: MESSAGES }),
+    ).rejects.toMatchObject({ kind: "http", status: 429 });
+  });
+
+  it("fails mid-stream when an error frame arrives inside a 200", async () => {
+    streamWith([
+      frame("A senha "),
+      'data: {"error":{"message":"provider dropped"}}\n\n',
+    ]);
+
+    const { deltas } = await streamCompletion({ messages: MESSAGES });
+
+    await expect(collect(deltas)).rejects.toMatchObject({
+      kind: "http",
+      message: expect.stringContaining("provider dropped"),
+    });
+  });
+
+  it("ends without deltas when the model answers nothing", async () => {
+    streamWith(["data: [DONE]\n\n"]);
+
+    const { deltas } = await streamCompletion({ messages: MESSAGES });
+
+    await expect(collect(deltas)).resolves.toEqual([]);
   });
 });

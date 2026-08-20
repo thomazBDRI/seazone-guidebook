@@ -44,14 +44,6 @@ export async function generateMetadata({
   };
 }
 
-/**
- * Every part of the page comes from the property row, so there is no static
- * shell worth streaming — and a partially prerendered shell would flush a 200
- * before `notFound()` runs, which would answer unknown codes with the wrong
- * status. Blocking keeps the response honest.
- */
-export const instant = false;
-
 export default async function GuidePage({ params }: PageProps) {
   const { code } = await params;
   const property = await loadProperty(code);

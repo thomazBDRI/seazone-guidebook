@@ -149,7 +149,7 @@ function GenerationFailure({
       <button
         type="button"
         onClick={onRetry}
-        className="inline-flex flex-none items-center gap-2 rounded-full border border-white/[.38] bg-white/10 px-[15px] py-2 text-[13px] font-semibold text-white transition-colors hover:border-white hover:bg-white hover:text-navy"
+        className="inline-flex flex-none items-center gap-2 rounded-full border border-transparent bg-gradient-warm px-[15px] py-2 text-[13px] font-semibold text-white transition-[transform,box-shadow] hover:-translate-y-px hover:shadow-[0_10px_26px_-8px_hsla(2,80%,50%,.7)]"
       >
         <Icon name="rotate-cw" className="size-[14px]" />
         {messages.retry}

@@ -231,11 +231,11 @@ export function ChatWidget({
         type="button"
         onClick={() => setOpen((current) => !current)}
         aria-label={open ? messages.closeLauncher : messages.openLauncher}
-        className="fixed bottom-5 right-5 z-[60] grid size-[60px] place-items-center rounded-full bg-gradient-sea text-white shadow-[0_10px_30px_-6px_hsla(220,100%,40%,.55)] transition-transform hover:scale-[1.06]"
+        className="fixed bottom-5 right-5 z-[60] grid size-[60px] place-items-center rounded-full bg-gradient-warm text-white shadow-[0_10px_30px_-6px_hsla(2,80%,50%,.6)] transition-transform hover:scale-[1.06]"
       >
         <Icon name={open ? "x" : "message-circle"} className="size-[26px]" />
         {open ? null : (
-          <span className="absolute right-0.5 top-0.5 size-[14px] rounded-full border-[2.5px] border-white bg-coral" />
+          <span className="absolute right-0.5 top-0.5 size-[14px] rounded-full border-[2.5px] border-white bg-navy" />
         )}
       </button>
     </>

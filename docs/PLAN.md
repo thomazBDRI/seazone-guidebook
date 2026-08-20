@@ -322,14 +322,31 @@ Conventional Commits, small steps, committed as we go.
   "Comodidades" (already used in `home.subtitle`) and a test asserts the two
   TOC labels differ in every locale.
 
-**E9 — Brand alignment pass**
-- `feat(ui): adopt the real seazone logo` (topbar, footer, favicon).
-- `refactor(ui): replace glass surfaces with solid components` — essentials
-  strip, hero secondary CTA and dark-section chips move to solid surfaces in
-  the brand language; topbar and left rail stay as they are.
-- `fix(ui): unify ai entry points on coral` — the chat FAB matches the hero
-  CTA so the assistant has one recognizable color.
-- Screenshot review (desktop + 390px) before delivery.
+**E9 — Brand alignment pass** ✅
+- ~~`feat(ui): adopt the real seazone logo`~~ — the published wordmark
+  (`seazone.com.br/logo.svg`) replaces the hand-drawn wave in the topbar, the
+  home header, the 404 header and the footer. Letter paths trade their
+  hardcoded navy for `currentColor`, so one asset serves white-on-navy and
+  navy-on-light; the house-shaped "a" keeps the brand coral, which holds on
+  both. The brand name stopped being markup text and became a catalog string,
+  used as the mark's accessible label. `app/icon.svg` is that house glyph on a
+  navy tile and `/favicon.ico` is Seazone's own icon, replacing the Next.js
+  default.
+- ~~`refactor(ui): replace glass surfaces with solid components`~~ — the real
+  guia is built from solid white cards, solid navy and solid blue, so every
+  translucent-plus-blur panel outside the approved menus went opaque: hero
+  essentials strip and code chip to navy, hero secondary CTA and topbar host
+  button to white with navy text, dark-section distance and action chips to
+  white on navy, home code badge to navy. The mobile section bar lost its blur
+  too. Only the scrolled topbar keeps one, over moving photography. Paddings
+  and border widths were left alone, so the pass shifts nothing.
+- ~~`fix(ui): unify ai entry points on coral`~~ — the chat FAB and the
+  generation-retry button take the hero CTA's coral gradient, so every way into
+  the assistant looks like the same thing; the FAB's unread dot went navy,
+  since coral on coral is invisible. In-panel blue (send button, guest bubbles)
+  stays: it is not an entry point.
+- Screenshot review done at 1440 and 390 on `/` and `/FLN001`, plus the dark
+  experiences section and the footer.
 
 ## 10. Decisions
 

@@ -9,8 +9,10 @@ import {
   ExperienceSkeleton,
 } from "@/components/guide/experience-section";
 import { Hero } from "@/components/guide/hero";
+import { HostSection } from "@/components/guide/host-section";
 import { RulesSection } from "@/components/guide/rules-section";
 import { SiteFooter } from "@/components/guide/site-footer";
+import { TocNav } from "@/components/guide/toc-nav";
 import { TopBar } from "@/components/guide/top-bar";
 import {
   accessTypeDisplay,
@@ -90,6 +92,7 @@ export default async function GuidePage({ params }: PageProps) {
             : accessTypeDisplay(property.property_access_type).label
         }
       />
+      <TocNav />
       <main>
         <ArrivalSection property={property} wifiQr={wifiQr} />
         <RulesSection property={property} />
@@ -107,6 +110,10 @@ export default async function GuidePage({ params }: PageProps) {
             city={property.city}
           />
         )}
+        <HostSection
+          hostName={property.host_name}
+          hostPhone={property.host_phone}
+        />
       </main>
       <SiteFooter />
     </>

@@ -2,11 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/guide/icon";
+import { getMessages } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 
-type CopyFieldProps = { label: string; value: string };
+type CopyFieldProps = { label: string; value: string; locale: Locale };
 
 /** Labelled credential row with a copy-to-clipboard button (mockup `.cred`). */
-export function CopyField({ label, value }: CopyFieldProps) {
+export function CopyField({ label, value, locale }: CopyFieldProps) {
+  const messages = getMessages(locale).copyField;
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -36,15 +39,15 @@ export function CopyField({ label, value }: CopyFieldProps) {
         <button
           type="button"
           onClick={copy}
-          aria-label={`Copiar ${label.toLowerCase()}`}
+          aria-label={messages.ariaCopy(label)}
           className="inline-flex flex-none items-center gap-1.5 rounded-lg border border-border bg-white px-3 py-[7px] text-xs font-semibold text-primary-strong transition-colors hover:border-primary hover:bg-sea-light"
         >
           {copied ? (
-            "✓ Copiado"
+            messages.copied
           ) : (
             <>
               <Icon name="copy" className="size-[13px]" />
-              Copiar
+              {messages.copy}
             </>
           )}
         </button>

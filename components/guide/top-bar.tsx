@@ -2,16 +2,20 @@
 
 import { useEffect, useRef, useState } from "react";
 import { BrandLockup, WhatsAppIcon } from "@/components/guide/brand";
+import { getMessages } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 import { cn } from "@/lib/utils";
 
 type TopBarProps = {
   /** wa.me target (digits only) */
   hostPhoneDigits: string;
+  locale: Locale;
 };
 
-export function TopBar({ hostPhoneDigits }: TopBarProps) {
+export function TopBar({ hostPhoneDigits, locale }: TopBarProps) {
   const bar = useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = useState(false);
+  const messages = getMessages(locale);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -42,7 +46,7 @@ export function TopBar({ hostPhoneDigits }: TopBarProps) {
           "bg-navy/[.86] shadow-[0_1px_0_hsla(0,0%,100%,.08)] backdrop-blur-[14px]",
       )}
     >
-      <BrandLockup />
+      <BrandLockup locale={locale} />
       <a
         className="inline-flex items-center gap-2 rounded-full border border-white/[.25] bg-white/[.12] px-[11px] py-[9px] text-[13.5px] font-semibold text-white backdrop-blur-[8px] transition-colors hover:bg-white/[.22] sm:px-4"
         href={`https://wa.me/${hostPhoneDigits}`}
@@ -50,7 +54,7 @@ export function TopBar({ hostPhoneDigits }: TopBarProps) {
         rel="noopener"
       >
         <WhatsAppIcon className="size-[15px]" />
-        <span className="hidden sm:inline">Falar com anfitrião</span>
+        <span className="hidden sm:inline">{messages.topBar.talkToHost}</span>
       </a>
     </header>
   );

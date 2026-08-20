@@ -59,6 +59,7 @@ export default async function GuidePage({ params }: PageProps) {
   ]);
   if (!property) notFound();
 
+  const messages = getMessages(locale);
   const guide = await getGuideByPropertyId(property.id);
   // an unreadable payload is treated as "not generated yet" rather than
   // crashing the whole guide over one bad column
@@ -79,7 +80,10 @@ export default async function GuidePage({ params }: PageProps) {
 
   return (
     <>
-      <TopBar hostPhoneDigits={phoneDigits(property.host_phone)} />
+      <TopBar
+        hostPhoneDigits={phoneDigits(property.host_phone)}
+        locale={locale}
+      />
       <Hero
         code={property.code}
         name={property.name}
@@ -90,11 +94,12 @@ export default async function GuidePage({ params }: PageProps) {
         checkOut={formatTime(property.check_out_time)}
         entry={
           property.is_self_checkin
-            ? "Self check-in"
+            ? messages.hero.selfCheckin
             : accessTypeDisplay(property.property_access_type, locale).label
         }
+        locale={locale}
       />
-      <TocNav />
+      <TocNav locale={locale} />
       <main>
         <ArrivalSection property={property} locale={locale} wifiQr={wifiQr} />
         <RulesSection property={property} locale={locale} />
@@ -105,20 +110,23 @@ export default async function GuidePage({ params }: PageProps) {
             neighborhood={property.neighborhood}
             city={property.city}
             generatedAt={guide?.generated_at ?? null}
+            locale={locale}
           />
         ) : (
           <ExperienceLoader
             code={property.code}
             neighborhood={property.neighborhood}
             city={property.city}
+            locale={locale}
           />
         )}
         <HostSection
           hostName={property.host_name}
           hostPhone={property.host_phone}
+          locale={locale}
         />
       </main>
-      <SiteFooter />
+      <SiteFooter locale={locale} />
       <ChatWidget
         code={property.code}
         propertyName={property.name}

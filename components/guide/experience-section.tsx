@@ -1,15 +1,26 @@
 import type { ReactNode } from "react";
 import { Icon } from "@/components/guide/icon";
+import { essentialTypeLabel } from "@/lib/domain/display";
 import type { GuideContent } from "@/lib/domain/guide";
+import { getMessages } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 
 type ShellProps = {
   neighborhood: string;
   city: string;
+  locale: Locale;
   children: ReactNode;
 };
 
 /** Dark full-bleed section with the mockup's radial glows. */
-export function ExperienceShell({ neighborhood, city, children }: ShellProps) {
+export function ExperienceShell({
+  neighborhood,
+  city,
+  locale,
+  children,
+}: ShellProps) {
+  const messages = getMessages(locale).experience;
+
   return (
     <section
       id="experiencias"
@@ -22,11 +33,10 @@ export function ExperienceShell({ neighborhood, city, children }: ShellProps) {
       />
       <div className="relative mx-auto max-w-[1080px] px-[clamp(16px,4vw,40px)] py-[clamp(48px,7vw,80px)]">
         <h2 className="mb-2.5 max-w-[20ch] font-display text-[clamp(28px,4.4vw,44px)] font-medium leading-[1.1] tracking-[-.01em]">
-          Explore {neighborhood} e {city}
+          {messages.title(neighborhood, city)}
         </h2>
         <p className="max-w-[52ch] text-[15px] text-sea-light/80">
-          Um guia criado especialmente para a sua estadia, com o melhor da
-          região ao redor da sua hospedagem.
+          {messages.subtitle}
         </p>
         {children}
       </div>
@@ -40,6 +50,7 @@ type ExperienceSectionProps = {
   city: string;
   /** ISO timestamp of the generation, used for the month and the footer date */
   generatedAt: string | null;
+  locale: Locale;
 };
 
 export function ExperienceSection({
@@ -47,11 +58,13 @@ export function ExperienceSection({
   neighborhood,
   city,
   generatedAt,
+  locale,
 }: ExperienceSectionProps) {
+  const messages = getMessages(locale).experience;
   const generated = generatedAt ? new Date(generatedAt) : null;
 
   return (
-    <ExperienceShell neighborhood={neighborhood} city={city}>
+    <ExperienceShell neighborhood={neighborhood} city={city} locale={locale}>
       <blockquote className="mb-[42px] mt-[34px] border-l-[3px] border-coral py-1.5 pl-6">
         <p className="max-w-[34ch] font-display text-[clamp(18px,2.4vw,23px)] font-normal italic leading-[1.45] text-sea-light">
           “{content.welcome_message}”
@@ -60,8 +73,9 @@ export function ExperienceSection({
 
       {content.restaurants.length > 0 ? (
         <Group
-          title="🍽️ Restaurantes próximos"
+          title={messages.restaurants}
           count={content.restaurants.length}
+          locale={locale}
         >
           {content.restaurants.map((place) => (
             <PlaceCard
@@ -70,6 +84,7 @@ export function ExperienceSection({
               distance={place.distance}
               description={place.description}
               city={city}
+              locale={locale}
               withInstagram
             />
           ))}
@@ -77,7 +92,11 @@ export function ExperienceSection({
       ) : null}
 
       {content.attractions.length > 0 ? (
-        <Group title="🌊 Atrações próximas" count={content.attractions.length}>
+        <Group
+          title={messages.attractions}
+          count={content.attractions.length}
+          locale={locale}
+        >
           {content.attractions.map((place) => (
             <PlaceCard
               key={place.name}
@@ -85,6 +104,7 @@ export function ExperienceSection({
               distance={place.distance}
               description={place.description}
               city={city}
+              locale={locale}
               withInstagram
             />
           ))}
@@ -92,7 +112,7 @@ export function ExperienceSection({
       ) : null}
 
       {content.essentials.length > 0 ? (
-        <Group title="🏥 Serviços essenciais">
+        <Group title={messages.essentials} locale={locale}>
           {content.essentials.map((place) => (
             <PlaceCard
               key={place.name}
@@ -100,7 +120,8 @@ export function ExperienceSection({
               distance={place.distance}
               description={place.description}
               city={city}
-              tag={place.type}
+              locale={locale}
+              tag={essentialTypeLabel(place.type, locale)}
             />
           ))}
         </Group>
@@ -113,7 +134,8 @@ export function ExperienceSection({
           </span>
           <div>
             <h4 className="mb-1.5 text-xs font-bold uppercase tracking-[.15em] text-coral">
-              Dica da estação{generated ? ` · ${monthName(generated)}` : ""}
+              {messages.seasonalTip}
+              {generated ? ` · ${monthName(generated, locale)}` : ""}
             </h4>
             <p className="max-w-[64ch] text-[15px] leading-[1.55] text-sea-light">
               {content.seasonal_tip}
@@ -124,8 +146,10 @@ export function ExperienceSection({
 
       <p className="mt-9 flex items-center gap-2 text-xs text-sea-light/60">
         <Icon name="sparkles" className="size-[13px]" />
-        Conteúdo gerado por IA com base na localização do imóvel
-        {generated ? ` · gerado em ${shortDate(generated)}` : ""}
+        {messages.aiNotice}
+        {generated
+          ? ` · ${messages.generatedOn(shortDate(generated, locale))}`
+          : ""}
       </p>
     </ExperienceShell>
   );
@@ -135,33 +159,34 @@ export function ExperienceSection({
 export function ExperienceSkeleton({
   neighborhood,
   city,
+  locale,
 }: {
   neighborhood: string;
   city: string;
+  locale: Locale;
 }) {
+  const messages = getMessages(locale).experience;
+
   return (
-    <ExperienceShell neighborhood={neighborhood} city={city}>
+    <ExperienceShell neighborhood={neighborhood} city={city} locale={locale}>
       <div className="my-[34px] flex items-center gap-4 rounded-xl border border-[hsla(220,100%,65%,.3)] bg-[hsla(220,60%,50%,.12)] px-6 py-5">
         <span className="grid size-11 flex-none animate-orbpulse place-items-center rounded-full bg-gradient-sea text-white">
           <Icon name="sparkles" className="size-5 animate-sparkle" />
         </span>
         <div>
-          <h4 className="text-[15.5px] font-bold">
-            Preparando seu guia personalizado…
-          </h4>
+          <h4 className="text-[15.5px] font-bold">{messages.skeleton.title}</h4>
           <p className="text-[13px] text-sea-light/75">
-            Nossa IA está explorando {neighborhood} para encontrar os melhores
-            lugares perto de você. Isso leva só alguns segundos.
+            {messages.skeleton.body(neighborhood)}
           </p>
         </div>
       </div>
-      <Group title="🍽️ Restaurantes próximos">
+      <Group title={messages.restaurants} locale={locale}>
         <SkeletonCard widths={[45, 92, 70]} />
         <SkeletonCard widths={[55, 88, 62]} />
         <SkeletonCard widths={[40, 95, 75]} />
         <SkeletonCard widths={[50, 85, 58]} />
       </Group>
-      <Group title="🌊 Atrações próximas">
+      <Group title={messages.attractions} locale={locale}>
         <SkeletonCard widths={[48, 90]} />
         <SkeletonCard widths={[42, 80]} />
       </Group>
@@ -172,10 +197,12 @@ export function ExperienceSkeleton({
 function Group({
   title,
   count,
+  locale,
   children,
 }: {
   title: string;
   count?: number;
+  locale: Locale;
   children: ReactNode;
 }) {
   return (
@@ -184,7 +211,7 @@ function Group({
         <h3 className="text-[19px] font-bold tracking-[-.01em]">{title}</h3>
         {count ? (
           <span className="text-[12.5px] font-semibold text-sea-light/65">
-            {count} {count === 1 ? "sugestão" : "sugestões"}
+            {getMessages(locale).experience.suggestions(count)}
           </span>
         ) : null}
       </div>
@@ -200,6 +227,7 @@ function PlaceCard({
   distance,
   description,
   city,
+  locale,
   tag,
   withInstagram,
 }: {
@@ -207,9 +235,11 @@ function PlaceCard({
   distance: string;
   description: string;
   city: string;
+  locale: Locale;
   tag?: string;
   withInstagram?: boolean;
 }) {
+  const messages = getMessages(locale).experience;
   const query = encodeURIComponent(`${name} ${city}`);
 
   return (
@@ -233,14 +263,14 @@ function PlaceCard({
           href={`https://www.google.com/maps/search/?api=1&query=${query}`}
           icon="map-pin"
         >
-          Ver no mapa
+          {messages.mapLink}
         </PlaceLink>
         {withInstagram ? (
           <PlaceLink
             href={`https://www.google.com/search?q=${query}%20instagram`}
             icon="instagram"
           >
-            Instagram
+            {messages.instagram}
           </PlaceLink>
         ) : null}
       </div>
@@ -290,15 +320,13 @@ function distanceLabel(distance: string): string {
   return distance.startsWith("≈") ? distance : `≈ ${distance}`;
 }
 
-function monthName(date: Date): string {
-  const month = new Intl.DateTimeFormat("pt-BR", { month: "long" }).format(
-    date,
-  );
+function monthName(date: Date, locale: Locale): string {
+  const month = new Intl.DateTimeFormat(locale, { month: "long" }).format(date);
   return month.charAt(0).toUpperCase() + month.slice(1);
 }
 
-function shortDate(date: Date): string {
-  return new Intl.DateTimeFormat("pt-BR", {
+function shortDate(date: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(locale, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

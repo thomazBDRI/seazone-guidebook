@@ -7,6 +7,8 @@ import {
   ExperienceSkeleton,
 } from "@/components/guide/experience-section";
 import { Icon } from "@/components/guide/icon";
+import { getMessages } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 
 /**
  * Drives the on-first-access generation of the experiences guide: kicks off
@@ -30,12 +32,14 @@ type ExperienceLoaderProps = {
   code: string;
   neighborhood: string;
   city: string;
+  locale: Locale;
 };
 
 export function ExperienceLoader({
   code,
   neighborhood,
   city,
+  locale,
 }: ExperienceLoaderProps) {
   const router = useRouter();
   const [state, setState] = useState<LoaderState>("generating");
@@ -107,28 +111,39 @@ export function ExperienceLoader({
 
   if (state === "failed") {
     return (
-      <ExperienceShell neighborhood={neighborhood} city={city}>
-        <GenerationFailure onRetry={retry} />
+      <ExperienceShell neighborhood={neighborhood} city={city} locale={locale}>
+        <GenerationFailure onRetry={retry} locale={locale} />
       </ExperienceShell>
     );
   }
-  return <ExperienceSkeleton neighborhood={neighborhood} city={city} />;
+  return (
+    <ExperienceSkeleton
+      neighborhood={neighborhood}
+      city={city}
+      locale={locale}
+    />
+  );
 }
 
 /** Friendly dead end: the rest of the guide still works without this section. */
-function GenerationFailure({ onRetry }: { onRetry: () => void }) {
+function GenerationFailure({
+  onRetry,
+  locale,
+}: {
+  onRetry: () => void;
+  locale: Locale;
+}) {
+  const messages = getMessages(locale).experience.failure;
+
   return (
     <div className="my-[34px] flex flex-col items-start gap-4 rounded-xl border border-coral/[.35] bg-[linear-gradient(135deg,hsla(2,97%,66%,.16),hsla(18,90%,64%,.08))] px-6 py-6 sm:flex-row sm:items-center">
       <span className="grid size-11 flex-none place-items-center rounded-full bg-gradient-warm text-white">
         <Icon name="circle-alert" className="size-[21px]" />
       </span>
       <div className="flex-1">
-        <h4 className="text-[15.5px] font-bold">
-          Não conseguimos gerar seu guia agora
-        </h4>
+        <h4 className="text-[15.5px] font-bold">{messages.title}</h4>
         <p className="max-w-[56ch] text-[13px] text-sea-light/75">
-          Nossa IA não respondeu desta vez. Todas as outras informações da sua
-          hospedagem seguem disponíveis acima — pode tentar de novo.
+          {messages.body}
         </p>
       </div>
       <button
@@ -137,7 +152,7 @@ function GenerationFailure({ onRetry }: { onRetry: () => void }) {
         className="inline-flex flex-none items-center gap-2 rounded-full border border-white/[.38] bg-white/10 px-[15px] py-2 text-[13px] font-semibold text-white transition-colors hover:border-white hover:bg-white hover:text-navy"
       >
         <Icon name="rotate-cw" className="size-[14px]" />
-        Tentar novamente
+        {messages.retry}
       </button>
     </div>
   );

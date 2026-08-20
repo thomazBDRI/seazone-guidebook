@@ -2,22 +2,28 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/guide/icon";
+import { getMessages } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 import { cn } from "@/lib/utils";
 
+/** Ids double as the anchor targets, so they stay Portuguese in every locale. */
 const SECTIONS = [
-  { id: "acesso", label: "Chegada & acesso", icon: "key-round" },
-  { id: "regras", label: "Regras da estadia", icon: "clipboard-check" },
-  { id: "comodidades", label: "Comodidades", icon: "sofa" },
-  { id: "experiencias", label: "Explore a região", icon: "sparkles" },
-  { id: "contato", label: "Contato", icon: "phone" },
-];
+  { id: "acesso", icon: "key-round" },
+  { id: "regras", icon: "clipboard-check" },
+  { id: "comodidades", icon: "sofa" },
+  { id: "experiencias", icon: "sparkles" },
+  { id: "contato", icon: "phone" },
+] as const;
 
 /** Distance kept between the rail and a dark section edge. */
 const PAD = 22;
 
-export function TocNav() {
+export function TocNav({ locale }: { locale: Locale }) {
+  const messages = getMessages(locale);
+  const label = (id: (typeof SECTIONS)[number]["id"]) =>
+    messages.toc.sections[id];
   const rail = useRef<HTMLElement>(null);
-  const [active, setActive] = useState(SECTIONS[0].id);
+  const [active, setActive] = useState<string>(SECTIONS[0].id);
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
   const [shift, setShift] = useState(0);
@@ -86,15 +92,14 @@ export function TocNav() {
     };
   }, []);
 
-  const currentLabel =
-    SECTIONS.find((section) => section.id === active)?.label ??
-    SECTIONS[0].label;
+  const currentSection =
+    SECTIONS.find((section) => section.id === active) ?? SECTIONS[0];
 
   return (
     <>
       <nav
         ref={rail}
-        aria-label="Nesta página"
+        aria-label={messages.toc.label}
         style={{ transform: `translateY(calc(-50% + ${shift}px))` }}
         className={cn(
           "pointer-events-none fixed left-[clamp(22px,2.5vw,44px)] top-1/2 z-30 hidden max-w-[180px] flex-col gap-0.5 opacity-0 transition-[opacity,transform] duration-[400ms] min-[1400px]:flex",
@@ -107,7 +112,7 @@ export function TocNav() {
             overDark ? "text-sea-light/50" : "text-muted-foreground/75",
           )}
         >
-          Nesta página
+          {messages.toc.label}
         </span>
         {SECTIONS.map((section) => {
           const isActive = section.id === active;
@@ -126,14 +131,14 @@ export function TocNav() {
                     : "text-primary-strong before:w-[26px] before:bg-primary"),
               )}
             >
-              {section.label}
+              {label(section.id)}
             </a>
           );
         })}
       </nav>
 
       <nav
-        aria-label="Nesta página"
+        aria-label={messages.toc.label}
         className="sticky top-[var(--topbar-h,62px)] z-40 border-b border-border bg-sea-mist/[.92] backdrop-blur-[14px] min-[1400px]:hidden"
       >
         <button
@@ -143,10 +148,10 @@ export function TocNav() {
           className="mx-auto flex w-full max-w-[1080px] items-center gap-2.5 px-[clamp(16px,4vw,40px)] py-3 text-left"
         >
           <span className="flex-none text-[10px] font-bold uppercase tracking-[.16em] text-muted-foreground">
-            Seção
+            {messages.toc.current}
           </span>
           <span className="flex-1 truncate text-[13.5px] font-bold text-primary-strong">
-            {currentLabel}
+            {label(currentSection.id)}
           </span>
           <Icon
             name="chevron-down"
@@ -172,7 +177,7 @@ export function TocNav() {
                   )}
                 >
                   <Icon name={section.icon} className="size-4 flex-none" />
-                  {section.label}
+                  {label(section.id)}
                 </a>
               ))}
             </div>

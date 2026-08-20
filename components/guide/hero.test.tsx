@@ -10,7 +10,8 @@ const base = {
   checkIn: "15:00",
   checkOut: "11:00",
   entry: "Self check-in",
-};
+  locale: "pt-BR",
+} as const;
 
 describe("Hero", () => {
   it("renders the code chip, name and essentials from data", () => {

@@ -3,36 +3,32 @@ import { GuideSection } from "@/components/guide/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { amenityList } from "@/lib/domain/display";
 import type { Property } from "@/lib/domain/property";
+import { getMessages } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
-
-function plural(count: number, one: string, many: string): string {
-  return count === 1 ? one : many;
-}
 
 type AmenitiesSectionProps = { property: Property; locale: Locale };
 
 export function AmenitiesSection({ property, locale }: AmenitiesSectionProps) {
+  const messages = getMessages(locale).amenities;
+
   return (
     <GuideSection id="comodidades">
-      <SectionHeading
-        eyebrow="O que o imóvel oferece"
-        title="Capacidade & comodidades"
-      />
+      <SectionHeading eyebrow={messages.eyebrow} title={messages.title} />
       <div className="mb-3.5 grid grid-cols-3 gap-3 max-[640px]:grid-cols-1 max-[640px]:gap-2.5">
         <CapStat
           icon="bed-double"
           value={property.bedroom_quantity}
-          label={plural(property.bedroom_quantity, "quarto", "quartos")}
+          label={messages.bedrooms(property.bedroom_quantity)}
         />
         <CapStat
           icon="bath"
           value={property.bathroom_quantity}
-          label={plural(property.bathroom_quantity, "banheiro", "banheiros")}
+          label={messages.bathrooms(property.bathroom_quantity)}
         />
         <CapStat
           icon="users"
           value={property.guest_capacity}
-          label={`${plural(property.guest_capacity, "hóspede", "hóspedes")} no máximo`}
+          label={messages.guests(property.guest_capacity)}
         />
       </div>
       <div className="grid grid-cols-4 gap-3 max-[880px]:grid-cols-2">

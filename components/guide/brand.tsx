@@ -1,3 +1,5 @@
+import { getMessages } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 import { cn } from "@/lib/utils";
 
 /** Seazone wave mark (from the approved mockup). */
@@ -62,14 +64,20 @@ export function WhatsAppIcon({ className }: { className?: string }) {
 }
 
 /** Brand lockup used in the topbar and on the 404 page. */
-export function BrandLockup({ className }: { className?: string }) {
+export function BrandLockup({
+  locale,
+  className,
+}: {
+  locale: Locale;
+  className?: string;
+}) {
   return (
     <span className={cn("flex items-center gap-2.5", className)}>
       <WaveLogo />
       <span>
         <span className="text-[19px] font-bold tracking-[-.03em]">seazone</span>
         <span className="-mt-[3px] block text-[11px] font-medium uppercase tracking-[.14em] opacity-[.72]">
-          Guia do Hóspede
+          {getMessages(locale).brand.tagline}
         </span>
       </span>
     </span>

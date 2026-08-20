@@ -49,6 +49,7 @@ describe("ExperienceSection", () => {
       neighborhood="Trindade"
       city="Florianópolis"
       generatedAt="2026-08-19T12:00:00.000Z"
+      locale="pt-BR"
     />,
   );
 
@@ -94,6 +95,7 @@ describe("ExperienceSection", () => {
         neighborhood="Trindade"
         city="Florianópolis"
         generatedAt={null}
+        locale="pt-BR"
       />,
     );
     expect(undated).toContain("Dica da estação");
@@ -104,7 +106,11 @@ describe("ExperienceSection", () => {
 describe("ExperienceSkeleton", () => {
   it("shows the generating banner and shimmering placeholders", () => {
     const html = render(
-      <ExperienceSkeleton neighborhood="Planalto" city="Gramado" />,
+      <ExperienceSkeleton
+        neighborhood="Planalto"
+        city="Gramado"
+        locale="pt-BR"
+      />,
     );
     expect(html).toContain("Preparando seu guia personalizado…");
     expect(html).toContain("Nossa IA está explorando Planalto");

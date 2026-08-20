@@ -1,13 +1,15 @@
 import { WaveLogoCompact } from "@/components/guide/brand";
+import { getMessages } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 
 /**
- * Fixed on purpose: reading the clock while rendering makes the page
- * unprerenderable under cacheComponents, and a guest guide has no reason to
- * be dynamic over a copyright line.
+ * The copyright year is fixed on purpose: reading the clock while rendering
+ * makes the page unprerenderable under cacheComponents, and a guest guide has
+ * no reason to be dynamic over a copyright line.
  */
-export const COPYRIGHT = "© 2026 Seazone Serviços Ltda. · Guia do Hóspede";
+export function SiteFooter({ locale }: { locale: Locale }) {
+  const messages = getMessages(locale);
 
-export function SiteFooter() {
   return (
     <footer
       data-dark-section
@@ -19,11 +21,9 @@ export function SiteFooter() {
             <WaveLogoCompact />
             <b className="text-base tracking-[-.02em]">seazone</b>
           </div>
-          <div className="text-[13px]">
-            Gestão inteligente de imóveis por temporada
-          </div>
+          <div className="text-[13px]">{messages.footer.tagline}</div>
         </div>
-        <div className="text-xs opacity-70">{COPYRIGHT}</div>
+        <div className="text-xs opacity-70">{messages.footer.copyright}</div>
       </div>
     </footer>
   );

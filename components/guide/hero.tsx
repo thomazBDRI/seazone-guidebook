@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { requestOpenChat } from "@/components/guide/chat-events";
 import { Icon } from "@/components/guide/icon";
+import { getMessages } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 import { cn } from "@/lib/utils";
 
 const SLIDE_MS = 2800;
@@ -18,6 +20,7 @@ type HeroProps = {
   checkOut: string;
   /** "Self check-in" or the access-type label */
   entry: string;
+  locale: Locale;
 };
 
 export function Hero({
@@ -29,7 +32,9 @@ export function Hero({
   checkIn,
   checkOut,
   entry,
+  locale,
 }: HeroProps) {
+  const messages = getMessages(locale);
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
@@ -64,7 +69,7 @@ export function Hero({
 
       <div className="relative mx-auto w-full max-w-[1080px] px-[clamp(16px,4vw,40px)] pb-[clamp(64px,8vh,96px)] pt-[120px]">
         <span className="inline-flex animate-rise items-center gap-[7px] rounded-full border border-white/30 bg-white/[.14] px-3.5 py-1.5 text-xs font-bold tracking-[.16em] backdrop-blur-[6px] [animation-delay:.05s] before:size-[7px] before:rounded-full before:bg-[hsl(152_70%_55%)] before:shadow-[0_0_8px_hsl(152_70%_55%)] before:content-['']">
-          IMÓVEL {code}
+          {messages.hero.propertyBadge(code)}
         </span>
         <h1 className="my-3 max-w-[14ch] animate-rise font-display text-[clamp(34px,6.2vw,64px)] font-medium leading-[1.04] tracking-[-.015em] [animation-delay:.15s] mt-[18px]">
           {name}
@@ -82,21 +87,29 @@ export function Hero({
             className="inline-flex items-center gap-[9px] rounded-full bg-gradient-warm px-[22px] py-3.5 text-[14.5px] font-bold text-white shadow-[0_10px_32px_-6px_hsla(2,80%,50%,.65)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[0_16px_38px_-6px_hsla(2,80%,50%,.75)] sm:px-7 sm:py-[15px] sm:text-[15.5px]"
           >
             <Icon name="sparkles" className="size-[19px] animate-sparkle" />
-            Tire dúvidas com a IA
+            {messages.hero.askAi}
           </button>
           <a
             className="inline-flex items-center gap-[9px] rounded-full border border-white/[.32] bg-white/10 px-[18px] py-3 text-[13.5px] font-semibold text-white backdrop-blur-[10px] transition-colors hover:bg-white/20 sm:px-6 sm:py-[13px] sm:text-[14.5px]"
             href="#acesso"
           >
             <Icon name="arrow-down" className="size-[17px]" />
-            Guia da hospedagem
+            {messages.hero.stayGuide}
           </a>
         </div>
 
         <dl className="mt-[30px] grid max-w-[620px] animate-rise grid-cols-3 rounded-[18px] border border-white/[.32] bg-white/10 backdrop-blur-[10px] [animation-delay:.5s]">
-          <Essential label="Check-in" value={checkIn} hint="em diante" />
-          <Essential label="Check-out" value={checkOut} hint="no máximo" />
-          <Essential label="Entrada" value={entry} />
+          <Essential
+            label={messages.hero.checkIn}
+            value={checkIn}
+            hint={messages.hero.checkInHint}
+          />
+          <Essential
+            label={messages.hero.checkOut}
+            value={checkOut}
+            hint={messages.hero.checkOutHint}
+          />
+          <Essential label={messages.hero.entry} value={entry} />
         </dl>
       </div>
     </section>

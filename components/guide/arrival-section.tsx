@@ -11,6 +11,7 @@ import {
   mapAddress,
 } from "@/lib/domain/display";
 import type { Property } from "@/lib/domain/property";
+import { getMessages } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
 
 type ArrivalSectionProps = {
@@ -25,21 +26,22 @@ export function ArrivalSection({
   locale,
   wifiQr,
 }: ArrivalSectionProps) {
+  const messages = getMessages(locale);
   const query = encodeURIComponent(mapAddress(property));
   const access = accessTypeDisplay(property.property_access_type, locale);
 
   return (
     <GuideSection id="acesso">
       <SectionHeading
-        eyebrow="Sua chegada"
-        title="Chegada & acesso"
-        description="Como chegar, entrar e se conectar."
+        eyebrow={messages.arrival.eyebrow}
+        title={messages.arrival.title}
+        description={messages.arrival.description}
       />
       <div className="grid grid-cols-[1.05fr_1fr] gap-4 max-[880px]:grid-cols-1">
         <Card className="row-span-3 flex flex-col overflow-hidden p-0 shadow-soft max-[880px]:row-auto">
           <iframe
             src={`https://www.google.com/maps?q=${query}&z=16&output=embed`}
-            title="Mapa — localização do imóvel"
+            title={messages.arrival.mapTitle}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             className="block min-h-[250px] w-full flex-1 border-0"
@@ -49,7 +51,8 @@ export function ArrivalSection({
               <b className="mb-0.5 block text-base tracking-[-.01em] text-foreground">
                 {addressLine(property)}
               </b>
-              {locationLine(property)} · CEP {property.postal_code}
+              {locationLine(property)} ·{" "}
+              {messages.arrival.postalCode(property.postal_code)}
             </address>
             <div className="flex flex-wrap gap-2.5">
               <ActionLink
@@ -59,7 +62,7 @@ export function ArrivalSection({
                 rel="noopener"
               >
                 <Icon name="car-front" />
-                Chamar Uber
+                {messages.arrival.uber}
               </ActionLink>
               <ActionLink
                 variant="sea"
@@ -68,13 +71,13 @@ export function ArrivalSection({
                 rel="noopener"
               >
                 <Icon name="map-pin" />
-                Google Maps
+                {messages.arrival.maps}
               </ActionLink>
             </div>
           </div>
         </Card>
 
-        <InfoCard icon={access.icon} title="Como entrar">
+        <InfoCard icon={access.icon} title={messages.arrival.howToEnter}>
           {property.property_access_instructions ? (
             <p className="text-sm text-muted-foreground">
               {property.property_access_instructions}
@@ -82,19 +85,19 @@ export function ArrivalSection({
           ) : null}
           {property.property_password ? (
             <span className="mt-2 inline-block rounded-lg bg-sea-light px-3 py-1 text-sm font-bold text-navy">
-              Código: {property.property_password}
+              {messages.arrival.accessCode(property.property_password)}
             </span>
           ) : null}
           {property.is_self_checkin ? (
             <span className="mt-2.5 flex w-fit items-center gap-1.5 rounded-full bg-ok-bg px-3 py-1 text-xs font-bold text-ok">
               <Icon name="check" className="size-3" />
-              Self check-in — entre no seu horário
+              {messages.arrival.selfCheckinBadge}
             </span>
           ) : null}
         </InfoCard>
 
         {property.has_parking_spot ? (
-          <InfoCard icon="car" title="Estacionamento">
+          <InfoCard icon="car" title={messages.arrival.parking}>
             {property.parking_spot_instructions ? (
               <p className="text-sm text-muted-foreground">
                 {property.parking_spot_instructions}
@@ -113,17 +116,27 @@ export function ArrivalSection({
             <div className="mb-4 flex items-center gap-[13px]">
               <IconBox name="wifi" />
               <div>
-                <h3 className="text-base font-bold tracking-[-.01em]">Wi-Fi</h3>
+                <h3 className="text-base font-bold tracking-[-.01em]">
+                  {messages.arrival.wifi.title}
+                </h3>
                 <p className="text-[13px] text-muted-foreground">
-                  Copie a senha ou aponte a câmera para o código.
+                  {messages.arrival.wifi.description}
                 </p>
               </div>
             </div>
             <div className="flex flex-col gap-4">
               <div>
-                <CopyField label="Rede" value={property.wifi_network} />
+                <CopyField
+                  label={messages.arrival.wifi.network}
+                  value={property.wifi_network}
+                  locale={locale}
+                />
                 {property.wifi_password ? (
-                  <CopyField label="Senha" value={property.wifi_password} />
+                  <CopyField
+                    label={messages.arrival.wifi.password}
+                    value={property.wifi_password}
+                    locale={locale}
+                  />
                 ) : null}
               </div>
               {wifiQr ? (
@@ -131,13 +144,13 @@ export function ArrivalSection({
                   {/* biome-ignore lint/performance/noImgElement: inline data URL generated server-side, nothing for the image optimizer to do */}
                   <img
                     src={wifiQr}
-                    alt="QR code para conectar ao Wi-Fi"
+                    alt={messages.arrival.wifi.qrAlt}
                     width={144}
                     height={144}
                     className="size-36 rounded-lg"
                   />
                   <span className="max-w-[26ch] text-center text-xs font-semibold leading-snug text-muted-foreground">
-                    Aponte a câmera do celular para conectar automaticamente
+                    {messages.arrival.wifi.qrCaption}
                   </span>
                 </div>
               ) : null}

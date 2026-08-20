@@ -4,31 +4,34 @@ import { Card } from "@/components/ui/card";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { formatTime, ruleLines } from "@/lib/domain/display";
 import type { Property } from "@/lib/domain/property";
+import { getMessages } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
 import { cn } from "@/lib/utils";
 
 type RulesSectionProps = { property: Property; locale: Locale };
 
 export function RulesSection({ property, locale }: RulesSectionProps) {
+  const messages = getMessages(locale).rules;
+
   return (
     <GuideSection id="regras">
-      <SectionHeading eyebrow="Boa convivência" title="Regras da estadia" />
+      <SectionHeading eyebrow={messages.eyebrow} title={messages.title} />
       <Card className="grid grid-cols-[300px_1px_1fr] items-stretch p-0 shadow-soft max-[880px]:grid-cols-1">
         <div className="px-[30px] py-7 max-[880px]:px-7 max-[880px]:py-[22px]">
           <h3 className="mb-3.5 text-[11.5px] font-bold uppercase tracking-[.15em] text-muted-foreground">
-            Horários
+            {messages.times}
           </h3>
           <TimeLine
             icon="log-in"
-            label="Check-in"
+            label={messages.checkIn}
             time={formatTime(property.check_in_time)}
-            hint="a partir deste horário"
+            hint={messages.checkInHint}
           />
           <TimeLine
             icon="log-out"
-            label="Check-out"
+            label={messages.checkOut}
             time={formatTime(property.check_out_time)}
-            hint="até este horário"
+            hint={messages.checkOutHint}
           />
         </div>
 
@@ -36,7 +39,7 @@ export function RulesSection({ property, locale }: RulesSectionProps) {
 
         <div className="px-[30px] py-7 max-[880px]:px-7 max-[880px]:py-[22px]">
           <h3 className="mb-3.5 text-[11.5px] font-bold uppercase tracking-[.15em] text-muted-foreground">
-            Durante sua estadia
+            {messages.duringStay}
           </h3>
           {ruleLines(property, locale).map((rule) => (
             <p

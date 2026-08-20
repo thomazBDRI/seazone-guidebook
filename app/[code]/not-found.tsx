@@ -1,18 +1,25 @@
 import Link from "next/link";
 import { BrandLockup, WhatsAppIcon } from "@/components/guide/brand";
 import { Icon } from "@/components/guide/icon";
-import { COPYRIGHT } from "@/components/guide/site-footer";
 import { ActionLink } from "@/components/ui/action-link";
+import { getMessages } from "@/lib/i18n";
+import { getLocale } from "@/lib/i18n/server";
 
 /** Seazone's own support line (the guest has no host to reach here). */
 const SUPPORT_WHATSAPP = "554891234567";
 
-export default function PropertyNotFound() {
+/** The code shown as a working example, and the one the CTA links to. */
+const EXAMPLE_CODE = "FLN001";
+
+export default async function PropertyNotFound() {
+  const locale = await getLocale();
+  const messages = getMessages(locale);
+
   return (
     <div className="flex min-h-screen flex-col overflow-x-hidden bg-sea-deep text-white">
       <header className="flex items-center px-[clamp(16px,4vw,40px)] py-[18px]">
         <Link href="/">
-          <BrandLockup />
+          <BrandLockup locale={locale} />
         </Link>
       </header>
 
@@ -30,20 +37,20 @@ export default function PropertyNotFound() {
               className="size-[13px]"
               strokeWidth={2.4}
             />
-            IMÓVEL NÃO ENCONTRADO
+            {messages.notFound.badge}
           </span>
           <h1 className="mb-3.5 font-display text-[clamp(30px,5.6vw,44px)] font-medium leading-[1.1] tracking-[-.01em]">
-            Parece que este imóvel{" "}
+            {messages.notFound.headingLead}{" "}
             <em className="italic text-[hsl(225_90%_78%)]">
-              navegou para longe
+              {messages.notFound.headingEmphasis}
             </em>
           </h1>
           <p className="mx-auto mb-[30px] max-w-[42ch] text-base leading-relaxed text-sea-light/[.68]">
-            Não encontramos nenhum imóvel com esse código. Confira o{" "}
+            {messages.notFound.bodyLead}{" "}
             <b className="font-semibold text-white">
-              link enviado na sua confirmação de reserva
+              {messages.notFound.bodyStrong}
             </b>{" "}
-            — o código aparece no final do endereço.
+            {messages.notFound.bodyTail}
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <ActionLink
@@ -53,17 +60,17 @@ export default function PropertyNotFound() {
               className="px-6 py-[13px] text-[14.5px] shadow-[0_10px_30px_-8px_hsla(220,100%,50%,.5)] hover:shadow-[0_10px_30px_-8px_hsla(220,100%,50%,.5)]"
             >
               <WhatsAppIcon />
-              Falar com a Seazone
+              {messages.notFound.support}
             </ActionLink>
             <Link
-              href="/FLN001"
+              href={`/${EXAMPLE_CODE}`}
               className="inline-flex items-center justify-center gap-2 rounded-[12px] border border-white/20 bg-white/[.09] px-6 py-[13px] text-[14.5px] font-semibold text-white transition-[transform,background-color] hover:bg-white/[.16]"
             >
-              Ver exemplo: FLN001
+              {messages.notFound.example(EXAMPLE_CODE)}
             </Link>
           </div>
           <p className="mt-[34px] text-[13px] text-sea-light/[.45]">
-            O link do seu guia tem este formato:{" "}
+            {messages.notFound.linkFormat}{" "}
             <code className="rounded-md border border-white/[.14] bg-white/[.08] px-2 py-0.5 font-mono text-[12.5px] text-[hsl(225_90%_80%)]">
               guia.seazone.com.br/FLN001
             </code>
@@ -72,7 +79,7 @@ export default function PropertyNotFound() {
       </main>
 
       <footer className="px-[clamp(16px,4vw,40px)] pb-[calc(22px+env(safe-area-inset-bottom))] pt-[22px] text-center text-xs text-sea-light/40">
-        {COPYRIGHT}
+        {messages.footer.copyright}
       </footer>
     </div>
   );

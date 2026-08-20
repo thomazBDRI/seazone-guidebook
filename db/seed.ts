@@ -61,12 +61,7 @@ const seedProperties: NewProperty[] = [
       elevator: true,
       balcony: true,
     },
-    services: {
-      early_checkin: true,
-      extend_stay: true,
-      luggage_storage: true,
-      extra_bedding: true,
-    },
+    services: { early_checkin: true, extend_stay: true, luggage_storage: true },
     images: [
       "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800",
     ],
@@ -115,7 +110,6 @@ const seedProperties: NewProperty[] = [
     services: {
       late_checkout: true,
       extend_stay: true,
-      special_occasion: true,
       airport_transfer:
         "Transfer particular até Canela e Gramado centro — combine com Carlos",
     },
@@ -172,8 +166,6 @@ const seedProperties: NewProperty[] = [
       early_checkin: true,
       late_checkout: true,
       midstay_cleaning: true,
-      grocery_stocking: true,
-      special_occasion: true,
     },
     images: [
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800",
@@ -323,8 +315,6 @@ const seedProperties: NewProperty[] = [
       early_checkin: true,
       extend_stay: true,
       midstay_cleaning: true,
-      grocery_stocking: true,
-      extra_bedding: true,
     },
     images: [
       "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",

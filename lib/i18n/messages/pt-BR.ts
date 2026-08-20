@@ -156,9 +156,6 @@ const ptBR = {
       extend_stay: "Estenda sua estadia",
       midstay_cleaning: "Limpeza extra",
       luggage_storage: "Guarda de bagagem",
-      grocery_stocking: "Geladeira abastecida",
-      special_occasion: "Decoração especial",
-      extra_bedding: "Berço ou cama extra",
       airport_transfer: "Transfer do aeroporto",
     },
     cta: {
@@ -305,12 +302,6 @@ const ptBR = {
         `Limpeza extra durante a estadia? Peça a ${host}.`,
       luggage_storage: ({ host }: { host: string }) =>
         `Voo só de noite? Deixe as malas guardadas com ${host} e aproveite o dia.`,
-      grocery_stocking: ({ host }: { host: string }) =>
-        `Chegue com a geladeira cheia: peça a ${host} o pré-abastecimento com suas compras.`,
-      special_occasion: ({ host }: { host: string }) =>
-        `Aniversário, lua de mel ou um pedido especial? ${host} prepara a decoração.`,
-      extra_bedding: ({ host }: { host: string }) =>
-        `Precisa de berço ou cama extra? Consulte ${host} sobre disponibilidade.`,
       airport_transfer: ({ host }: { host: string }) =>
         `Transfer do aeroporto: consulte ${host} sobre valores e horários.`,
     },

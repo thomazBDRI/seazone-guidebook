@@ -200,9 +200,6 @@ const SERVICE_ICONS: Record<string, string> = {
   midstay_cleaning: "brush-cleaning",
   luggage_storage: "luggage",
   airport_transfer: "plane",
-  grocery_stocking: "shopping-cart",
-  special_occasion: "gift",
-  extra_bedding: "bed-double",
 };
 
 const SERVICE_ORDER = Object.keys(SERVICE_ICONS);

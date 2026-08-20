@@ -70,6 +70,12 @@ describe("buildChatMessages", () => {
     });
   });
 
+  it("never leaks another property's wifi password as a prompt example", () => {
+    // regression: the formatting rules once used FLN001's real password as an
+    // illustration, shipping it in every property's system prompt
+    expect(systemPrompt(grm001)).not.toContain("floripa2024");
+  });
+
   it("grounds the four canonical questions in the data block", () => {
     const prompt = systemPrompt();
 

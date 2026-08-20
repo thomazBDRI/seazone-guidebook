@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import QRCode from "qrcode";
 import { cache } from "react";
+import { ArrivalSection } from "@/components/guide/arrival-section";
 import { Hero } from "@/components/guide/hero";
 import { SiteFooter } from "@/components/guide/site-footer";
 import { TopBar } from "@/components/guide/top-bar";
@@ -10,6 +12,7 @@ import {
   locationLine,
   phoneDigits,
 } from "@/lib/domain/display";
+import { wifiQrPayload } from "@/lib/domain/wifi";
 import { getPropertyByCode } from "@/lib/repositories/properties";
 
 /** Deduplicates the lookup between generateMetadata and the page render. */
@@ -44,6 +47,15 @@ export default async function GuidePage({ params }: PageProps) {
   const property = await loadProperty(code);
   if (!property) notFound();
 
+  // generated here (not in the browser) so the password never travels twice
+  const wifiQr =
+    property.wifi_network && property.wifi_password
+      ? await QRCode.toDataURL(
+          wifiQrPayload(property.wifi_network, property.wifi_password),
+          { margin: 1, width: 192 },
+        )
+      : null;
+
   return (
     <>
       <TopBar hostPhoneDigits={phoneDigits(property.host_phone)} />
@@ -61,6 +73,9 @@ export default async function GuidePage({ params }: PageProps) {
             : accessTypeDisplay(property.property_access_type).label
         }
       />
+      <main>
+        <ArrivalSection property={property} wifiQr={wifiQr} />
+      </main>
       <SiteFooter />
     </>
   );

@@ -150,24 +150,83 @@ describe("generateGuide", () => {
     );
   });
 
-  it("gives up after the retry also fails validation", async () => {
+  it("gives up after the correction turn also fails validation", async () => {
     createCompletion.mockResolvedValue({ text: "{}", model: "m" });
 
     await expect(generateGuide(fln001)).rejects.toThrow(GenerationError);
     await expect(generateGuide(fln001)).rejects.toMatchObject({
       stage: "validation",
     });
-    // two attempts per call, never more
+    // one correction turn per call, never a third pass
     expect(createCompletion).toHaveBeenCalledTimes(4);
   });
 
-  it("wraps a model failure as a GenerationError without retrying", async () => {
-    createCompletion.mockRejectedValue(new Error("openrouter returned 429"));
+  it("retries an empty response, which free endpoints return under load", async () => {
+    createCompletion
+      .mockRejectedValueOnce(
+        Object.assign(new Error("model returned no content"), {
+          kind: "empty",
+        }),
+      )
+      .mockResolvedValueOnce({
+        text: JSON.stringify(VALID_GUIDE),
+        model: "m",
+      });
+
+    const result = await generateGuide(fln001);
+
+    expect(result.content).toEqual(VALID_GUIDE);
+    expect(createCompletion).toHaveBeenCalledTimes(2);
+    // the same prompt is replayed, not a correction turn
+    expect(createCompletion.mock.calls[1][0].messages).toEqual(
+      createCompletion.mock.calls[0][0].messages,
+    );
+  });
+
+  it("retries a rate limit and a timeout too", async () => {
+    for (const transient of [
+      Object.assign(new Error("429"), { kind: "http", status: 429 }),
+      Object.assign(new Error("502"), { kind: "http", status: 502 }),
+      Object.assign(new Error("timed out"), { kind: "timeout" }),
+      Object.assign(new Error("fetch failed"), { kind: "network" }),
+    ]) {
+      vi.clearAllMocks();
+      createCompletion.mockRejectedValueOnce(transient).mockResolvedValueOnce({
+        text: JSON.stringify(VALID_GUIDE),
+        model: "m",
+      });
+
+      await expect(generateGuide(fln001)).resolves.toMatchObject({
+        content: VALID_GUIDE,
+      });
+      expect(createCompletion).toHaveBeenCalledTimes(2);
+    }
+  });
+
+  it("stops after the attempt ceiling when the failure never clears", async () => {
+    createCompletion.mockRejectedValue(
+      Object.assign(new Error("model returned no content"), { kind: "empty" }),
+    );
 
     await expect(generateGuide(fln001)).rejects.toMatchObject({
       name: "GenerationError",
       stage: "llm",
-      message: "openrouter returned 429",
+    });
+    expect(createCompletion).toHaveBeenCalledTimes(3);
+  });
+
+  it("does not retry a failure another identical call cannot fix", async () => {
+    createCompletion.mockRejectedValue(
+      Object.assign(new Error("openrouter returned 401: invalid key"), {
+        kind: "http",
+        status: 401,
+      }),
+    );
+
+    await expect(generateGuide(fln001)).rejects.toMatchObject({
+      name: "GenerationError",
+      stage: "llm",
+      message: "openrouter returned 401: invalid key",
     });
     expect(createCompletion).toHaveBeenCalledTimes(1);
   });

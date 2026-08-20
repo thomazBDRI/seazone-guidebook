@@ -32,31 +32,77 @@ export class GenerationError extends Error {
 
 export type GeneratedGuide = { content: GuideContent; model: string };
 
+/** Hard ceiling on model calls, whatever mix of failures we hit. */
+const MAX_ATTEMPTS = 3;
+/**
+ * Stop starting new attempts past this point. The route handler has 60s and
+ * grounding has already spent some of it, so a late retry would be killed
+ * mid-flight and persist nothing.
+ */
+const ATTEMPT_BUDGET_MS = 40_000;
+
 export async function generateGuide(
   property: Property,
 ): Promise<GeneratedGuide> {
   const pois = await groundOnOsm(property);
-  const messages = buildGuideMessages({ property, pois });
+  let messages = buildGuideMessages({ property, pois });
 
-  const first = await complete(messages);
-  const parsed = validate(first.text);
-  if (parsed.success) {
-    return { content: parsed.data, model: first.model };
+  const deadline = Date.now() + ATTEMPT_BUDGET_MS;
+  let corrected = false;
+  let lastError: GenerationError | undefined;
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const hasBudget = attempt < MAX_ATTEMPTS && Date.now() < deadline;
+
+    let completion: Awaited<ReturnType<typeof createCompletion>>;
+    try {
+      completion = await createCompletion({ messages, json: true });
+    } catch (cause) {
+      lastError = new GenerationError("llm", (cause as Error).message, {
+        cause,
+      });
+      // free endpoints drop requests and return empty bodies under load
+      if (isTransient(cause) && hasBudget) continue;
+      throw lastError;
+    }
+
+    const parsed = validate(completion.text);
+    if (parsed.success) {
+      return { content: parsed.data, model: completion.model };
+    }
+
+    lastError = new GenerationError(
+      "validation",
+      `model output failed validation: ${parsed.issues}`,
+    );
+    // one correction turn only; a model that misses the contract twice is
+    // not going to find it on a third pass
+    if (corrected || !hasBudget) throw lastError;
+
+    messages = buildCorrectionMessages(
+      messages,
+      completion.text,
+      parsed.issues,
+    );
+    corrected = true;
   }
 
-  // one retry: free models routinely miss the contract on the first pass
-  const retry = await complete(
-    buildCorrectionMessages(messages, first.text, parsed.issues),
-  );
-  const retried = validate(retry.text);
-  if (retried.success) {
-    return { content: retried.data, model: retry.model };
-  }
+  throw lastError ?? new GenerationError("llm", "generation made no attempt");
+}
 
-  throw new GenerationError(
-    "validation",
-    `model output failed validation twice: ${retried.issues}`,
-  );
+/**
+ * Whether another identical call is worth making. Deliberately duck-typed
+ * rather than an `instanceof OpenRouterError`, so an error that crossed a
+ * module or serialization boundary still classifies correctly.
+ */
+function isTransient(error: unknown): boolean {
+  const { kind, status } = (error ?? {}) as {
+    kind?: string;
+    status?: number;
+  };
+
+  if (kind === "empty" || kind === "timeout" || kind === "network") return true;
+  return status === 429 || (status !== undefined && status >= 500);
 }
 
 /**
@@ -72,16 +118,6 @@ async function groundOnOsm(property: Property): Promise<NearbyPois | null> {
 
   const pois = await fetchNearbyPois(point.lat, point.lon);
   return hasPois(pois) ? pois : null;
-}
-
-async function complete(
-  messages: Parameters<typeof createCompletion>[0]["messages"],
-) {
-  try {
-    return await createCompletion({ messages, json: true });
-  } catch (cause) {
-    throw new GenerationError("llm", (cause as Error).message, { cause });
-  }
 }
 
 type ValidationOutcome =

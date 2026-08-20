@@ -25,11 +25,14 @@ import { GuideContentSchema } from "@/lib/domain/guide";
 import { wifiQrPayload } from "@/lib/domain/wifi";
 import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n/server";
-import { getGuideByPropertyId } from "@/lib/repositories/guides";
-import { getPropertyByCode } from "@/lib/repositories/properties";
+import { getPropertyWithGuideByCode } from "@/lib/repositories/properties";
 
-/** Deduplicates the lookup between generateMetadata and the page render. */
-const loadProperty = cache(getPropertyByCode);
+/**
+ * Deduplicates the lookup between generateMetadata and the page render, and
+ * carries the guide in the same round trip — the route is fully dynamic, so
+ * every sequential query happens between the guest's click and the first byte.
+ */
+const loadPropertyWithGuide = cache(getPropertyWithGuideByCode);
 
 type PageProps = { params: Promise<{ code: string }> };
 
@@ -37,13 +40,13 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { code } = await params;
-  const [property, messages] = await Promise.all([
-    loadProperty(code),
-    getLocale().then(getMessages),
-  ]);
-  if (!property) {
+  const locale = await getLocale();
+  const messages = getMessages(locale);
+  const result = await loadPropertyWithGuide(code, locale);
+  if (!result) {
     return { title: messages.metadata.notFoundTitle };
   }
+  const { property } = result;
   return {
     title: messages.metadata.propertyTitle(property.name),
     description: messages.metadata.propertyDescription(
@@ -55,14 +58,12 @@ export async function generateMetadata({
 
 export default async function GuidePage({ params }: PageProps) {
   const { code } = await params;
-  const [property, locale] = await Promise.all([
-    loadProperty(code),
-    getLocale(),
-  ]);
-  if (!property) notFound();
+  const locale = await getLocale();
+  const result = await loadPropertyWithGuide(code, locale);
+  if (!result) notFound();
+  const { property, guide } = result;
 
   const messages = getMessages(locale);
-  const guide = await getGuideByPropertyId(property.id, locale);
   // an unreadable payload is treated as "not generated yet" rather than
   // crashing the whole guide over one bad column
   const parsedContent =

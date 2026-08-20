@@ -61,6 +61,15 @@ export const properties = pgTable("properties", {
     .$type<Record<string, boolean>>()
     .notNull()
     .default({}),
+  /**
+   * Guest services the host offers on request (early check-in, late check-out,
+   * transfer…). `true` takes the dictionary's default sentence; a string is a
+   * host-authored note shown as-is, so an unusual arrangement needs no deploy.
+   */
+  services: jsonb("services")
+    .$type<Record<string, boolean | string>>()
+    .notNull()
+    .default({}),
   images: text("images").array().notNull().default([]),
 
   hostName: text("host_name").notNull(),

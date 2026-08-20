@@ -51,8 +51,26 @@ describe("message catalogs", () => {
     const es = getMessages("es");
     expect(es.hero.askAi).toBe("Pregunta a la IA");
     expect(es.host.title).toBe("Habla con tu anfitrión");
-    expect(es.amenities.title).toBe("Capacidad y servicios");
+    expect(es.amenities.title).toBe("Capacidad y comodidades");
     expect(es.notFound.badge).toBe("ALOJAMIENTO NO ENCONTRADO");
+  });
+
+  it("gives the amenities and services sections labels of their own", () => {
+    // es once translated "comodidades" as "Servicios", colliding with the
+    // section that now owns that word
+    for (const locale of LOCALES) {
+      const { sections } = getMessages(locale).toc;
+      expect(sections.servicos).not.toBe(sections.comodidades);
+    }
+  });
+
+  it("keeps the emergency numbers identical in every locale", () => {
+    for (const locale of LOCALES) {
+      const { numbers, note } = getMessages(locale).services.emergency;
+      // the words around them translate; 192/193/190 are what you dial
+      expect(numbers).toMatch(/192.+193.+190/);
+      expect(note("Ana Paula")).toContain("Ana Paula");
+    }
   });
 
   it("interpolates and pluralizes per language", () => {

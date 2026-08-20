@@ -41,6 +41,7 @@ export const fln001: Property = {
     elevator: true,
     balcony: true,
   },
+  services: { early_checkin: true, extend_stay: true, luggage_storage: true },
   images: [
     "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800",
   ],
@@ -48,7 +49,7 @@ export const fln001: Property = {
   host_phone: "+5548991234567",
 };
 
-/** GRM001 variant: pets allowed, keybox, no babies. */
+/** GRM001 variant: pets allowed, keybox, no babies, a host-authored service note. */
 export const grm001: Property = {
   ...fln001,
   id: "8f66f4b8-5e32-4a1b-8d9f-2b3c4d5e6f70",
@@ -85,6 +86,12 @@ export const grm001: Property = {
     bbq_grill: true,
     balcony: true,
     dishwasher: true,
+  },
+  services: {
+    late_checkout: true,
+    extend_stay: true,
+    airport_transfer:
+      "Transfer particular até Canela e Gramado centro — combine com Carlos",
   },
   images: [
     "https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800",

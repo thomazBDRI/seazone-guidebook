@@ -1,0 +1,1 @@
+ALTER TABLE "properties" ADD COLUMN "services" jsonb DEFAULT '{}'::jsonb NOT NULL;

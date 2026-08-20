@@ -41,6 +41,16 @@ export const PropertySchema = z.object({
   events_permitted: z.boolean(),
 
   amenities: z.record(z.string(), z.boolean()),
+  /**
+   * Services offered on request: `true` renders the dictionary's default
+   * sentence, a string is a host-authored note. Defaulted and caught so a row
+   * written before the column existed — or one carrying an unexpected shape —
+   * still parses into a guide instead of blanking the page.
+   */
+  services: z
+    .record(z.string(), z.union([z.boolean(), z.string()]))
+    .default({})
+    .catch({}),
   images: z.array(z.string()),
 
   host_name: z.string(),

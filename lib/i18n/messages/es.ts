@@ -79,7 +79,9 @@ const es: Messages = {
     sections: {
       acesso: "Llegada y acceso",
       regras: "Normas de la estancia",
-      comodidades: "Servicios",
+      // "Comodidades" rather than "Servicios": the section below owns that word
+      comodidades: "Comodidades",
+      servicos: "Servicios",
       experiencias: "Explora la zona",
       contato: "Contacto",
     },
@@ -126,11 +128,24 @@ const es: Messages = {
 
   amenities: {
     eyebrow: "Lo que ofrece el alojamiento",
-    title: "Capacidad y servicios",
+    title: "Capacidad y comodidades",
     bedrooms: (count: number) => (count === 1 ? "dormitorio" : "dormitorios"),
     bathrooms: (count: number) => (count === 1 ? "baño" : "baños"),
     guests: (count: number) =>
       count === 1 ? "huésped como máximo" : "huéspedes como máximo",
+  },
+
+  services: {
+    eyebrow: "Servicios a petición",
+    title: "¿Necesitas algo más?",
+    description:
+      "Acuérdalo directamente con quien cuida el alojamiento — todo sujeto a disponibilidad.",
+    emergency: {
+      title: "Emergencias",
+      numbers: "Ambulancia 192 · Bomberos 193 · Policía 190",
+      note: (hostName: string) =>
+        `Para problemas en el alojamiento — una fuga, un corte de luz, una cerradura atascada — habla primero con ${hostName}.`,
+    },
   },
 
   experience: {
@@ -224,6 +239,22 @@ const es: Messages = {
       fireplace: "Chimenea",
       gym: "Gimnasio",
       parking: "Aparcamiento",
+      jacuzzi: "Jacuzzi",
+      beach_access: "Acceso a la playa",
+    },
+    services: {
+      early_checkin: ({ host, checkIn }) =>
+        `¿Quieres entrar antes de las ${checkIn}? Habla con ${host} — sujeto a disponibilidad.`,
+      late_checkout: ({ host }) =>
+        `¿Necesitas salir más tarde? Acuérdalo con ${host} — sujeto a disponibilidad.`,
+      extend_stay: () =>
+        "¿Quieres quedarte más días? Habla con el equipo de Seazone y consigue descuento en las noches extra.",
+      midstay_cleaning: ({ host }) =>
+        `¿Limpieza extra durante la estancia? Pídesela a ${host}.`,
+      luggage_storage: ({ host }) =>
+        `¿Sales demasiado temprano? Pregúntale a ${host} por la guarda de equipaje.`,
+      airport_transfer: ({ host }) =>
+        `Traslado del aeropuerto: consulta precios y horarios con ${host}.`,
     },
     accessTypes: {
       smart_lock: "Cerradura electrónica",

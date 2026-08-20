@@ -87,6 +87,7 @@ const ptBR = {
       acesso: "Chegada & acesso",
       regras: "Regras da estadia",
       comodidades: "Comodidades",
+      servicos: "Serviços",
       experiencias: "Explore a região",
       contato: "Contato",
     },
@@ -141,6 +142,19 @@ const ptBR = {
       count === 1 ? "banheiro" : "banheiros",
     guests: (count: number): string =>
       count === 1 ? "hóspede no máximo" : "hóspedes no máximo",
+  },
+
+  services: {
+    eyebrow: "Serviços a pedido",
+    title: "Precisa de algo?",
+    description:
+      "Combine direto com quem cuida do imóvel — tudo sujeito a disponibilidade.",
+    emergency: {
+      title: "Emergências",
+      numbers: "SAMU 192 · Bombeiros 193 · Polícia 190",
+      note: (hostName: string) =>
+        `Para problemas no imóvel — vazamento, falta de energia, fechadura travada — fale primeiro com ${hostName}.`,
+    },
   },
 
   experience: {
@@ -235,6 +249,27 @@ const ptBR = {
       fireplace: "Lareira",
       gym: "Academia",
       parking: "Estacionamento",
+      jacuzzi: "Jacuzzi",
+      beach_access: "Acesso à praia",
+    },
+    /**
+     * Services offered on request. Every template receives the host name and
+     * the check-in time, so a translation may interpolate whichever it needs
+     * (or neither) without changing the caller.
+     */
+    services: {
+      early_checkin: ({ host, checkIn }: { host: string; checkIn: string }) =>
+        `Quer entrar antes das ${checkIn}? Fale com ${host} — sujeito à disponibilidade.`,
+      late_checkout: ({ host }: { host: string }) =>
+        `Precisa sair mais tarde? Combine com ${host} — sujeito à disponibilidade.`,
+      extend_stay: () =>
+        "Quer ficar mais dias? Fale com o time Seazone e ganhe desconto nas diárias adicionais.",
+      midstay_cleaning: ({ host }: { host: string }) =>
+        `Limpeza extra durante a estadia? Peça a ${host}.`,
+      luggage_storage: ({ host }: { host: string }) =>
+        `Check-out cedo demais? Pergunte a ${host} sobre guarda de bagagem.`,
+      airport_transfer: ({ host }: { host: string }) =>
+        `Transfer do aeroporto: consulte ${host} sobre valores e horários.`,
     },
     accessTypes: {
       smart_lock: "Fechadura eletrônica",

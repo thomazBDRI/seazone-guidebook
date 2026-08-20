@@ -80,6 +80,7 @@ const en: Messages = {
       acesso: "Arrival & access",
       regras: "House rules",
       comodidades: "Amenities",
+      servicos: "Services",
       experiencias: "Explore the area",
       contato: "Contact",
     },
@@ -131,6 +132,19 @@ const en: Messages = {
     bathrooms: (count: number) => (count === 1 ? "bathroom" : "bathrooms"),
     guests: (count: number) =>
       count === 1 ? "guest maximum" : "guests maximum",
+  },
+
+  services: {
+    eyebrow: "Services on request",
+    title: "Need anything else?",
+    description:
+      "Arrange it directly with whoever looks after the place — all subject to availability.",
+    emergency: {
+      title: "Emergencies",
+      numbers: "Ambulance 192 · Fire 193 · Police 190",
+      note: (hostName: string) =>
+        `For problems in the property — a leak, a power cut, a jammed lock — talk to ${hostName} first.`,
+    },
   },
 
   experience: {
@@ -222,6 +236,22 @@ const en: Messages = {
       fireplace: "Fireplace",
       gym: "Gym",
       parking: "Parking",
+      jacuzzi: "Hot tub",
+      beach_access: "Beach access",
+    },
+    services: {
+      early_checkin: ({ host, checkIn }) =>
+        `Want to get in before ${checkIn}? Ask ${host} — subject to availability.`,
+      late_checkout: ({ host }) =>
+        `Need to leave later? Arrange it with ${host} — subject to availability.`,
+      extend_stay: () =>
+        "Thinking of staying longer? Talk to the Seazone team and get a discount on the extra nights.",
+      midstay_cleaning: ({ host }) =>
+        `Extra cleaning during your stay? Just ask ${host}.`,
+      luggage_storage: ({ host }) =>
+        `Checking out too early? Ask ${host} about leaving your luggage.`,
+      airport_transfer: ({ host }) =>
+        `Airport transfer: check prices and times with ${host}.`,
     },
     accessTypes: {
       smart_lock: "Smart lock",

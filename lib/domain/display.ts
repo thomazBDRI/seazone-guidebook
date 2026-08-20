@@ -134,6 +134,8 @@ const AMENITY_ICONS: Record<string, string> = {
   fireplace: "flame",
   gym: "dumbbell",
   parking: "car",
+  jacuzzi: "bath",
+  beach_access: "umbrella",
 };
 
 /** Humanizes unknown keys so new backend amenities never break the UI. */
@@ -165,6 +167,71 @@ export function amenityList(
     .filter((key) => amenities[key])
     .sort((a, b) => (known[b] ? 1 : 0) - (known[a] ? 1 : 0))
     .map((key) => ({ key, ...amenityDisplay(key, locale) }));
+}
+
+export type ServiceLine = {
+  key: string;
+  icon: string;
+  /** Localized sentence for a known service; the humanized key otherwise. */
+  sentence: string;
+  /** Text authored on the row, shown as written — never translated. */
+  note: string | null;
+};
+
+/** What the sentence templates may interpolate. */
+export type ServiceContext = { hostName: string; checkIn: string };
+
+/**
+ * Declaration order doubles as display order, so the section reads the same
+ * for every property. Keys the catalog does not know come after these.
+ */
+const SERVICE_ICONS: Record<string, string> = {
+  early_checkin: "clock",
+  late_checkout: "log-out",
+  extend_stay: "calendar-plus",
+  midstay_cleaning: "brush-cleaning",
+  luggage_storage: "luggage",
+  airport_transfer: "plane",
+};
+
+const SERVICE_ORDER = Object.keys(SERVICE_ICONS);
+
+type ServiceTemplates = Record<
+  string,
+  ((context: { host: string; checkIn: string }) => string) | undefined
+>;
+
+/**
+ * services jsonb → guest-facing lines. A `false` (or empty) value means the
+ * service is not offered and never reaches the page; the chat prompt relies on
+ * that so it can tell a guest honestly that something is unavailable.
+ */
+export function serviceLines(
+  services: Record<string, boolean | string>,
+  { hostName, checkIn }: ServiceContext,
+  locale: Locale,
+): ServiceLine[] {
+  const templates: ServiceTemplates = getMessages(locale).domain.services;
+  const context = { host: hostName, checkIn: formatTime(checkIn) };
+
+  return Object.keys(services)
+    .filter((key) => services[key] !== false && services[key] !== "")
+    .sort((a, b) => serviceRank(a) - serviceRank(b))
+    .map((key) => {
+      const value = services[key];
+      const template = templates[key];
+      return {
+        key,
+        icon: SERVICE_ICONS[key] ?? "concierge-bell",
+        sentence: template ? template(context) : humanize(key),
+        note: typeof value === "string" ? value : null,
+      };
+    });
+}
+
+function serviceRank(key: string): number {
+  const index = SERVICE_ORDER.indexOf(key);
+  return index === -1 ? SERVICE_ORDER.length : index;
 }
 
 const ACCESS_TYPE_ICONS: Record<string, string> = {

@@ -12,8 +12,9 @@ import {
   mapAddress,
   phoneDigits,
   ruleLines,
+  serviceLines,
 } from "@/lib/domain/display";
-import { LOCALES } from "@/lib/i18n/locales";
+import { LOCALES, type Locale } from "@/lib/i18n/locales";
 import { fln001, grm001 } from "@/test/fixtures/property";
 
 describe("formatTime", () => {
@@ -90,6 +91,139 @@ describe("amenityList", () => {
     const list = amenityList({ zzz_custom: true, wifi: true }, "pt-BR");
     expect(list[0].key).toBe("wifi");
     expect(list[1].label).toBe("Zzz custom");
+  });
+});
+
+describe("serviceLines", () => {
+  const host = { hostName: "Ana Paula", checkIn: "15:00:00" };
+  const lines = (
+    services: Record<string, boolean | string>,
+    locale = "pt-BR",
+  ) => serviceLines(services, host, locale as Locale);
+
+  it("writes the default sentence for a service flagged true", () => {
+    expect(lines({ early_checkin: true })).toEqual([
+      {
+        key: "early_checkin",
+        icon: "clock",
+        sentence:
+          "Quer entrar antes das 15:00? Fale com Ana Paula — sujeito à disponibilidade.",
+        note: null,
+      },
+    ]);
+  });
+
+  it("keeps the sentence and carries the row's text as the note", () => {
+    const [transfer] = lines({
+      airport_transfer: "Buscamos no aeroporto de Navegantes",
+    });
+    expect(transfer.sentence).toBe(
+      "Transfer do aeroporto: consulte Ana Paula sobre valores e horários.",
+    );
+    // host-authored text is data: shown exactly as it was written
+    expect(transfer.note).toBe("Buscamos no aeroporto de Navegantes");
+    expect(transfer.icon).toBe("plane");
+  });
+
+  it("covers every known key with its own icon", () => {
+    const all = lines({
+      early_checkin: true,
+      late_checkout: true,
+      extend_stay: true,
+      midstay_cleaning: true,
+      luggage_storage: true,
+      airport_transfer: true,
+    });
+
+    expect(all.map((line) => line.icon)).toEqual([
+      "clock",
+      "log-out",
+      "calendar-plus",
+      "brush-cleaning",
+      "luggage",
+      "plane",
+    ]);
+    expect(all.map((line) => line.sentence)).toEqual([
+      "Quer entrar antes das 15:00? Fale com Ana Paula — sujeito à disponibilidade.",
+      "Precisa sair mais tarde? Combine com Ana Paula — sujeito à disponibilidade.",
+      "Quer ficar mais dias? Fale com o time Seazone e ganhe desconto nas diárias adicionais.",
+      "Limpeza extra durante a estadia? Peça a Ana Paula.",
+      "Check-out cedo demais? Pergunte a Ana Paula sobre guarda de bagagem.",
+      "Transfer do aeroporto: consulte Ana Paula sobre valores e horários.",
+    ]);
+  });
+
+  it("humanizes a service the catalog does not know", () => {
+    expect(
+      lines({ pet_sitting: "Combinamos com a Bia, R$ 80 a diária" }),
+    ).toEqual([
+      {
+        key: "pet_sitting",
+        icon: "concierge-bell",
+        sentence: "Pet sitting",
+        note: "Combinamos com a Bia, R$ 80 a diária",
+      },
+    ]);
+    expect(lines({ pet_sitting: true })[0].note).toBeNull();
+  });
+
+  it("drops services that are not offered", () => {
+    expect(
+      lines({ early_checkin: false, late_checkout: "", extend_stay: true }).map(
+        (line) => line.key,
+      ),
+    ).toEqual(["extend_stay"]);
+    expect(lines({})).toEqual([]);
+  });
+
+  it("orders known services first, whatever order the row spelled them", () => {
+    const keys = lines({
+      zzz_custom: true,
+      airport_transfer: true,
+      early_checkin: true,
+    }).map((line) => line.key);
+    expect(keys).toEqual(["early_checkin", "airport_transfer", "zzz_custom"]);
+  });
+
+  it("interpolates the check-in time already trimmed of its seconds", () => {
+    expect(lines({ early_checkin: true })[0].sentence).toContain(
+      "antes das 15:00",
+    );
+    expect(
+      serviceLines(
+        { early_checkin: true },
+        { hostName: "Carlos", checkIn: "14:00" },
+        "pt-BR",
+      )[0].sentence,
+    ).toContain("antes das 14:00");
+  });
+
+  it("translates the sentences while leaving the note as authored", () => {
+    const english = lines(
+      { early_checkin: true, airport_transfer: "Van até Jurerê" },
+      "en",
+    );
+    expect(english[0].sentence).toBe(
+      "Want to get in before 15:00? Ask Ana Paula — subject to availability.",
+    );
+    expect(english[1].note).toBe("Van até Jurerê");
+
+    const spanish = lines({ late_checkout: true, extend_stay: true }, "es");
+    expect(spanish[0].sentence).toBe(
+      "¿Necesitas salir más tarde? Acuérdalo con Ana Paula — sujeto a disponibilidad.",
+    );
+    expect(spanish[1].sentence).toContain("descuento en las noches extra");
+  });
+
+  it("humanizes an unknown service the same way in every locale", () => {
+    for (const locale of LOCALES) {
+      expect(lines({ pet_sitting: true }, locale)[0]).toEqual({
+        key: "pet_sitting",
+        icon: "concierge-bell",
+        sentence: "Pet sitting",
+        note: null,
+      });
+    }
   });
 });
 

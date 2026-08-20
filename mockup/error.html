@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Imóvel não encontrado · Guia do Hóspede — Seazone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy: hsl(220 100% 12%);
+  --sea-deep: hsl(220 100% 8%);
+  --primary: hsl(220 100% 50%);
+  --primary-strong: hsl(220 100% 40%);
+  --sea-light: hsl(225 70% 95%);
+  --coral: hsl(2 97% 66%);
+  --gradient-sea: linear-gradient(135deg, hsl(220 100% 50%), hsl(220 100% 35%));
+  --font-body: "DM Sans", sans-serif;
+  --font-display: "Fraunces", serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:var(--font-body);
+  background:var(--sea-deep);
+  color:#fff;
+  min-height:100dvh;
+  display:flex;flex-direction:column;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.topbar{
+  display:flex;align-items:center;padding:18px clamp(16px,4vw,40px);
+}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff}
+.brand svg{width:26px;height:26px}
+.brand-word{font-weight:700;font-size:19px;letter-spacing:-.03em}
+.brand-sub{font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;opacity:.72;display:block;margin-top:-3px}
+
+main{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:40px clamp(16px,4vw,40px) 80px;
+  position:relative;
+}
+main::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(560px 340px at 80% 10%, hsla(220,100%,55%,.22), transparent 65%),
+    radial-gradient(480px 300px at 10% 90%, hsla(2,97%,66%,.12), transparent 65%);
+}
+.box{position:relative;text-align:center;max-width:520px;animation:rise .7s both}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+/* ilha perdida */
+.art{width:190px;height:150px;margin:0 auto 8px;position:relative}
+.art .sun{
+  position:absolute;top:6px;right:22px;width:38px;height:38px;border-radius:50%;
+  background:var(--coral);opacity:.9;
+  box-shadow:0 0 40px hsla(2,97%,66%,.5);
+  animation:float 5s ease-in-out infinite;
+}
+.art svg{position:absolute;bottom:0;left:0;width:100%}
+.art .isle{animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+
+.code-chip{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:700;letter-spacing:.16em;
+  background:hsla(2,97%,66%,.14);border:1px solid hsla(2,97%,66%,.45);
+  color:hsl(2 100% 80%);
+  padding:6px 15px;border-radius:999px;margin-bottom:20px;
+}
+.code-chip svg{width:13px;height:13px}
+h1{
+  font-family:var(--font-display);font-weight:500;
+  font-size:clamp(30px,5.6vw,44px);letter-spacing:-.01em;line-height:1.1;
+  margin-bottom:14px;
+}
+h1 em{font-style:italic;color:hsl(225 90% 78%)}
+p.lead{
+  color:hsla(225,70%,95%,.68);font-size:16px;line-height:1.6;
+  max-width:42ch;margin:0 auto 30px;
+}
+p.lead b{color:#fff;font-weight:600}
+.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-size:14.5px;font-weight:600;border-radius:12px;padding:13px 24px;
+  text-decoration:none;transition:transform .15s, background .2s;
+}
+.btn svg{width:16px;height:16px}
+.btn-primary{background:var(--gradient-sea);color:#fff;box-shadow:0 10px 30px -8px hsla(220,100%,50%,.5)}
+.btn-primary:hover{transform:translateY(-2px)}
+.btn-ghost{background:hsla(0,0%,100%,.09);border:1px solid hsla(0,0%,100%,.2);color:#fff}
+.btn-ghost:hover{background:hsla(0,0%,100%,.16)}
+.hint{
+  margin-top:34px;font-size:13px;color:hsla(225,70%,95%,.45);
+}
+.hint code{
+  font-family:ui-monospace,monospace;font-size:12.5px;
+  background:hsla(0,0%,100%,.08);border:1px solid hsla(0,0%,100%,.14);
+  padding:2px 8px;border-radius:6px;color:hsl(225 90% 80%);
+}
+footer{
+  padding:22px clamp(16px,4vw,40px) calc(22px + env(safe-area-inset-bottom));
+  text-align:center;font-size:12px;color:hsla(225,70%,95%,.4);
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M2 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M2 20c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/><path d="M12 4l3.5 6h-7L12 4z" fill="#fff"/></svg>
+    <span>
+      <span class="brand-word">seazone</span>
+      <span class="brand-sub">Guia do Hóspede</span>
+    </span>
+  </a>
+</header>
+
+<main>
+  <div class="box">
+    <div class="art">
+      <div class="sun"></div>
+      <svg viewBox="0 0 190 90" fill="none">
+        <g class="isle">
+          <ellipse cx="95" cy="62" rx="46" ry="12" fill="hsl(35 60% 72%)"/>
+          <path d="M95 62V30" stroke="hsl(25 40% 40%)" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M95 32c-3-9 5-15 13-14-6 3-7 7-6 9 7-5 16-2 18 4-7-2-11 0-13 2 8 1 12 7 10 12-5-6-10-6-14-5" fill="hsl(150 45% 42%)"/>
+          <path d="M95 32c3-8-4-14-12-13 5 3 6 6 5 8-7-4-14-1-16 5 6-2 10 0 12 2-7 1-10 6-8 10 4-5 9-5 13-4" fill="hsl(150 50% 35%)"/>
+        </g>
+        <path d="M0 78c14 0 14-7 27-7s14 7 27 7 14-7 27-7 14 7 27 7 14-7 27-7 14 7 28 7 13-7 27-7" stroke="hsl(220 100% 55%)" stroke-width="3" stroke-linecap="round" opacity=".85"/>
+        <path d="M0 88c14 0 14-7 27-7s14 7 27 7 14-7 27-7 14 7 27 7 14-7 27-7 14 7 28 7 13-7 27-7" stroke="hsl(220 100% 50%)" stroke-width="3" stroke-linecap="round" opacity=".4"/>
+      </svg>
+    </div>
+
+    <span class="code-chip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5h.01"/></svg>
+      IMÓVEL "XYZ123" NÃO ENCONTRADO
+    </span>
+    <h1>Parece que este imóvel <em>navegou para longe</em></h1>
+    <p class="lead">
+      Não encontramos nenhum imóvel com esse código. Confira o <b>link enviado na sua confirmação de reserva</b> — o código aparece no final do endereço.
+    </p>
+    <div class="actions">
+      <a class="btn btn-primary" href="https://wa.me/554891234567">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.2 14.1c-.2.6-1.2 1.2-1.7 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.2c.1.2.1.4 0 .6l-.4.6-.5.5c-.2.2-.3.4-.1.7.2.3.9 1.4 1.9 2.3 1.3 1.2 2.4 1.5 2.7 1.7.3.1.5.1.7-.1l1-1.2c.2-.3.4-.2.7-.1l2.1 1c.3.2.5.3.6.4 0 .1 0 .7-.2 1.3z"/></svg>
+        Falar com a Seazone
+      </a>
+      <a class="btn btn-ghost" href="index.html">Ver exemplo: FLN001</a>
+    </div>
+    <p class="hint">O link do seu guia tem este formato: <code>guia.seazone.com.br/FLN001</code></p>
+  </div>
+</main>
+
+<footer>© 2026 Seazone Serviços Ltda. · Guia do Hóspede</footer>
+
+</body>
+</html>

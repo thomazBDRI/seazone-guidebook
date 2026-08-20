@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apartamento Beira-Mar Florianópolis · Guia do Hóspede — Seazone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   SEAZONE GUEST GUIDE — design tokens
+   (extraídos de guia-do-hospede.seazone.com.br)
+   ============================================================ */
+:root{
+  --sea-deep: hsl(220 100% 8%);
+  --navy: hsl(220 100% 12%);
+  --navy-soft: hsl(220 80% 16%);
+  --primary: hsl(220 100% 50%);
+  --primary-strong: hsl(220 100% 40%);
+  --sea-light: hsl(225 70% 95%);
+  --sea-mist: hsl(225 70% 98%);
+  --sand: hsl(6 100% 98%);
+  --coral: hsl(2 97% 66%);
+  --coral-deep: hsl(2 72% 50%);
+  --ink: hsl(220 70% 12%);
+  --muted: hsl(220 14% 44%);
+  --border: hsl(220 28% 90%);
+  --ok: hsl(152 65% 36%);
+  --ok-bg: hsl(152 60% 95%);
+  --no: hsl(2 72% 50%);
+  --no-bg: hsl(2 90% 96%);
+  --radius: 14px;
+  --radius-lg: 22px;
+  --shadow-soft: 0 2px 15px -3px hsla(220,100%,50%,.08);
+  --shadow-card: 0 4px 25px -5px hsla(220,100%,50%,.12);
+  --shadow-elevated: 0 14px 44px -12px hsla(220,100%,30%,.28);
+  --gradient-sea: linear-gradient(135deg, hsl(220 100% 50%), hsl(220 100% 35%));
+  --gradient-warm: linear-gradient(135deg, hsl(2 97% 66%), hsl(18 90% 64%));
+  --font-body: "DM Sans", sans-serif;
+  --font-display: "Fraunces", serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:130px}
+@media (min-width:1400px){html{scroll-padding-top:86px}}
+body{
+  font-family:var(--font-body);
+  color:var(--ink);
+  background:var(--sea-mist);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.55;
+}
+img{display:block;max-width:100%}
+a{color:inherit}
+button{font-family:inherit;cursor:pointer}
+
+/* ---------- topbar ---------- */
+.topbar{
+  position:fixed;inset:0 0 auto 0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px clamp(16px,4vw,40px);
+  color:#fff;
+  transition:background .3s, box-shadow .3s;
+}
+.topbar.scrolled{
+  background:hsla(220,100%,10%,.86);
+  backdrop-filter:blur(14px);
+  box-shadow:0 1px 0 hsla(0,0%,100%,.08);
+}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand svg{width:26px;height:26px}
+.brand-word{font-weight:700;font-size:19px;letter-spacing:-.03em}
+.brand-sub{font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;opacity:.72;display:block;margin-top:-3px}
+.top-actions{display:flex;align-items:center;gap:10px}
+.btn-whats{
+  display:inline-flex;align-items:center;gap:8px;
+  background:hsla(0,0%,100%,.12);border:1px solid hsla(0,0%,100%,.25);
+  color:#fff;font-weight:600;font-size:13.5px;
+  padding:9px 16px;border-radius:999px;text-decoration:none;
+  backdrop-filter:blur(8px);
+  transition:background .2s;
+}
+.btn-whats:hover{background:hsla(0,0%,100%,.22)}
+.btn-whats svg{width:15px;height:15px}
+.lang{font-size:12.5px;font-weight:600;opacity:.85;letter-spacing:.04em}
+.lang span{opacity:.5;font-weight:400}
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative;
+  min-height:min(88vh,720px);
+  display:flex;align-items:flex-end;
+  color:#fff;
+  overflow:hidden;
+  background:var(--navy);
+}
+.hero-imgs{position:absolute;inset:0}
+.hero-imgs img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .9s ease}
+.hero-imgs img.on{opacity:1}
+.hero-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,
+    hsla(220,100%,10%,.72) 0%,
+    hsla(220,100%,16%,.30) 40%,
+    hsla(220,100%,8%,.88) 100%);
+}
+.hero-inner{
+  position:relative;width:100%;
+  max-width:1080px;margin:0 auto;
+  padding:120px clamp(16px,4vw,40px) clamp(64px,8vh,96px);
+}
+.chip-code{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:12px;font-weight:700;letter-spacing:.16em;
+  background:hsla(0,0%,100%,.14);border:1px solid hsla(0,0%,100%,.3);
+  padding:6px 14px;border-radius:999px;
+  backdrop-filter:blur(6px);
+  animation:rise .7s .05s both;
+}
+.chip-code::before{content:"";width:7px;height:7px;border-radius:50%;background:hsl(152 70% 55%);box-shadow:0 0 8px hsl(152 70% 55%)}
+.hero h1{
+  font-family:var(--font-display);
+  font-weight:500;
+  font-size:clamp(34px,6.2vw,64px);
+  line-height:1.04;
+  letter-spacing:-.015em;
+  margin:18px 0 12px;
+  max-width:14ch;
+  animation:rise .7s .15s both;
+}
+.hero-sub{
+  font-size:clamp(15px,1.8vw,18px);
+  font-weight:500;color:hsla(225,70%,95%,.92);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  animation:rise .7s .25s both;
+}
+.hero-sub .dot{width:4px;height:4px;border-radius:50%;background:hsla(0,0%,100%,.5)}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;animation:rise .7s .38s both}
+.hero-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-size:14.5px;font-weight:600;border-radius:999px;padding:13px 24px;
+  text-decoration:none;border:none;transition:transform .15s, background .2s, box-shadow .2s;
+}
+.hero-btn svg{width:17px;height:17px}
+.hero-btn.solid{
+  background:var(--gradient-warm);color:#fff;
+  font-size:15.5px;font-weight:700;padding:15px 28px;
+  box-shadow:0 10px 32px -6px hsla(2,80%,50%,.65);
+}
+.hero-btn.solid svg{width:19px;height:19px;animation:sparkle 2.4s ease-in-out infinite}
+.hero-btn.solid:hover{transform:translateY(-2px);box-shadow:0 16px 38px -6px hsla(2,80%,50%,.75)}
+.hero-btn.glass{
+  background:hsla(0,0%,100%,.1);border:1px solid hsla(0,0%,100%,.32);color:#fff;
+  backdrop-filter:blur(10px);
+}
+.hero-btn.glass:hover{background:hsla(0,0%,100%,.2)}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+/* ---------- essentials (glass strip inside hero) ---------- */
+.essentials{
+  margin-top:30px;max-width:620px;
+  display:grid;grid-template-columns:repeat(3,1fr);
+  background:hsla(0,0%,100%,.1);border:1px solid hsla(0,0%,100%,.32);
+  border-radius:18px;backdrop-filter:blur(10px);
+  animation:rise .7s .5s both;
+}
+.ess-item{
+  position:relative;padding:16px 14px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;
+}
+.ess-item + .ess-item::before{
+  content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+  height:58%;width:1px;background:hsla(0,0%,100%,.28);
+}
+.ess-label{font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:hsla(0,0%,100%,.62)}
+.ess-value{font-size:16.5px;font-weight:700;letter-spacing:-.01em;color:#fff}
+.ess-value small{font-size:12px;font-weight:500;color:hsla(0,0%,100%,.6)}
+
+/* ---------- left rail TOC (desktop, wide screens) ----------
+   Sem cartão: itens soltos sobre o fundo da página. Aparece só
+   depois do herói e inverte as cores sobre seções escuras. */
+.toc{
+  position:fixed;left:clamp(22px,2.5vw,44px);top:50%;z-index:30;
+  display:none;flex-direction:column;gap:2px;
+  max-width:180px;
+  opacity:0;pointer-events:none;
+  transform:translateY(-50%);
+  transition:opacity .4s ease, transform .35s ease;
+}
+.toc.visible{opacity:1;pointer-events:auto}
+@media (min-width:1400px){.toc{display:flex}}
+.toc-head{
+  font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;opacity:.75;
+  transition:color .4s;
+}
+.toc a{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 0;text-decoration:none;
+  font-size:12.5px;font-weight:600;color:var(--muted);
+  transition:color .3s;
+}
+.toc a::before{
+  content:"";flex:none;width:16px;height:2px;border-radius:2px;
+  background:var(--border);
+  transition:width .25s,background .3s;
+}
+.toc a:hover{color:var(--primary)}
+.toc a.active{color:var(--primary-strong)}
+.toc a.active::before{width:26px;background:var(--primary)}
+/* sobre seções escuras: fundo some, primeiro plano fica claro */
+.toc.dark .toc-head{color:hsla(225,70%,95%,.5)}
+.toc.dark a{color:hsla(225,70%,95%,.6)}
+.toc.dark a::before{background:hsla(225,70%,95%,.2)}
+.toc.dark a:hover{color:#fff}
+.toc.dark a.active{color:#fff}
+.toc.dark a.active::before{background:hsl(225 90% 74%)}
+
+/* ---------- "on this page" bar (mobile / narrow desktop) ---------- */
+.mtoc{
+  position:sticky;top:var(--topbar-h,62px);z-index:40;
+  background:hsla(225,70%,98%,.92);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+@media (min-width:1400px){.mtoc{display:none}}
+.mtoc-btn{
+  width:100%;max-width:1080px;margin:0 auto;
+  display:flex;align-items:center;gap:10px;
+  padding:12px clamp(16px,4vw,40px);
+  background:none;border:none;text-align:left;
+}
+.mtoc-btn .mtoc-tag{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);flex:none}
+.mtoc-btn .mtoc-cur{font-size:13.5px;font-weight:700;color:var(--primary-strong);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mtoc-btn svg{width:16px;height:16px;color:var(--muted);flex:none;transition:transform .25s}
+.mtoc.open .mtoc-btn svg{transform:rotate(180deg)}
+.mtoc-panel{
+  display:none;
+  border-top:1px solid var(--border);
+  background:hsla(225,70%,99%,.98);
+}
+.mtoc.open .mtoc-panel{display:block}
+.mtoc-panel-inner{max-width:1080px;margin:0 auto;padding:8px clamp(16px,4vw,40px) 14px;display:flex;flex-direction:column}
+.mtoc-panel a{
+  display:flex;align-items:center;gap:11px;
+  padding:11px 4px;text-decoration:none;
+  font-size:14px;font-weight:600;color:var(--muted);
+  border-bottom:1px solid hsl(220 28% 94%);
+}
+.mtoc-panel a:last-child{border-bottom:none}
+.mtoc-panel a svg{width:16px;height:16px;flex:none}
+.mtoc-panel a.active{color:var(--primary-strong)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+section.block{padding:clamp(44px,7vw,72px) 0 0}
+.sec-head{margin-bottom:26px}
+.sec-eyebrow{
+  font-size:11.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--primary);display:flex;align-items:center;gap:10px;
+}
+.sec-eyebrow::before{content:"";width:26px;height:2px;background:var(--primary);border-radius:2px}
+.sec-title{
+  font-family:var(--font-display);font-weight:500;
+  font-size:clamp(26px,3.6vw,36px);letter-spacing:-.01em;line-height:1.12;
+  margin-top:8px;
+}
+.sec-desc{color:var(--muted);margin-top:8px;max-width:56ch;font-size:15px}
+
+/* ---------- cards ---------- */
+.card{
+  background:#fff;border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-soft);
+}
+
+/* ---------- chegada & acesso ---------- */
+.access-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:16px}
+.map-card{grid-row:span 3;padding:0;overflow:hidden;display:flex;flex-direction:column}
+.map-card iframe{width:100%;flex:1;min-height:250px;border:0;display:block}
+.map-body{padding:20px 22px 22px;display:flex;flex-direction:column;gap:16px}
+.map-body address{font-style:normal;font-size:14px;color:var(--muted);line-height:1.6}
+.map-body address b{display:block;font-size:16px;color:var(--ink);letter-spacing:-.01em;margin-bottom:2px}
+.map-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn-uber{background:#000;color:#fff}
+.btn-uber:hover{background:hsl(0 0% 15%);transform:translateY(-1px)}
+.access-card{padding:24px;display:flex;gap:16px;align-items:flex-start}
+.access-icon{
+  width:46px;height:46px;flex:none;border-radius:13px;
+  background:var(--sea-light);color:var(--primary);
+  display:grid;place-items:center;
+}
+.access-icon svg{width:22px;height:22px}
+.access-card h3{font-size:16px;font-weight:700;letter-spacing:-.01em;margin-bottom:4px}
+.access-card p{font-size:14px;color:var(--muted)}
+.access-card .hl{
+  display:inline-block;margin-top:8px;
+  font-weight:700;color:var(--navy);font-size:14px;
+  background:var(--sea-light);padding:4px 12px;border-radius:8px;
+}
+.badge-selfcheckin{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:700;color:var(--ok);
+  background:var(--ok-bg);border-radius:999px;padding:4px 12px;margin-top:10px;
+}
+.badge-selfcheckin svg{width:12px;height:12px}
+.wifi-lite{padding:24px}
+.wifi-lite .wl-head{display:flex;align-items:center;gap:13px;margin-bottom:16px}
+.wifi-lite .wl-head h3{font-size:16px;font-weight:700;letter-spacing:-.01em}
+.wifi-lite .wl-head p{font-size:13px;color:var(--muted)}
+.wifi-body{display:flex;gap:18px;align-items:stretch;flex-wrap:wrap}
+.wifi-creds{flex:1;min-width:210px}
+.cred{margin-bottom:10px}
+.cred:last-of-type{margin-bottom:0}
+.cred-label{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.cred-row{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--sea-mist);border:1px solid var(--border);
+  border-radius:11px;padding:10px 13px;
+}
+.cred-value{font-size:15px;font-weight:700;letter-spacing:.01em;color:var(--ink);font-variant-ligatures:none}
+.copy-btn{
+  display:inline-flex;align-items:center;gap:6px;flex:none;
+  background:#fff;border:1px solid var(--border);color:var(--primary-strong);
+  font-size:12px;font-weight:600;padding:7px 12px;border-radius:8px;
+  transition:background .2s,border-color .2s;
+}
+.copy-btn:hover{background:var(--sea-light);border-color:var(--primary)}
+.copy-btn svg{width:13px;height:13px}
+.qr-box{
+  flex:none;width:132px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  background:var(--sea-mist);border:1px solid var(--border);border-radius:12px;
+  padding:12px 10px;
+}
+.qr-box img{width:96px;height:96px;border-radius:6px}
+.qr-box span{font-size:11px;font-weight:600;color:var(--muted);text-align:center;line-height:1.35}
+
+/* ---------- regras ---------- */
+.rules-card{display:grid;grid-template-columns:300px 1px 1fr;padding:0;align-items:stretch}
+.rules-col{padding:28px 30px}
+.rules-col h3{
+  font-size:11.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:14px;
+}
+.rules-divider{background:var(--border);width:1px;margin:26px 0}
+.tline{display:flex;gap:14px;align-items:flex-start;padding:10px 0}
+.tline svg{width:20px;height:20px;flex:none;color:var(--ink);opacity:.7;margin-top:6px}
+.tline .tl-label{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.tline b{display:block;font-family:var(--font-display);font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.15}
+.tline small{font-size:12.5px;color:var(--muted)}
+.rule{display:flex;align-items:center;gap:15px;padding:9px 0;font-size:15px;font-weight:500;color:var(--ink)}
+.rule-ic{position:relative;width:27px;height:27px;flex:none;display:grid;place-items:center}
+.rule-ic svg{width:25px;height:25px;color:hsl(220 35% 35%)}
+.rule-ic.no::after{
+  content:"";position:absolute;width:32px;height:1.8px;border-radius:2px;
+  background:hsl(220 35% 35%);transform:rotate(45deg);
+  box-shadow:0 0 0 1.5px #fff;
+}
+
+/* ---------- comodidades ---------- */
+.cap-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.cap-stat{
+  background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;display:flex;align-items:center;gap:14px;
+  box-shadow:var(--shadow-soft);
+}
+.cap-stat-ic{width:44px;height:44px;flex:none;border-radius:12px;background:var(--navy);color:#fff;display:grid;place-items:center}
+.cap-stat-ic svg{width:21px;height:21px}
+.cap-stat b{font-size:22px;font-weight:700;letter-spacing:-.03em;font-family:var(--font-display);display:block;line-height:1.1}
+.cap-stat span{font-size:12.5px;font-weight:600;color:var(--muted)}
+.amen-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.amen{
+  background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+  padding:17px 18px;display:flex;align-items:center;gap:13px;
+  box-shadow:var(--shadow-soft);
+  transition:transform .2s, box-shadow .2s;
+}
+.amen:hover{transform:translateY(-2px);box-shadow:var(--shadow-card)}
+.amen-ic{flex:none;display:grid;place-items:center;color:hsl(220 35% 35%)}
+.amen-ic svg{width:25px;height:25px}
+.amen span{font-size:14px;font-weight:600}
+
+/* ---------- guia de experiências (IA) ---------- */
+.exp-section{
+  margin-top:clamp(44px,7vw,72px);
+  background:var(--navy);
+  color:#fff;
+  position:relative;overflow:hidden;
+}
+.exp-section::before{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(600px 340px at 85% 0%, hsla(220,100%,55%,.25), transparent 65%),
+    radial-gradient(520px 320px at 0% 100%, hsla(2,97%,66%,.13), transparent 65%);
+  pointer-events:none;
+}
+.exp-inner{position:relative;max-width:1080px;margin:0 auto;padding:clamp(48px,7vw,80px) clamp(16px,4vw,40px)}
+@keyframes sparkle{0%,100%{transform:scale(1) rotate(0deg);opacity:1}50%{transform:scale(1.25) rotate(12deg);opacity:.7}}
+.exp-title{
+  font-family:var(--font-display);font-weight:500;
+  font-size:clamp(28px,4.4vw,44px);letter-spacing:-.01em;line-height:1.1;
+  margin:0 0 10px;max-width:20ch;
+}
+.exp-sub{color:hsla(225,70%,95%,.8);font-size:15px;max-width:52ch}
+.welcome{
+  margin:34px 0 42px;
+  border-left:3px solid var(--coral);
+  padding:6px 0 6px 24px;
+}
+.welcome p{
+  font-family:var(--font-display);font-style:italic;font-weight:400;
+  font-size:clamp(18px,2.4vw,23px);line-height:1.45;color:hsl(225 70% 93%);
+  max-width:34ch;
+}
+.exp-group{margin-top:40px}
+.exp-group-head{display:flex;align-items:baseline;gap:14px;margin-bottom:18px}
+.exp-group-head h3{font-size:19px;font-weight:700;letter-spacing:-.01em}
+.exp-group-head .count{font-size:12.5px;font-weight:600;color:hsla(225,70%,95%,.65)}
+.exp-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.exp-card{
+  background:hsla(220,60%,55%,.14);
+  border:1px solid hsla(225,70%,95%,.18);
+  border-radius:var(--radius);
+  padding:18px 20px;
+  transition:background .2s, border-color .2s, transform .2s;
+}
+.exp-card:hover{background:hsla(220,60%,55%,.16);border-color:hsla(225,70%,95%,.28);transform:translateY(-2px)}
+.exp-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.exp-card h4{font-size:15.5px;font-weight:700;letter-spacing:-.01em}
+.dist{
+  flex:none;font-size:11.5px;font-weight:700;
+  background:hsla(0,0%,100%,.13);border:1px solid hsla(0,0%,100%,.28);
+  color:#fff;
+  border-radius:999px;padding:3px 11px;white-space:nowrap;
+}
+.exp-card p{font-size:13.5px;color:hsla(225,70%,95%,.84);line-height:1.5}
+.exp-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.exp-link{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:600;text-decoration:none;
+  color:#fff;
+  background:hsla(0,0%,100%,.1);border:1px solid hsla(0,0%,100%,.38);
+  padding:6px 13px;border-radius:999px;
+  transition:background .2s,color .2s,border-color .2s;
+}
+.exp-link:hover{background:#fff;color:var(--navy);border-color:#fff}
+.exp-link svg{width:13px;height:13px}
+.ess-tag{
+  display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--coral);margin-bottom:6px;
+}
+.seasonal{
+  margin-top:46px;
+  background:linear-gradient(135deg, hsla(2,97%,66%,.16), hsla(18,90%,64%,.08));
+  border:1px solid hsla(2,97%,66%,.35);
+  border-radius:var(--radius-lg);
+  padding:24px 26px;
+  display:flex;gap:18px;align-items:flex-start;
+}
+.seasonal-ic{
+  width:44px;height:44px;flex:none;border-radius:50%;
+  background:var(--gradient-warm);display:grid;place-items:center;color:#fff;
+}
+.seasonal-ic svg{width:21px;height:21px}
+.seasonal h4{font-size:12px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--coral);margin-bottom:6px}
+.seasonal p{font-size:15px;color:hsl(225 70% 93%);line-height:1.55;max-width:64ch}
+.exp-foot{
+  margin-top:36px;font-size:12px;color:hsla(225,70%,95%,.6);
+  display:flex;align-items:center;gap:8px;
+}
+.exp-foot svg{width:13px;height:13px}
+
+/* ---------- loading state (IA gerando) ---------- */
+.gen-banner{
+  display:flex;align-items:center;gap:16px;
+  background:hsla(220,60%,50%,.12);border:1px solid hsla(220,100%,65%,.3);
+  border-radius:var(--radius-lg);padding:20px 24px;margin:34px 0;
+}
+.gen-orb{
+  width:44px;height:44px;flex:none;border-radius:50%;
+  background:var(--gradient-sea);
+  display:grid;place-items:center;color:#fff;
+  animation:orbpulse 1.8s ease-in-out infinite;
+}
+.gen-orb svg{width:20px;height:20px;animation:sparkle 1.8s ease-in-out infinite}
+@keyframes orbpulse{
+  0%,100%{box-shadow:0 0 0 0 hsla(220,100%,55%,.5)}
+  50%{box-shadow:0 0 0 14px hsla(220,100%,55%,0)}
+}
+.gen-banner h4{font-size:15.5px;font-weight:700}
+.gen-banner p{font-size:13px;color:hsla(225,70%,95%,.75)}
+.skel{position:relative;overflow:hidden;background:hsla(225,70%,95%,.08);border-radius:10px}
+.skel::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,hsla(225,70%,95%,.09),transparent);
+  animation:shimmer 1.6s infinite;
+}
+@keyframes shimmer{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.skel-card{border:1px solid hsla(225,70%,95%,.09);border-radius:var(--radius);padding:18px 20px;background:hsla(220,60%,50%,.05)}
+.skel-line{height:12px;margin-bottom:10px}
+.skel-line:last-child{margin-bottom:0}
+
+/* ---------- contato ---------- */
+.host-card{padding:26px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.host-row{display:flex;align-items:center;gap:16px}
+.avatar{
+  width:56px;height:56px;flex:none;border-radius:50%;
+  background:var(--navy);color:#fff;
+  display:grid;place-items:center;
+  font-weight:700;font-size:19px;letter-spacing:.02em;
+}
+.host-name{font-size:17px;font-weight:700;letter-spacing:-.01em}
+.host-role{font-size:12.5px;color:var(--muted);font-weight:500}
+.host-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font-size:14px;font-weight:600;border-radius:12px;padding:12px 20px;
+  text-decoration:none;border:none;transition:transform .15s, box-shadow .2s, background .2s;
+}
+.btn svg{width:16px;height:16px}
+.btn-primary{background:var(--gradient-sea);color:#fff;box-shadow:var(--shadow-card)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:var(--shadow-elevated)}
+.btn-ghost{background:var(--sea-light);color:var(--primary-strong)}
+.btn-ghost:hover{background:hsl(225 70% 91%)}
+.btn-wa{background:hsl(142 65% 42%);color:#fff;box-shadow:0 4px 18px -4px hsla(142,65%,35%,.5)}
+.btn-wa:hover{background:hsl(142 65% 36%);transform:translateY(-1px)}
+.btn-outline{background:#fff;border:1px solid var(--border);color:var(--ink)}
+.btn-outline:hover{background:var(--sea-mist)}
+
+/* ---------- footer ---------- */
+footer{
+  margin-top:clamp(48px,8vw,84px);
+  background:var(--sea-deep);color:hsla(225,70%,95%,.6);
+  padding:36px clamp(16px,4vw,40px) calc(36px + env(safe-area-inset-bottom));
+}
+.foot-inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.foot-brand{display:flex;align-items:center;gap:9px;color:#fff}
+.foot-brand svg{width:20px;height:20px}
+.foot-brand b{font-size:16px;letter-spacing:-.02em}
+.foot-tag{font-size:13px}
+.foot-copy{font-size:12px;opacity:.7}
+
+/* ---------- chat ---------- */
+.chat-fab{
+  position:fixed;right:20px;bottom:20px;z-index:60;
+  width:60px;height:60px;border-radius:50%;border:none;
+  background:var(--gradient-sea);color:#fff;
+  display:grid;place-items:center;
+  box-shadow:0 10px 30px -6px hsla(220,100%,40%,.55);
+  transition:transform .2s;
+}
+.chat-fab:hover{transform:scale(1.06)}
+.chat-fab svg{width:26px;height:26px}
+.chat-fab .dot-badge{
+  position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;
+  background:var(--coral);border:2.5px solid #fff;
+}
+.chat-panel{
+  position:fixed;right:20px;bottom:92px;z-index:60;
+  width:min(392px, calc(100vw - 32px));
+  height:min(560px, calc(100dvh - 120px));
+  background:#fff;border-radius:20px;
+  box-shadow:0 24px 70px -18px hsla(220,100%,20%,.45);
+  display:flex;flex-direction:column;overflow:hidden;
+  transform-origin:bottom right;
+  transition:transform .25s cubic-bezier(.32,.72,.35,1.1), opacity .2s;
+}
+.chat-panel.hidden{transform:scale(.75) translateY(20px);opacity:0;pointer-events:none}
+.chat-head{
+  background:var(--navy);color:#fff;
+  padding:16px 18px;display:flex;align-items:center;gap:12px;flex:none;
+}
+.chat-avatar{
+  width:38px;height:38px;border-radius:50%;flex:none;
+  background:var(--gradient-sea);display:grid;place-items:center;color:#fff;
+}
+.chat-avatar svg{width:18px;height:18px}
+.chat-head-info{flex:1;min-width:0}
+.chat-head-info b{font-size:14.5px;display:block}
+.chat-status{font-size:11.5px;color:hsl(152 70% 65%);display:flex;align-items:center;gap:5px}
+.chat-status::before{content:"";width:6px;height:6px;border-radius:50%;background:hsl(152 70% 55%)}
+.chat-close{background:none;border:none;color:hsla(0,0%,100%,.7);padding:6px}
+.chat-close:hover{color:#fff}
+.chat-close svg{width:18px;height:18px}
+.chat-body{flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:12px;background:var(--sea-mist)}
+.msg{max-width:82%;padding:11px 15px;font-size:14px;line-height:1.5;animation:msgin .25s both}
+@keyframes msgin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.msg.bot{
+  align-self:flex-start;background:#fff;color:var(--ink);
+  border:1px solid var(--border);
+  border-radius:16px 16px 16px 5px;
+  box-shadow:var(--shadow-soft);
+}
+.msg.user{
+  align-self:flex-end;background:var(--gradient-sea);color:#fff;
+  border-radius:16px 16px 5px 16px;
+}
+.typing{display:inline-flex;gap:4px;padding:4px 2px;align-items:center}
+.typing i{width:6px;height:6px;border-radius:50%;background:hsl(220 20% 70%);animation:blink 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.18s}
+.typing i:nth-child(3){animation-delay:.36s}
+@keyframes blink{0%,70%,100%{opacity:.3;transform:none}35%{opacity:1;transform:translateY(-3px)}}
+.suggestions{display:flex;flex-wrap:wrap;gap:7px;padding:0 16px 10px;background:var(--sea-mist);flex:none}
+.sug{
+  font-size:12px;font-weight:600;color:var(--primary-strong);
+  background:#fff;border:1px solid var(--border);
+  border-radius:999px;padding:7px 13px;
+  transition:background .2s,border-color .2s;
+}
+.sug:hover{background:var(--sea-light);border-color:var(--primary)}
+.chat-input{flex:none;display:flex;gap:9px;padding:12px 14px;background:#fff;border-top:1px solid var(--border)}
+.chat-input input{
+  flex:1;border:1px solid var(--border);border-radius:999px;
+  padding:11px 18px;font-family:inherit;font-size:14px;outline:none;
+  transition:border-color .2s, box-shadow .2s;
+}
+.chat-input input:focus{border-color:var(--primary);box-shadow:0 0 0 3px hsla(220,100%,50%,.14)}
+.chat-send{
+  width:44px;height:44px;flex:none;border-radius:50%;border:none;
+  background:var(--gradient-sea);color:#fff;display:grid;place-items:center;
+  transition:transform .15s;
+}
+.chat-send:hover{transform:scale(1.07)}
+.chat-send svg{width:17px;height:17px}
+
+/* ---------- demo controls (mockup only) ---------- */
+.demo{
+  position:fixed;left:16px;bottom:16px;z-index:70;
+  background:hsla(220,100%,10%,.92);backdrop-filter:blur(10px);
+  color:#fff;border-radius:14px;padding:12px 14px;
+  box-shadow:var(--shadow-elevated);
+  font-size:12px;
+  border:1px dashed hsla(0,0%,100%,.3);
+}
+.demo b{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;opacity:.6;margin-bottom:8px}
+.demo-row{display:flex;gap:6px}
+.demo button,.demo a{
+  font-size:11.5px;font-weight:600;color:#fff;text-decoration:none;
+  background:hsla(0,0%,100%,.12);border:1px solid hsla(0,0%,100%,.2);
+  border-radius:8px;padding:6px 10px;
+}
+.demo button.on{background:var(--primary);border-color:var(--primary)}
+
+/* ---------- responsive ---------- */
+@media (max-width:880px){
+  .access-grid{grid-template-columns:1fr}
+  .map-card{grid-row:auto}
+  .rules-card{grid-template-columns:1fr}
+  .rules-divider{width:auto;height:1px;margin:0 28px}
+  .rules-col{padding:22px 28px}
+  .amen-grid{grid-template-columns:repeat(2,1fr)}
+  .exp-cards{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .ess-item{padding:15px 8px}
+  .ess-value{font-size:14.5px}
+  .ess-value small{display:none}
+  .ess-label{font-size:9.5px}
+  .rules-times{grid-template-columns:1fr}
+  .cap-stats{grid-template-columns:1fr;gap:10px}
+  .lang{display:none}
+  .hero{min-height:78vh}
+  .hero-btn{padding:12px 18px;font-size:13.5px}
+  .hero-btn.solid{padding:14px 22px;font-size:14.5px}
+  .btn-whats span{display:none}
+  .btn-whats{padding:9px 11px}
+  .demo{left:10px;bottom:10px;padding:9px 11px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ TOPBAR ══════════════ -->
+<header class="topbar" id="topbar">
+  <a class="brand" href="#">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M2 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M2 20c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/><path d="M12 4l3.5 6h-7L12 4z" fill="#fff"/></svg>
+    <span>
+      <span class="brand-word">seazone</span>
+      <span class="brand-sub">Guia do Hóspede</span>
+    </span>
+  </a>
+  <div class="top-actions">
+    <span class="lang">PT <span>· EN · ES</span></span>
+    <a class="btn-whats" href="https://wa.me/5548991234567" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.2 14.1c-.2.6-1.2 1.2-1.7 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.2c.1.2.1.4 0 .6l-.4.6-.5.5c-.2.2-.3.4-.1.7.2.3.9 1.4 1.9 2.3 1.3 1.2 2.4 1.5 2.7 1.7.3.1.5.1.7-.1l1-1.2c.2-.3.4-.2.7-.1l2.1 1c.3.2.5.3.6.4 0 .1 0 .7-.2 1.3z"/></svg>
+      <span>Falar com anfitrião</span>
+    </a>
+  </div>
+</header>
+
+<!-- ══════════════ HERO ══════════════ -->
+<div class="hero">
+  <div class="hero-imgs" id="heroImgs">
+    <img class="on" src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1600&q=80" alt="Sala de estar do Apartamento Beira-Mar Florianópolis">
+    <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1600&q=80" alt="Ambiente integrado do apartamento">
+    <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1600&q=80" alt="Cozinha e sala do apartamento">
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-inner">
+    <span class="chip-code">IMÓVEL FLN001</span>
+    <h1>Apartamento Beira-Mar Florianópolis</h1>
+    <div class="hero-sub">
+      <span>Apartamento</span><span class="dot"></span>
+      <span>Trindade, Florianópolis — SC</span>
+    </div>
+    <div class="hero-ctas">
+      <button class="hero-btn solid" id="heroChatBtn">
+        <i data-lucide="sparkles"></i>
+        Tire dúvidas com a IA
+      </button>
+      <a class="hero-btn glass" href="#acesso">
+        <i data-lucide="arrow-down"></i>
+        Guia da hospedagem
+      </a>
+    </div>
+    <div class="essentials">
+      <div class="ess-item">
+        <span class="ess-label">Check-in</span>
+        <span class="ess-value">15:00 <small>em diante</small></span>
+      </div>
+      <div class="ess-item">
+        <span class="ess-label">Check-out</span>
+        <span class="ess-value">11:00 <small>no máximo</small></span>
+      </div>
+      <div class="ess-item">
+        <span class="ess-label">Entrada</span>
+        <span class="ess-value">Self check-in</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ LEFT RAIL TOC (desktop largo) ══════════════ -->
+<nav class="toc" aria-label="Nesta página">
+  <span class="toc-head">Nesta página</span>
+  <a href="#acesso" data-toc class="active">Chegada & acesso</a>
+  <a href="#regras" data-toc>Regras da estadia</a>
+  <a href="#comodidades" data-toc>Comodidades</a>
+  <a href="#experiencias" data-toc>Explore a região</a>
+  <a href="#contato" data-toc>Contato</a>
+</nav>
+
+<!-- ══════════════ "NESTA PÁGINA" BAR (mobile / desktop estreito) ══════════════ -->
+<nav class="mtoc" id="mtoc" aria-label="Nesta página">
+  <button class="mtoc-btn" id="mtocBtn" aria-expanded="false">
+    <span class="mtoc-tag">Nesta página</span>
+    <span class="mtoc-cur" id="mtocCur">Chegada & acesso</span>
+    <i data-lucide="chevron-down"></i>
+  </button>
+  <div class="mtoc-panel">
+    <div class="mtoc-panel-inner">
+      <a href="#acesso" data-toc class="active"><i data-lucide="key-round"></i>Chegada & acesso</a>
+      <a href="#regras" data-toc><i data-lucide="clipboard-check"></i>Regras da estadia</a>
+      <a href="#comodidades" data-toc><i data-lucide="sofa"></i>Comodidades</a>
+      <a href="#experiencias" data-toc><i data-lucide="sparkles"></i>Explore a região</a>
+      <a href="#contato" data-toc><i data-lucide="phone"></i>Contato</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <!-- ══════════════ CHEGADA & ACESSO ══════════════ -->
+  <section class="block wrap" id="acesso">
+    <div class="sec-head">
+      <div class="sec-eyebrow">Sua chegada</div>
+      <h2 class="sec-title">Chegada & acesso</h2>
+      <p class="sec-desc">Como chegar, entrar e se conectar.</p>
+    </div>
+    <div class="access-grid">
+      <div class="card map-card">
+        <iframe src="https://www.google.com/maps?q=Rua+Lauro+Linhares,+589,+Trindade,+Florian%C3%B3polis+-+SC&z=16&output=embed" loading="lazy" title="Mapa — localização do imóvel" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div class="map-body">
+          <address>
+            <b>Rua Lauro Linhares, 589 — Apto 301</b>
+            Trindade, Florianópolis — SC · CEP 88036-001
+          </address>
+          <div class="map-actions">
+            <a class="btn btn-uber" href="https://m.uber.com/ul/?action=setPickup&amp;pickup=my_location&amp;dropoff[latitude]=-27.5859&amp;dropoff[longitude]=-48.5222&amp;dropoff[nickname]=Apartamento%20Beira-Mar&amp;dropoff[formatted_address]=Rua%20Lauro%20Linhares%2C%20589%2C%20Trindade%2C%20Florian%C3%B3polis%20-%20SC" target="_blank" rel="noopener">
+              <i data-lucide="car-front"></i>
+              Chamar Uber
+            </a>
+            <a class="btn btn-ghost" href="https://maps.google.com/?q=Rua+Lauro+Linhares+589+Florianópolis" target="_blank" rel="noopener">
+              <i data-lucide="map-pin"></i>
+              Google Maps
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="card access-card">
+        <div class="access-icon"><i data-lucide="lock-keyhole"></i></div>
+        <div>
+          <h3>Como entrar</h3>
+          <p>Use o código na fechadura eletrônica da porta de entrada.</p>
+          <span class="hl">Código: 4521</span>
+          <br>
+          <span class="badge-selfcheckin"><i data-lucide="check"></i>Self check-in — entre no seu horário</span>
+        </div>
+      </div>
+      <div class="card access-card">
+        <div class="access-icon"><i data-lucide="car"></i></div>
+        <div>
+          <h3>Estacionamento</h3>
+          <p>Portão lateral — digite <b>7890</b> no interfone para abrir.</p>
+          <span class="hl">Vaga 12 — subsolo B1</span>
+        </div>
+      </div>
+      <div class="card wifi-lite">
+        <div class="wl-head">
+          <div class="access-icon"><i data-lucide="wifi"></i></div>
+          <div>
+            <h3>Wi-Fi</h3>
+            <p>Copie a senha ou aponte a câmera para o código.</p>
+          </div>
+        </div>
+        <div class="wifi-body">
+          <div class="wifi-creds">
+            <div class="cred">
+              <div class="cred-label">Rede</div>
+              <div class="cred-row">
+                <span class="cred-value">SeaHome_FLN001</span>
+                <button class="copy-btn" data-copy="SeaHome_FLN001"><i data-lucide="copy"></i>Copiar</button>
+              </div>
+            </div>
+            <div class="cred">
+              <div class="cred-label">Senha</div>
+              <div class="cred-row">
+                <span class="cred-value">floripa2024</span>
+                <button class="copy-btn" data-copy="floripa2024"><i data-lucide="copy"></i>Copiar</button>
+              </div>
+            </div>
+          </div>
+          <div class="qr-box">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=192x192&amp;data=WIFI%3AT%3AWPA%3BS%3ASeaHome_FLN001%3BP%3Afloripa2024%3B%3B" alt="QR code para conectar ao Wi-Fi" width="96" height="96">
+            <span>Escaneie para conectar automaticamente</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ REGRAS ══════════════ -->
+  <section class="block wrap" id="regras">
+    <div class="sec-head">
+      <div class="sec-eyebrow">Boa convivência</div>
+      <h2 class="sec-title">Regras da estadia</h2>
+    </div>
+    <div class="card rules-card">
+      <div class="rules-col">
+        <h3>Horários</h3>
+        <div class="tline">
+          <i data-lucide="log-in"></i>
+          <div>
+            <div class="tl-label">Check-in</div>
+            <b>15:00</b>
+            <small>a partir deste horário</small>
+          </div>
+        </div>
+        <div class="tline">
+          <i data-lucide="log-out"></i>
+          <div>
+            <div class="tl-label">Check-out</div>
+            <b>11:00</b>
+            <small>até este horário</small>
+          </div>
+        </div>
+      </div>
+      <div class="rules-divider"></div>
+      <div class="rules-col">
+        <h3>Durante sua estadia</h3>
+        <div class="rule">
+          <span class="rule-ic"><i data-lucide="users"></i></span>
+          Máximo de 4 hóspedes
+        </div>
+        <div class="rule">
+          <span class="rule-ic no"><i data-lucide="paw-print"></i></span>
+          Não é permitido animais de estimação
+        </div>
+        <div class="rule">
+          <span class="rule-ic"><i data-lucide="cigarette-off"></i></span>
+          Proibido fumar no imóvel
+        </div>
+        <div class="rule">
+          <span class="rule-ic"><i data-lucide="person-standing"></i></span>
+          Crianças são bem-vindas
+        </div>
+        <div class="rule">
+          <span class="rule-ic"><i data-lucide="baby"></i></span>
+          Adequado para bebês
+        </div>
+        <div class="rule">
+          <span class="rule-ic no"><i data-lucide="party-popper"></i></span>
+          Festas e eventos não são permitidos
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ COMODIDADES ══════════════ -->
+  <section class="block wrap" id="comodidades">
+    <div class="sec-head">
+      <div class="sec-eyebrow">O que o imóvel oferece</div>
+      <h2 class="sec-title">Capacidade & comodidades</h2>
+    </div>
+    <div class="cap-stats">
+      <div class="cap-stat">
+        <div class="cap-stat-ic"><i data-lucide="bed-double"></i></div>
+        <div><b>2</b><span>quartos</span></div>
+      </div>
+      <div class="cap-stat">
+        <div class="cap-stat-ic"><i data-lucide="bath"></i></div>
+        <div><b>1</b><span>banheiro</span></div>
+      </div>
+      <div class="cap-stat">
+        <div class="cap-stat-ic"><i data-lucide="users"></i></div>
+        <div><b>4</b><span>hóspedes no máximo</span></div>
+      </div>
+    </div>
+    <div class="amen-grid">
+      <div class="amen"><div class="amen-ic"><i data-lucide="wifi"></i></div><span>Wi-Fi</span></div>
+      <div class="amen"><div class="amen-ic"><i data-lucide="tv"></i></div><span>TV</span></div>
+      <div class="amen"><div class="amen-ic"><i data-lucide="snowflake"></i></div><span>Ar-condicionado</span></div>
+      <div class="amen"><div class="amen-ic"><i data-lucide="cooking-pot"></i></div><span>Cozinha completa</span></div>
+      <div class="amen"><div class="amen-ic"><i data-lucide="washing-machine"></i></div><span>Máquina de lavar</span></div>
+      <div class="amen"><div class="amen-ic"><i data-lucide="arrow-up-down"></i></div><span>Elevador</span></div>
+      <div class="amen"><div class="amen-ic"><i data-lucide="fence"></i></div><span>Varanda</span></div>
+    </div>
+  </section>
+</main>
+
+<!-- ══════════════ GUIA DE EXPERIÊNCIAS (IA) ══════════════ -->
+<section class="exp-section" id="experiencias">
+  <div class="exp-inner">
+    <h2 class="exp-title">Explore a Trindade e Florianópolis</h2>
+    <p class="exp-sub">Um guia criado especialmente para a sua estadia, com o melhor da região ao redor do seu apartamento.</p>
+
+    <!-- ===== estado: gerado ===== -->
+    <div id="exp-ready">
+      <div class="welcome">
+        <p>“Seu apartamento fica no coração da Trindade, a poucos minutos das principais atrações da ilha. Prepare-se para dias de praia, gastronomia açoriana e o melhor da vida universitária de Floripa.”</p>
+      </div>
+
+      <div class="exp-group">
+        <div class="exp-group-head"><h3>🍽️ Restaurantes próximos</h3><span class="count">5 sugestões</span></div>
+        <div class="exp-cards">
+          <div class="exp-card">
+            <div class="exp-card-top"><h4>Box 32</h4><span class="dist">≈ 1,2 km</span></div>
+            <p>Boteco tradicional de Florianópolis no Mercado Público, famoso pelos petiscos e pelo pastel de camarão.</p>
+            <div class="exp-actions">
+              <a class="exp-link" href="https://www.google.com/maps/search/?api=1&amp;query=Box+32+Florian%C3%B3polis" target="_blank" rel="noopener"><i data-lucide="map-pin"></i>Ver no mapa</a>
+              <a class="exp-link" href="https://www.google.com/search?q=Box+32+Florian%C3%B3polis+instagram" target="_blank" rel="noopener"><i data-lucide="instagram"></i>Instagram</a>
+            </div>
+          </div>
+          <div class="exp-card">
+            <div class="exp-card-top"><h4>Armazém Vieira</h4><span class="dist">≈ 2,5 km</span></div>
+            <p>Referência em frutos do mar desde 1958, em um casarão histórico com cachaças artesanais.</p>
+            <div class="exp-actions">
+              <a class="exp-link" href="https://www.google.com/maps/search/?api=1&amp;query=Armaz%C3%A9m+Vieira+Florian%C3%B3polis" target="_blank" rel="noopener"><i data-lucide="map-pin"></i>Ver no mapa</a>
+              <a class="exp-link" href="https://www.google.com/search?q=Armaz%C3%A9m+Vieira+Florian%C3%B3polis+instagram" target="_blank" rel="noopener"><i data-lucide="instagram"></i>Instagram</a>
+            </div>
+          </div>
+          <div class="exp-card">
+            <div class="exp-card-top"><h4>Toca da Garoupa</h4><span class="dist">≈ 3,1 km</span></div>
+            <p>Clássico da culinária litorânea: sequência de camarão e peixes frescos em ambiente acolhedor.</p>
+            <div class="exp-actions">
+              <a class="exp-link" href="https://www.google.com/maps/search/?api=1&amp;query=Toca+da+Garoupa+Florian%C3%B3polis" target="_blank" rel="noopener"><i data-lucide="map-pin"></i>Ver no mapa</a>
+              <a class="exp-link" href="https://www.google.com/search?q=Toca+da+Garoupa+Florian%C3%B3polis+instagram" target="_blank" rel="noopener"><i data-lucide="instagram"></i>Instagram</a>
+            </div>
+          </div>
+          <div class="exp-card">
+            <div class="exp-card-top"><h4>Café Cultura</h4><span class="dist">≈ 900 m</span></div>
+            <p>Café queridinho do bairro para brunch e trabalho remoto, com pães artesanais e bom espresso.</p>
+            <div class="exp-actions">
+              <a class="exp-link" href="https://www.google.com/maps/search/?api=1&amp;query=Caf%C3%A9+Cultura+Florian%C3%B3polis" target="_blank" rel="noopener"><i data-lucide="map-pin"></i>Ver no mapa</a>
+              <a class="exp-link" href="https://www.google.com/search?q=Caf%C3%A9+Cultura+Florian%C3%B3polis+instagram" target="_blank" rel="noopener"><i data-lucide="instagram"></i>Instagram</a>
+            </div>
+          </div>
+          <div class="exp-card">
+            <div class="exp-card-top"><h4>Bar do Boni</h4><span class="dist">≈ 700 m</span></div>
+            <p>Point universitário da Trindade, ideal para um fim de tarde descontraído com porções generosas.</p>
+            <div class="exp-actions">
+              <a class="exp-link" href="https://www.google.com/maps/search/?api=1&amp;query=Bar+do+Boni+Florian%C3%B3polis" target="_blank" rel="noopener"><i data-lucide="map-pin"></i>Ver no mapa</a>
+              <a class="exp-link" href="https://www.google.com/search?q=Bar+do+Boni+Florian%C3%B3polis+instagram" target="_blank" rel="noopener"><i data-lucide="instagram"></i>Instagram</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exp-group">
+        <div class="exp-group-head"><h3>🌊 Atrações próximas</h3><span class="count">4 sugestões</span></div>
+        <div class="exp-cards">
+          <div class="exp-card">
+            <div class="exp-card-top"><h4>Praia da Joaquina</h4><span class="dist">≈ 18 km</span></div>
+            <p>Famosa pelas dunas e pelas ondas para surf — palco de campeonatos internacionais.</p>
+            <div class="exp-actions">
+              <a class="exp-link" href="https://www.google.com/maps/search/?api=1&amp;query=Praia+da+Joaquina+Florian%C3%B3polis" target="_blank" rel="noopener"><i data-lucide="map-pin"></i>Ver no mapa</a>
+              <a class="exp-link" href="https://www.google.com/search?q=Praia+da+Joaquina+Florian%C3%B3polis+instagram" target="_blank" rel="noopener"><i data-lucide="instagram"></i>Instagram</a>
+            </div>
+          </div>
+          <div class="exp-card">
+            <div class="exp-card-top"><h4>Lagoa da Conceição</h4><span class="dist">≈ 10 km</span></div>
+            <p>Cartão-postal da ilha: esportes aquáticos de dia, gastronomia e vida noturna à noite.</p>
+            <div class="exp-actions">
+              <a class="exp-link" href="https://www.google.com/maps/search/?api=1&amp;query=Lagoa+da+Concei%C3%A7%C3%A3o+Florian%C3%B3polis" target="_blank" rel="noopener"><i data-lucide="map-pin"></i>Ver no mapa</a>
+              <a class="exp-link" href="https://www.google.com/search?q=Lagoa+da+Concei%C3%A7%C3%A3o+Florian%C3%B3polis+instagram" target="_blank" rel="noopener"><i data-lucide="instagram"></i>Instagram</a>
+            </div>
+          </div>
+          <div class="exp-card">
+            <div class="exp-card-top"><h4>Mirante do Morro da Cruz</h4><span class="dist">≈ 4 km</span></div>
+            <p>Vista panorâmica de 360° da ilha e das pontes — imperdível ao pôr do sol.</p>
+            <div class="exp-actions">
+              <a class="exp-link" href="https://www.google.com/maps/search/?api=1&amp;query=Mirante+do+Morro+da+Cruz+Florian%C3%B3polis" target="_blank" rel="noopener"><i data-lucide="map-pin"></i>Ver no mapa</a>
+            </div>
+          </div>
+          <div class="exp-card">
+            <div class="exp-card-top"><h4>Ponte Hercílio Luz</h4><span class="dist">≈ 6 km</span></div>
+            <p>Símbolo de Florianópolis, iluminada à noite. Passeie pelo entorno revitalizado.</p>
+            <div class="exp-actions">
+              <a class="exp-link" href="https://www.google.com/maps/search/?api=1&amp;query=Ponte+Herc%C3%ADlio+Luz+Florian%C3%B3polis" target="_blank" rel="noopener"><i data-lucide="map-pin"></i>Ver no mapa</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exp-group">
+        <div class="exp-group-head"><h3>🏥 Serviços essenciais</h3></div>
+        <div class="exp-cards">
+          <div class="exp-card">
+            <span class="ess-tag">Farmácia</span>
+            <div class="exp-card-top"><h4>Farmácia Catarinense</h4><span class="dist">≈ 300 m</span></div>
+            <p>Farmácia 24h na Av. Madre Benvenuta.</p>
+            <div class="exp-actions">
+              <a class="exp-link" href="https://www.google.com/maps/search/?api=1&amp;query=Farm%C3%A1cia+Catarinense+Florian%C3%B3polis" target="_blank" rel="noopener"><i data-lucide="map-pin"></i>Ver no mapa</a>
+            </div>
+          </div>
+          <div class="exp-card">
+            <span class="ess-tag">Supermercado</span>
+            <div class="exp-card-top"><h4>Supermercado Hippo</h4><span class="dist">≈ 850 m</span></div>
+            <p>Mercado completo com padaria e hortifruti, aberto todos os dias até 22h.</p>
+            <div class="exp-actions">
+              <a class="exp-link" href="https://www.google.com/maps/search/?api=1&amp;query=Supermercado+Hippo+Florian%C3%B3polis" target="_blank" rel="noopener"><i data-lucide="map-pin"></i>Ver no mapa</a>
+            </div>
+          </div>
+          <div class="exp-card">
+            <span class="ess-tag">Hospital</span>
+            <div class="exp-card-top"><h4>Hospital Universitário UFSC</h4><span class="dist">≈ 1,5 km</span></div>
+            <p>Hospital público com pronto-socorro 24 horas, dentro do campus da UFSC.</p>
+            <div class="exp-actions">
+              <a class="exp-link" href="https://www.google.com/maps/search/?api=1&amp;query=Hospital+Universit%C3%A1rio+UFSC+Florian%C3%B3polis" target="_blank" rel="noopener"><i data-lucide="map-pin"></i>Ver no mapa</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="seasonal">
+        <div class="seasonal-ic"><i data-lucide="sun"></i></div>
+        <div>
+          <h4>Dica da estação · Agosto</h4>
+          <p>Agosto é inverno em Floripa: temperaturas entre 13°C e 21°C. Leve um agasalho para as noites e aproveite os dias de sol para trilhas — a época é ótima para avistar baleias-francas no sul da ilha.</p>
+        </div>
+      </div>
+
+      <div class="exp-foot">
+        <i data-lucide="sparkles"></i>
+        Conteúdo gerado por IA com base na localização do imóvel · gerado em 19/08/2026
+      </div>
+    </div>
+
+    <!-- ===== estado: gerando (demo) ===== -->
+    <div id="exp-loading" hidden>
+      <div class="gen-banner">
+        <div class="gen-orb">
+          <i data-lucide="sparkles"></i>
+        </div>
+        <div>
+          <h4>Preparando seu guia personalizado…</h4>
+          <p>Nossa IA está explorando a Trindade para encontrar os melhores lugares perto de você. Isso leva só alguns segundos.</p>
+        </div>
+      </div>
+      <div class="exp-group">
+        <div class="exp-group-head"><h3>🍽️ Restaurantes próximos</h3></div>
+        <div class="exp-cards">
+          <div class="skel-card"><div class="skel skel-line" style="width:45%"></div><div class="skel skel-line" style="width:92%"></div><div class="skel skel-line" style="width:70%"></div></div>
+          <div class="skel-card"><div class="skel skel-line" style="width:55%"></div><div class="skel skel-line" style="width:88%"></div><div class="skel skel-line" style="width:62%"></div></div>
+          <div class="skel-card"><div class="skel skel-line" style="width:40%"></div><div class="skel skel-line" style="width:95%"></div><div class="skel skel-line" style="width:75%"></div></div>
+          <div class="skel-card"><div class="skel skel-line" style="width:50%"></div><div class="skel skel-line" style="width:85%"></div><div class="skel skel-line" style="width:58%"></div></div>
+        </div>
+      </div>
+      <div class="exp-group">
+        <div class="exp-group-head"><h3>🌊 Atrações próximas</h3></div>
+        <div class="exp-cards">
+          <div class="skel-card"><div class="skel skel-line" style="width:48%"></div><div class="skel skel-line" style="width:90%"></div></div>
+          <div class="skel-card"><div class="skel skel-line" style="width:42%"></div><div class="skel skel-line" style="width:80%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ CONTATO ══════════════ -->
+<section class="block wrap" id="contato">
+  <div class="sec-head">
+    <div class="sec-eyebrow">Estamos por perto</div>
+    <h2 class="sec-title">Fale com sua anfitriã</h2>
+  </div>
+  <div class="card host-card">
+    <div class="host-row">
+      <div class="avatar">AP</div>
+      <div>
+        <div class="host-name">Ana Paula</div>
+        <div class="host-role">Anfitriã Seazone deste imóvel</div>
+      </div>
+    </div>
+    <div class="host-actions">
+      <a class="btn btn-wa" href="https://wa.me/5548991234567" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.2 14.1c-.2.6-1.2 1.2-1.7 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.2c.1.2.1.4 0 .6l-.4.6-.5.5c-.2.2-.3.4-.1.7.2.3.9 1.4 1.9 2.3 1.3 1.2 2.4 1.5 2.7 1.7.3.1.5.1.7-.1l1-1.2c.2-.3.4-.2.7-.1l2.1 1c.3.2.5.3.6.4 0 .1 0 .7-.2 1.3z"/></svg>
+        WhatsApp
+      </a>
+      <a class="btn btn-outline" href="tel:+5548991234567">
+        <i data-lucide="phone"></i>
+        +55 48 99123-4567
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer>
+  <div class="foot-inner">
+    <div>
+      <div class="foot-brand">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M2 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 4l3.5 6h-7L12 4z" fill="currentColor"/></svg>
+        <b>seazone</b>
+      </div>
+      <div class="foot-tag">Gestão inteligente de imóveis por temporada</div>
+    </div>
+    <div class="foot-copy">© 2026 Seazone Serviços Ltda. · Guia do Hóspede</div>
+  </div>
+</footer>
+
+<!-- ══════════════ CHAT ══════════════ -->
+<div class="chat-panel hidden" id="chatPanel" role="dialog" aria-label="Assistente virtual">
+  <div class="chat-head">
+    <div class="chat-avatar">
+      <i data-lucide="sparkles"></i>
+    </div>
+    <div class="chat-head-info">
+      <b>Assistente Seazone</b>
+      <span class="chat-status">Online · conhece o FLN001</span>
+    </div>
+    <button class="chat-close" id="chatClose" aria-label="Fechar chat">
+      <i data-lucide="x"></i>
+    </button>
+  </div>
+  <div class="chat-body" id="chatBody">
+    <div class="msg bot">Oi! 👋 Sou o assistente do <b>Apartamento Beira-Mar</b>. Posso ajudar com Wi-Fi, regras, horários e dicas da região. O que você precisa?</div>
+  </div>
+  <div class="suggestions" id="chatSugs">
+    <button class="sug">Qual a senha do WiFi?</button>
+    <button class="sug">Posso trazer meu cachorro?</button>
+    <button class="sug">A que horas posso fazer check-in?</button>
+    <button class="sug">Que restaurantes tem perto?</button>
+  </div>
+  <div class="chat-input">
+    <input type="text" id="chatInput" placeholder="Pergunte sobre o imóvel…" autocomplete="off">
+    <button class="chat-send" id="chatSend" aria-label="Enviar">
+      <i data-lucide="send"></i>
+    </button>
+  </div>
+</div>
+<button class="chat-fab" id="chatFab" aria-label="Abrir assistente virtual">
+  <i data-lucide="message-circle"></i>
+  <span class="dot-badge"></span>
+</button>
+
+<!-- ══════════════ DEMO CONTROLS (somente mockup) ══════════════ -->
+<div class="demo">
+  <b>Mockup · estados</b>
+  <div class="demo-row">
+    <button id="stReady" class="on">Guia gerado</button>
+    <button id="stLoading">IA gerando</button>
+    <a href="error.html">Erro 404 →</a>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+lucide.createIcons();
+
+/* topbar blur on scroll + height var for the sticky "nesta página" bar */
+const topbar = document.getElementById('topbar');
+addEventListener('scroll', () => topbar.classList.toggle('scrolled', scrollY > 40), {passive:true});
+function setTopbarH(){ document.documentElement.style.setProperty('--topbar-h', topbar.offsetHeight + 'px'); }
+setTopbarH();
+addEventListener('resize', setTopbarH);
+
+/* hero photo slideshow — rotates automatically when there is more than 1 photo */
+const heroImgs = [...document.querySelectorAll('#heroImgs img')];
+if (heroImgs.length > 1){
+  let heroIdx = 0;
+  setInterval(() => {
+    heroIdx = (heroIdx + 1) % heroImgs.length;
+    heroImgs.forEach((img, k) => img.classList.toggle('on', k === heroIdx));
+  }, 2800);
+}
+
+/* TOC scroll-spy (left rail + "nesta página" bar) */
+const tocLinks = [...document.querySelectorAll('[data-toc]')];
+const mtoc = document.getElementById('mtoc');
+const mtocBtn = document.getElementById('mtocBtn');
+const mtocCur = document.getElementById('mtocCur');
+const targets = [...new Set(tocLinks.map(a => a.getAttribute('href')))].map(h => document.querySelector(h));
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const href = '#' + e.target.id;
+      tocLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === href));
+      const cur = tocLinks.find(a => a.getAttribute('href') === href);
+      if (cur) mtocCur.textContent = cur.textContent.trim();
+    }
+  });
+}, {rootMargin:'-30% 0px -60% 0px'});
+targets.forEach(t => t && obs.observe(t));
+
+/* rail: aparece assim que o herói libera espaço; inverte cores sobre
+   seções escuras; desliza para baixo da borda escura em vez de cruzá-la */
+const toc = document.querySelector('.toc');
+const hero = document.querySelector('.hero');
+const darkEls = [document.querySelector('.exp-section'), document.querySelector('footer')];
+function railState(){
+  const railH = toc.offsetHeight || 200;
+  const railTop = innerHeight/2 - railH/2, railBottom = railTop + railH;
+  const pad = 22;
+  toc.classList.toggle('visible', hero.getBoundingClientRect().bottom < railTop - pad);
+  /* se a borda inferior de uma seção escura cruza a faixa do rail, empurra o rail para baixo dela */
+  let shift = 0;
+  darkEls.forEach(el => {
+    const b = el.getBoundingClientRect().bottom;
+    if (b > railTop - pad && b < railBottom + pad) shift = b + pad - railTop;
+  });
+  shift = Math.min(shift, innerHeight - railBottom - 16);
+  toc.style.transform = `translateY(calc(-50% + ${shift}px))`;
+  const midY = innerHeight/2 + shift;
+  const overDark = darkEls.some(el => {
+    const r = el.getBoundingClientRect();
+    return r.top < midY && r.bottom > midY;
+  });
+  toc.classList.toggle('dark', overDark);
+}
+railState();
+addEventListener('scroll', railState, {passive:true});
+addEventListener('resize', railState);
+
+/* "nesta página" dropdown */
+mtocBtn.onclick = () => {
+  const open = mtoc.classList.toggle('open');
+  mtocBtn.setAttribute('aria-expanded', open);
+};
+document.querySelectorAll('.mtoc-panel a').forEach(a => a.addEventListener('click', () => {
+  mtoc.classList.remove('open');
+  mtocBtn.setAttribute('aria-expanded', 'false');
+}));
+
+/* copy buttons */
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(btn.dataset.copy); } catch(e){}
+    const old = btn.innerHTML;
+    btn.innerHTML = '✓ Copiado';
+    setTimeout(() => btn.innerHTML = old, 1600);
+  });
+});
+
+/* demo state toggles */
+const stReady = document.getElementById('stReady'), stLoading = document.getElementById('stLoading');
+const expReady = document.getElementById('exp-ready'), expLoading = document.getElementById('exp-loading');
+stReady.onclick = () => { expReady.hidden = false; expLoading.hidden = true; stReady.classList.add('on'); stLoading.classList.remove('on'); };
+stLoading.onclick = () => { expReady.hidden = true; expLoading.hidden = false; stLoading.classList.add('on'); stReady.classList.remove('on'); document.getElementById('experiencias').scrollIntoView({behavior:'smooth'}); };
+
+/* ---------- chat (mocked streaming) ---------- */
+const fab = document.getElementById('chatFab'), panel = document.getElementById('chatPanel');
+const body = document.getElementById('chatBody'), input = document.getElementById('chatInput');
+fab.onclick = () => { panel.classList.toggle('hidden'); if (!panel.classList.contains('hidden')) input.focus(); };
+document.getElementById('chatClose').onclick = () => panel.classList.add('hidden');
+document.getElementById('heroChatBtn').onclick = () => { panel.classList.remove('hidden'); input.focus(); };
+
+const ANSWERS = [
+  [/senha|wifi|wi-fi|internet|rede/i, 'A rede é <b>SeaHome_FLN001</b> e a senha é <b>floripa2024</b>. 📶 É só copiar na seção "Chegada & acesso" aqui do guia!'],
+  [/cachorro|animal|pet|gato/i, 'Infelizmente este imóvel <b>não permite animais de estimação</b>. 🚫🐾 Se precisar de uma opção pet friendly, a Ana Paula pode te ajudar pelo WhatsApp.'],
+  [/check.?in|entrada|chegar|horas/i, 'O check-in pode ser feito <b>a partir das 15h</b>. Como o imóvel tem self check-in com fechadura eletrônica (código 4521), você entra no seu horário! 🔑'],
+  [/restaurante|comer|comida|jantar|almoç/i, 'Perto de você tem o <b>Box 32</b> (1,2 km), famoso pelos petiscos, e o <b>Armazém Vieira</b> (2,5 km), referência em frutos do mar desde 1958. 🍤 Veja mais na seção "Explore a região"!'],
+  [/check.?out|saída|sair/i, 'O check-out é <b>até as 11h</b>. É só fechar a porta ao sair — a fechadura tranca automaticamente. 👋'],
+];
+const FALLBACK = 'Boa pergunta! Não tenho essa informação nos dados do imóvel, mas a anfitriã <b>Ana Paula</b> pode ajudar pelo WhatsApp: +55 48 99123-4567. 💬';
+
+function answerFor(q){ for (const [re, a] of ANSWERS) if (re.test(q)) return a; return FALLBACK; }
+
+function addMsg(cls, html){
+  const el = document.createElement('div');
+  el.className = 'msg ' + cls;
+  el.innerHTML = html;
+  body.appendChild(el);
+  body.scrollTop = body.scrollHeight;
+  return el;
+}
+
+let busy = false;
+function send(text){
+  if (!text.trim() || busy) return;
+  busy = true;
+  addMsg('user', text.replace(/</g,'&lt;'));
+  input.value = '';
+  const typing = addMsg('bot', '<span class="typing"><i></i><i></i><i></i></span>');
+  setTimeout(() => {
+    /* simulated token streaming */
+    const full = answerFor(text);
+    typing.innerHTML = '';
+    let i = 0;
+    const plainLen = full.length;
+    const iv = setInterval(() => {
+      i += 2 + Math.floor(Math.random()*3);
+      typing.innerHTML = full.slice(0, i);
+      body.scrollTop = body.scrollHeight;
+      if (i >= plainLen){ clearInterval(iv); typing.innerHTML = full; busy = false; }
+    }, 28);
+  }, 850);
+}
+document.getElementById('chatSend').onclick = () => send(input.value);
+input.addEventListener('keydown', e => { if (e.key === 'Enter') send(input.value); });
+document.querySelectorAll('.sug').forEach(s => s.onclick = () => { panel.classList.remove('hidden'); send(s.textContent); });
+</script>
+</body>
+</html>

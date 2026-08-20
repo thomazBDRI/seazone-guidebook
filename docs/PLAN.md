@@ -8,7 +8,7 @@ step maps to one or more small commits.
 
 | Layer | Choice | Notes |
 |---|---|---|
-| Framework | Next.js 15 (App Router, RSC) | Turbopack for dev/build |
+| Framework | Next.js 16 (App Router, RSC) | Turbopack is the default bundler |
 | Language | TypeScript (strict) | |
 | Styles | Tailwind CSS | Tokens ported from `mockup/` design system |
 | Icons | lucide-react | Already in scaffold |
@@ -214,22 +214,22 @@ Deploy is Vercel's Git integration (no deploy job in Actions).
 | Name | Where | Purpose |
 |---|---|---|
 | `SUPABASE_URL` | Vercel env, GitHub secret, `.env.local` | Project URL (server-side) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Vercel env, GitHub secret, `.env.local` | Server-only DB access (RLS deny-all) |
+| `SUPABASE_SECRET_KEY` | Vercel env, GitHub secret, `.env.local` | Server-only DB access (RLS deny-all) |
 | `OPENROUTER_API_KEY` | Vercel env, GitHub secret, `.env.local` | Guide gen + chat + CI reviewer |
+| `SUPABASE_DB_URL` | GitHub secret, `.env.local` | Direct Postgres for migrations/seed (scripts/CI only) |
 
 No `NEXT_PUBLIC_*` secrets. `lib/env.ts` Zod-validates presence at boot.
 `.env.example` documents the names without values.
 
 ## 9. Work breakdown (small commits, every step)
 
-Conventional Commits; every commit carries the trailer
-`Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
+Conventional Commits, small steps, committed as we go.
 
-**E0 — Tooling migration**
-1. `chore: migrate package management to bun` (drop `package-lock.json`, `bun.lock`)
-2. `chore: replace eslint with biome` (config, scripts, fix findings)
-3. `chore: clean scaffold to project baseline` (remove starter demo bits)
-4. `ci: add quality workflow (biome, tsc, vitest)`
+**E0 — Tooling migration** ✅
+1. ~~`chore: migrate package management to bun`~~
+2. ~~`chore: replace eslint with biome`~~
+3. ~~`chore: clean scaffold to project baseline`~~
+4. ~~`ci: add quality workflow (biome, tsc, build)`~~ (vitest step lands with the first tests)
 
 **E1 — Environment & database**
 5. `feat(env): add zod-validated environment module`
@@ -276,10 +276,10 @@ Conventional Commits; every commit carries the trailer
 
 ## 10. Open decisions
 
-- **Hybrid OSM grounding (recommended) vs pure-LLM knowledge** for the guide
-  pipeline — hybrid keeps content real for any address, at the cost of two extra
-  free API calls. Fallback to pure-LLM either way.
 - Free model picks (swappable env/config): a strong free instruct model for
   guide+chat (e.g. Llama 3.3 70B free / Gemini flash free tier on OpenRouter)
   and a vision-capable free model for the CI reviewer. Final choice after a
   quick quality test at implementation time.
+
+Decided: hybrid OSM-grounded generation (Nominatim + Overpass feeding the LLM),
+with pure-LLM fallback when OSM is unavailable (see §4.1).

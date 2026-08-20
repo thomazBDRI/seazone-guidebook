@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     await request.json().catch(() => null),
   );
   if (!payload.success) {
-    return Response.json({ error: "invalid_locale" }, { status: 400 });
+    return NextResponse.json({ error: "invalid_locale" }, { status: 400 });
   }
 
   const response = NextResponse.json({ locale: payload.data.locale });

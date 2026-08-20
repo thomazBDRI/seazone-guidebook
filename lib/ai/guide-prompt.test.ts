@@ -200,6 +200,42 @@ describe("buildGuideMessages", () => {
   });
 });
 
+describe("locale", () => {
+  it("asks for the guide in the language it will be stored under", () => {
+    const english = promptText(
+      buildGuideMessages({ property: fln001, pois: null, locale: "en" }),
+    );
+    expect(english).toContain("Escreva sempre em inglês");
+    expect(english).toContain(
+      "Todo o texto dentro do JSON deve estar em inglês",
+    );
+
+    const spanish = promptText(
+      buildGuideMessages({ property: fln001, pois: null, locale: "es" }),
+    );
+    expect(spanish).toContain("Escreva sempre em espanhol");
+  });
+
+  it("keeps the pt-BR wording as the reference", () => {
+    const text = promptText(
+      buildGuideMessages({ property: fln001, pois: null, locale: "pt-BR" }),
+    );
+    expect(text).toContain("Escreva sempre em português do Brasil");
+  });
+
+  it("pins the essentials type to its portuguese literals in every locale", () => {
+    for (const locale of ["pt-BR", "en", "es"] as const) {
+      const text = promptText(
+        buildGuideMessages({ property: fln001, pois: null, locale }),
+      );
+      expect(text).toContain("farmácia | supermercado | hospital");
+      expect(text).toContain(
+        'o campo "type" de essentials: ele é um dado do sistema e usa sempre os valores em português',
+      );
+    }
+  });
+});
+
 describe("buildCorrectionMessages", () => {
   const base = buildGuideMessages({
     property: fln001,

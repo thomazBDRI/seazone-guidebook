@@ -127,6 +127,29 @@ describe("buildChatMessages", () => {
     expect(prompt).toMatch(/sem relação com a estadia/i);
   });
 
+  it("answers in the locale being read, mirroring a guest who switches", () => {
+    const english = systemPrompt(fln001, guide, ask("hi"), "en");
+    expect(english).toContain("está lendo o guia em inglês");
+    expect(english).toMatch(/responda inteiramente no idioma dela/i);
+
+    expect(systemPrompt(fln001, guide, ask("hola"), "es")).toContain(
+      "está lendo o guia em espanhol",
+    );
+    expect(systemPrompt()).toContain(
+      "está lendo o guia em português do Brasil",
+    );
+  });
+
+  it("grounds the data block in the locale being read", () => {
+    const english = systemPrompt(fln001, guide, ask("hi"), "en");
+    expect(english).toContain("Pets are not allowed");
+    expect(english).toContain("Air conditioning");
+    expect(english).toContain("Smart lock");
+    // property data itself is never translated
+    expect(english).toContain("floripa2024");
+    expect(english).toContain("Rua Lauro Linhares, 589 — Apto 301");
+  });
+
   it("omits the region guide gracefully when none was generated", () => {
     const prompt = systemPrompt(fln001, null);
 

@@ -16,8 +16,8 @@ export function RulesSection({ property, locale }: RulesSectionProps) {
   return (
     <GuideSection id="regras">
       <SectionHeading eyebrow={messages.eyebrow} title={messages.title} />
-      <Card className="grid grid-cols-[300px_1px_1fr] items-stretch p-0 shadow-soft max-[880px]:grid-cols-1">
-        <div className="px-[30px] py-7 max-[880px]:px-7 max-[880px]:py-[22px]">
+      <div className="grid grid-cols-[300px_1fr] items-start gap-3 max-[880px]:grid-cols-1">
+        <Card className="px-[30px] py-7 shadow-soft max-[880px]:px-7 max-[880px]:py-[22px]">
           <h3 className="mb-3.5 text-[11.5px] font-bold uppercase tracking-[.15em] text-muted-foreground">
             {messages.times}
           </h3>
@@ -33,36 +33,38 @@ export function RulesSection({ property, locale }: RulesSectionProps) {
             time={formatTime(property.check_out_time)}
             hint={messages.checkOutHint}
           />
-        </div>
+        </Card>
 
-        <div className="my-[26px] w-px bg-border max-[880px]:mx-7 max-[880px]:my-0 max-[880px]:h-px max-[880px]:w-auto" />
-
-        <div className="px-[30px] py-7 max-[880px]:px-7 max-[880px]:py-[22px]">
+        <div>
           <h3 className="mb-3.5 text-[11.5px] font-bold uppercase tracking-[.15em] text-muted-foreground">
             {messages.duringStay}
           </h3>
-          {ruleLines(property, locale).map((rule) => (
-            <p
-              key={rule.key}
-              className="flex items-center gap-[15px] py-[9px] text-[15px] font-medium"
-            >
-              <span
-                className={cn(
-                  "relative grid size-[27px] flex-none place-items-center",
-                  !rule.allowed &&
-                    "after:absolute after:h-[1.8px] after:w-8 after:rotate-45 after:rounded-sm after:bg-slate-icon after:shadow-[0_0_0_1.5px_#fff] after:content-['']",
-                )}
+          <div className="grid grid-cols-2 gap-3 max-[880px]:grid-cols-1">
+            {ruleLines(property, locale).map((rule) => (
+              <div
+                key={rule.key}
+                className="flex items-center gap-[13px] rounded-lg border border-border bg-white px-[18px] py-[17px] shadow-soft transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-card"
               >
-                <Icon
-                  name={rule.icon}
-                  className="size-[25px] text-slate-icon"
-                />
-              </span>
-              {rule.sentence}
-            </p>
-          ))}
+                {/* the slash is the only marker for a forbidden rule: the
+                    sentence already says no, so no red/green is needed */}
+                <span
+                  className={cn(
+                    "relative grid size-[27px] flex-none place-items-center",
+                    !rule.allowed &&
+                      "after:absolute after:h-[1.8px] after:w-8 after:rotate-45 after:rounded-sm after:bg-slate-icon after:shadow-[0_0_0_1.5px_#fff] after:content-['']",
+                  )}
+                >
+                  <Icon
+                    name={rule.icon}
+                    className="size-[25px] text-slate-icon"
+                  />
+                </span>
+                <span className="text-sm font-semibold">{rule.sentence}</span>
+              </div>
+            ))}
+          </div>
         </div>
-      </Card>
+      </div>
     </GuideSection>
   );
 }

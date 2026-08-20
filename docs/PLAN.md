@@ -16,6 +16,7 @@ step maps to one or more small commits.
 | Lint & format | Biome | Replaces ESLint + Prettier (zero-config, Rust) |
 | Validation | Zod | Env, DB rows, API payloads, LLM output |
 | Backend / DB | Supabase (Postgres) | Server-side access only |
+| ORM & migrations | Drizzle (drizzle-kit) | Schema in `db/schema.ts`; generated SQL migrations; runtime reads/writes stay on `supabase-js` (HTTPS, serverless-safe) |
 | LLM | OpenRouter (free models) | Guide generation, chat, CI reviewer |
 | Unit tests | Vitest + Testing Library | Runs under bun; RTL/Next ecosystem maturity |
 | E2E ("instrumented") | Playwright | Screenshots/traces uploaded as CI artifacts |
@@ -47,65 +48,24 @@ Security posture:
 
 ## 3. Data model (from the PDF reference JSON)
 
-```sql
-create table properties (
-  id uuid primary key default gen_random_uuid(),
-  code text unique not null,                    -- 'FLN001'
-  name text not null,
-  property_type text not null,
-  bedroom_quantity int not null,
-  bathroom_quantity int not null,
-  guest_capacity int not null,
-  -- address (flattened; needed individually for geocoding + display)
-  street text not null, number text not null, complement text,
-  neighborhood text not null, city text not null, state text not null,
-  postal_code text not null,
-  -- operational
-  wifi_network text, wifi_password text,
-  is_self_checkin boolean not null default false,
-  property_access_type text,                    -- 'smart_lock' | 'keybox' | ...
-  property_access_instructions text,
-  property_password text,
-  has_parking_spot boolean not null default false,
-  parking_spot_identifier text,
-  parking_spot_instructions text,
-  -- rules
-  check_in_time time not null, check_out_time time not null,
-  allow_pet boolean not null,
-  smoking_permitted boolean not null,
-  suitable_for_children boolean not null,
-  suitable_for_babies boolean not null,
-  events_permitted boolean not null,
-  -- open-ended sets
-  amenities jsonb not null default '{}',        -- { wifi: true, tv: true, ... }
-  images text[] not null default '{}',
-  -- host
-  host_name text not null, host_phone text not null,
-  created_at timestamptz not null default now()
-);
+Schema lives in TypeScript at `db/schema.ts` (Drizzle). SQL migrations are
+generated with `bun run db:generate` into `db/migrations/` and applied with
+`bun run db:migrate`; `bun run db:seed` upserts the two reference properties.
 
-create table experience_guides (
-  property_id uuid primary key references properties(id) on delete cascade,
-  status text not null check (status in ('pending','ready','failed')),
-  content jsonb,                                -- GuideSchema (Zod-validated)
-  model text,
-  error text,
-  generated_at timestamptz,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
+- **`properties`** — one row per unit, publicly addressed by unique `code`
+  (`FLN001`). All PDF fields flattened into typed columns (identity, address,
+  wifi/access/parking, rule booleans, host) + `amenities jsonb` + `images
+  text[]`.
+- **`experience_guides`** — one row per property (PK = `property_id` FK),
+  `status` enum `pending|ready|failed`, `content jsonb` (Zod-validated guide),
+  `model`, `error`, timestamps. The `pending` row doubles as the generation
+  lock.
 
-alter table properties enable row level security;
-alter table experience_guides enable row level security;
--- no policies: deny-all; server uses service role
-```
-
-- Scalars flattened into typed columns (queryable, constrainable); `amenities`
-  stays `jsonb` because the set is open-ended and boolean-valued — the frontend
-  owns a dictionary `amenity key → { icon, label }` with a humanized fallback
-  for unknown keys. Rules booleans map to full sentences the same way
+- RLS enabled with no policies (deny-all) via `.enableRLS()` — access happens
+  only through server-side code with the secret key.
+- The frontend owns display dictionaries: `amenity key → { icon, label }` with
+  humanized fallback for unknown keys, and rule booleans → full sentences
   (`allow_pet: false → "Não é permitido animais de estimação"`).
-- Seed script (`bun run seed`) upserts FLN001 + GRM001 from the PDF JSON.
 
 ## 4. AI features
 
@@ -233,8 +193,7 @@ Conventional Commits, small steps, committed as we go.
 
 **E1 — Environment & database**
 5. `feat(env): add zod-validated environment module`
-6. `feat(db): add schema migration for properties and experience_guides`
-7. `feat(db): add seed script with FLN001 and GRM001`
+6. `feat(db): add drizzle schema, migrations and seed`
 8. `feat(db): add server supabase client and repositories`
 
 **E2 — Domain**

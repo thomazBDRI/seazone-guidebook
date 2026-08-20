@@ -113,25 +113,25 @@ export function ArrivalSection({ property, wifiQr }: ArrivalSectionProps) {
                 </p>
               </div>
             </div>
-            <div className="flex flex-wrap items-stretch gap-[18px]">
-              <div className="min-w-[210px] flex-1">
+            <div className="flex flex-col gap-4">
+              <div>
                 <CopyField label="Rede" value={property.wifi_network} />
                 {property.wifi_password ? (
                   <CopyField label="Senha" value={property.wifi_password} />
                 ) : null}
               </div>
               {wifiQr ? (
-                <div className="flex w-[132px] flex-none flex-col items-center justify-center gap-2 rounded-xl border border-border bg-sea-mist px-2.5 py-3">
+                <div className="flex flex-col items-center gap-2.5 rounded-xl border border-border bg-sea-mist px-4 py-5">
                   {/* biome-ignore lint/performance/noImgElement: inline data URL generated server-side, nothing for the image optimizer to do */}
                   <img
                     src={wifiQr}
                     alt="QR code para conectar ao Wi-Fi"
-                    width={96}
-                    height={96}
-                    className="size-24 rounded-md"
+                    width={144}
+                    height={144}
+                    className="size-36 rounded-lg"
                   />
-                  <span className="text-center text-[11px] font-semibold leading-[1.35] text-muted-foreground">
-                    Escaneie para conectar automaticamente
+                  <span className="max-w-[26ch] text-center text-xs font-semibold leading-snug text-muted-foreground">
+                    Aponte a câmera do celular para conectar automaticamente
                   </span>
                 </div>
               ) : null}

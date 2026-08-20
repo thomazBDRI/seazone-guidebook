@@ -143,7 +143,7 @@ export function TocNav() {
           className="mx-auto flex w-full max-w-[1080px] items-center gap-2.5 px-[clamp(16px,4vw,40px)] py-3 text-left"
         >
           <span className="flex-none text-[10px] font-bold uppercase tracking-[.16em] text-muted-foreground">
-            Nesta página
+            Seção
           </span>
           <span className="flex-1 truncate text-[13.5px] font-bold text-primary-strong">
             {currentLabel}

@@ -23,23 +23,6 @@ export function TocNav() {
   const [shift, setShift] = useState(0);
   const [overDark, setOverDark] = useState(false);
 
-  // scroll spy for both the rail and the "nesta página" bar
-  useEffect(() => {
-    const targets = SECTIONS.map(({ id }) =>
-      document.getElementById(id),
-    ).filter((element): element is HTMLElement => element !== null);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActive(entry.target.id);
-        }
-      },
-      { rootMargin: "-30% 0px -60% 0px" },
-    );
-    for (const target of targets) observer.observe(target);
-    return () => observer.disconnect();
-  }, []);
-
   /**
    * The rail shows up only once the hero has cleared its band, and slides
    * below the bottom edge of a dark section instead of straddling it —
@@ -50,8 +33,24 @@ export function TocNav() {
     const darkSections = Array.from(
       document.querySelectorAll("[data-dark-section]"),
     );
+    const targets = SECTIONS.map(({ id }) =>
+      document.getElementById(id),
+    ).filter((element): element is HTMLElement => element !== null);
 
     const update = () => {
+      // scroll spy: last section whose top passed the reading line wins; a
+      // short final section can never reach it, so page bottom forces it
+      const spyLine = window.innerHeight * 0.35;
+      let current = targets[0]?.id ?? SECTIONS[0].id;
+      for (const target of targets) {
+        if (target.getBoundingClientRect().top <= spyLine) current = target.id;
+      }
+      const atBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 90;
+      const lastTarget = targets.at(-1);
+      if (atBottom && lastTarget) current = lastTarget.id;
+      setActive(current);
       const railHeight = rail.current?.offsetHeight || 200;
       const railTop = window.innerHeight / 2 - railHeight / 2;
       const railBottom = railTop + railHeight;

@@ -229,6 +229,19 @@ Conventional Commits, small steps, committed as we go.
 30. `ci: add e2e job with artifact upload`
 31. `ci: add ai reviewer job over diff and e2e artifacts`
 
+**E6.5 — i18n (pt-BR / en / es)**
+- `feat(i18n): extract ui strings to locale dictionaries` — no hardcoded
+  strings in components; typed message catalog (pt-BR is the source of truth),
+  locale resolved from a cookie with pt-BR default.
+- `feat(i18n): localize domain dictionaries` — rule sentences, amenity labels,
+  access types and date/phone formatting per locale.
+- `feat(i18n): add language switcher (PT · EN · ES)` — in the topbar, like the
+  reference site.
+- `feat(i18n): localize ai content per locale` — chat answers in the active
+  language (prompt instruction); experience guides become per-locale rows
+  (extend experience_guides PK to (property_id, locale)) so each language is
+  still generated only once and persisted.
+
 **E7 — Polish & delivery**
 32. `docs: add readme with architecture and decisions (pt-br)`
 33. `feat(home): list available properties for reviewers` — home page shows all

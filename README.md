@@ -1,109 +1,272 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# Guia Digital do Hóspede — Seazone
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+Aplicação web que entrega, para cada imóvel de temporada, um guia digital
+completo da hospedagem: como chegar e entrar, Wi-Fi com QR code, regras da
+estadia, comodidades, contato do anfitrião, um guia de experiências da região
+gerado por IA a partir do endereço real e um assistente de chat que responde
+dúvidas em tempo real — sempre com base nos dados daquele imóvel, em português,
+inglês ou espanhol. Nada é escrito no frontend: cada página renderiza
+exclusivamente o que está no banco.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+**Produção:** https://seazone-guidebook.vercel.app
 
-## Features
+| Link | O que é |
+|---|---|
+| [`/FLN001`](https://seazone-guidebook.vercel.app/FLN001) | Apartamento Beira-Mar, Florianópolis — SC |
+| [`/GRM001`](https://seazone-guidebook.vercel.app/GRM001) | Chalé Serra, Gramado — RS |
+| [`/`](https://seazone-guidebook.vercel.app/) | Índice dos imóveis — página que existe **só** para a avaliação técnica |
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Proxy
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+O hóspede real nunca vê uma listagem: ele recebe na confirmação da reserva um
+link direto para o guia da sua hospedagem (`/FLN001`). A home existe para quem
+avalia este teste poder abrir qualquer imóvel rapidamente, e diz isso na
+própria página. Códigos são case-insensitive (`/fln001` funciona) e um código
+inexistente cai em uma página 404 própria.
 
-## Demo
+O plano de trabalho que guiou a implementação, commit a commit, está em
+[`docs/PLAN.md`](docs/PLAN.md).
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+## Stack
 
-## Deploy to Vercel
+| Camada | Escolha | Por quê |
+|---|---|---|
+| Framework | Next.js 16 (App Router, RSC) + Turbopack | Renderização no servidor por padrão: os dados do imóvel nunca precisam ir ao browser para virar tela |
+| Linguagem | TypeScript estrito | |
+| Runtime e gerenciador | Bun | Instalação e execução de scripts rápidas; `bun.lock` versionado |
+| Estilos | Tailwind CSS | Tokens do design system portados do mockup aprovado (`mockup/`) |
+| Lint e format | Biome | Substitui ESLint + Prettier em uma ferramenta só |
+| Validação | Zod | Ambiente, linhas do banco, payloads de API e **saída do LLM** |
+| Banco | Supabase (Postgres) | Acesso apenas server-side, com RLS negando tudo |
+| ORM e migrations | Drizzle (drizzle-kit) | Schema em TypeScript, migrations SQL versionadas; leituras em runtime via `supabase-js` (HTTPS, seguro em serverless) |
+| IA | OpenRouter (modelos gratuitos) | Geração do guia, chat e revisor de CI, todos trocáveis por variável de ambiente |
+| Testes unitários | Vitest | Domínio, prompts, pipeline, repositórios e componentes |
+| Testes E2E | Playwright | Roda contra o build de produção e o banco real, com o LLM substituído por um stub local |
+| CI | GitHub Actions | qualidade → e2e (com artefatos) → revisor de IA |
+| Deploy | Vercel (integração Git) | Preview por branch e produção no `main` |
 
-Vercel deployment will guide you through creating a Supabase account and project.
+## Arquitetura
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+```
+Browser ── página RSC /[code] ─────────► Supabase (imóvel + guia persistido)
+   │
+   ├── POST /api/guides/[code] ──────► pipeline de geração (uma vez por imóvel/idioma)
+   │        (skeleton de loading)       ├─ Nominatim: geocodifica o endereço
+   │                                    ├─ Overpass: POIs reais num raio de 2,5 km
+   │                                    ├─ LLM compõe o guia (JSON validado por Zod)
+   │                                    └─ persiste no Supabase (lock, idempotente)
+   │
+   └── POST /api/chat (stream SSE) ──► LLM
+            fundamentado nos dados do imóvel + guia persistido (contexto montado no servidor)
+```
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+### Decisões que valem explicar
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+**Acesso a dados só no servidor.** O RLS do Supabase está habilitado sem
+nenhuma policy — ou seja, nega tudo. Todo acesso acontece em Server Components
+e route handlers usando a chave secreta, que nunca é exposta (não existe
+nenhuma variável `NEXT_PUBLIC_*` no projeto). Um link ou uma URL vazada não dá
+acesso a nada. Senha de Wi-Fi e código de acesso chegam ao browser apenas como
+HTML já renderizado do imóvel que o hóspede está vendo — o QR code do Wi-Fi,
+por exemplo, é gerado no servidor para a senha não trafegar duas vezes.
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+**O guia de experiências é gerado uma vez e nunca regenerado.** O requisito é
+conteúdo contextualizado ao endereço real, persistido, com feedback visual de
+carregamento — o que implica geração no primeiro acesso, não no build. Na
+primeira visita a página renderiza o skeleton e chama
+`POST /api/guides/[code]`; o handler tenta inserir a linha `pending` em
+`experience_guides` (`on conflict do nothing`), e só quem ganhou essa corrida
+gera — os acessos concorrentes fazem polling até a linha virar `ready`. A
+chave primária é `(property_id, locale)`, então cada idioma é gerado uma vez e
+guardado por conta própria.
 
-## Clone and run locally
+**O pipeline é fundamentado em dados reais (grounding), não na memória do
+modelo.** O endereço é geocodificado no Nominatim e os pontos de interesse
+vizinhos vêm do Overpass (ambos OpenStreetMap, gratuitos e sem chave); o LLM
+recebe essa lista com nome, categoria e distância e faz o que modelo faz bem:
+curar e escrever. A saída é JSON validado por Zod, com **uma** tentativa de
+correção quando o schema reprova (o erro do Zod volta para o modelo). Se o OSM
+estiver fora do ar, o guia é gerado só com o conhecimento do modelo; se o LLM
+falhar, a linha vira `failed`, a página mostra um estado amigável com botão de
+tentar novamente e o resto do guia continua no ar. Falha de IA é um cenário
+tratado, não uma exceção não capturada.
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+**O chat é fundamentado e resistente a prompt injection.** As instruções e os
+dados do imóvel vivem na mensagem `system`; o texto do hóspede vai na mensagem
+`user`, intocado — nunca concatenado dentro das instruções, que é justamente o
+que abre a porta para injeção. O system prompt proíbe inventar dados, manda
+encaminhar o que não estiver no contexto para o WhatsApp do anfitrião e declara
+explicitamente que mensagens do usuário não mudam regras nem papel. Somando a
+isso: corpo da requisição validado por Zod, teto de tamanho por mensagem e de
+histórico, e o contexto montado no servidor (o cliente só envia
+`{ code, messages }`). A resposta é **streaming real** via SSE, token a token.
 
-2. Create a Next.js app using the Supabase Starter template npx command
+**i18n com catálogos tipados.** Todo texto de interface vive em
+`lib/i18n/messages/` — pt-BR é a referência e o tipo `Messages` é inferido
+dele, então uma chave faltando em `en`/`es` é erro de compilação, não um furo
+na tela. O idioma vem de um cookie (não da URL: o hóspede recebe um único
+link, e trocar de idioma não pode mudar o endereço dele) e vale para tudo,
+incluindo os dicionários de domínio — regras, comodidades, tipos de acesso — e
+o conteúdo de IA, que é gerado e persistido por idioma.
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
+**404 honesto.** `cacheComponents` está desligado de propósito: o shell
+pré-renderizado responde 200 antes de o `notFound()` decidir, e um código de
+imóvel inexistente precisa devolver 404 de verdade, não uma página de erro com
+status 200. Como toda rota renderiza a partir dos dados de um imóvel
+específico, não havia nada a ganhar com cache de shell.
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
+## Inteligência artificial
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+### Modelos
 
-3. Use `cd` to change into the app's directory
+Todos gratuitos no OpenRouter e trocáveis por variável de ambiente — modelo
+gratuito é limitado por rate sem aviso, e trocar não deveria exigir um deploy.
 
-   ```bash
-   cd with-supabase-app
-   ```
+| Uso | Padrão | Por quê |
+|---|---|---|
+| Guia de experiências | `nvidia/nemotron-3-ultra-550b-a55b:free` (`OPENROUTER_GUIDE_MODEL`) | Compõe JSON longo e estruturado; roda uma vez por imóvel/idioma, então latência importa pouco |
+| Chat | `nvidia/nemotron-3-nano-30b-a3b:free` (`OPENROUTER_CHAT_MODEL`) | Perfil oposto: primeiro token em menos de um segundo e sem preâmbulo de raciocínio, porque o hóspede assiste à resposta sendo digitada |
+| Revisor de CI | `z-ai/glm-5.2:free` (`OPENROUTER_REVIEW_MODEL`), com fallback para `poolside/laguna-s-2.1:free` e `nvidia/nemotron-3-super-120b-a12b:free` | Escolhido testando quatro modelos com um diff que continha um `await` esquecido e uma chave secreta vazada: pegou os dois, de forma concisa, em ~5s |
 
-4. Rename `.env.example` to `.env.local` and update the following:
+### Notas de prompt engineering
 
-  ```env
-  NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=[INSERT SUPABASE PROJECT API PUBLISHABLE OR ANON KEY]
-  ```
-  > [!NOTE]
-  > This example uses `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, which refers to Supabase's new **publishable** key format.
-  > Both legacy **anon** keys and new **publishable** keys can be used with this variable name during the transition period. Supabase's dashboard may show `NEXT_PUBLIC_SUPABASE_ANON_KEY`; its value can be used in this example.
-  > See the [full announcement](https://github.com/orgs/supabase/discussions/29260) for more information.
+- **Grounding acima de tudo.** O prompt do guia entrega os POIs reais do
+  OpenStreetMap e proíbe inventar lugares; distâncias devem ser copiadas
+  literalmente dos dados, nunca estimadas.
+- **Saída estruturada e validada.** O guia é pedido como JSON com formato
+  descrito no prompt e conferido por Zod ao chegar; uma falha de schema gera
+  uma única tentativa de correção com o erro real anexado.
+- **Separação de papéis.** Instruções e dados no `system`, hóspede no `user`.
+  O que o hóspede escreve nunca é interpolado em instrução.
+- **Proibição explícita de invenção.** Quando a resposta não está no contexto,
+  o modelo diz isso em uma frase e encaminha para o anfitrião — comportamento
+  coberto por teste.
+- **Prompts escritos em português, com o idioma-alvo parametrizado.** Um único
+  conjunto de guardrails para revisar, em vez de três traduções que divergem
+  com o tempo.
 
-  Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+## Como rodar localmente
 
-5. You can now run the Next.js local development server:
+Pré-requisitos: [Bun](https://bun.sh) (versão em `.tool-versions`) e um projeto
+Supabase.
 
-   ```bash
-   npm run dev
-   ```
+```sh
+bun install
+cp .env.example .env.local   # preencha os valores
+```
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+| Variável | Obrigatória | Para quê |
+|---|---|---|
+| `SUPABASE_URL` | sim | URL do projeto Supabase (uso server-side) |
+| `SUPABASE_SECRET_KEY` | sim | Chave secreta; único caminho de acesso aos dados (RLS nega tudo) |
+| `OPENROUTER_API_KEY` | sim | Geração do guia, chat e revisor de CI |
+| `SUPABASE_DB_URL` | migrations/seed | Conexão Postgres direta, usada só por scripts |
+| `OPENROUTER_GUIDE_MODEL` | não | Troca o modelo do guia |
+| `OPENROUTER_CHAT_MODEL` | não | Troca o modelo do chat |
+| `OPENROUTER_BASE_URL` | não | Qualquer host compatível com a API da OpenAI; é o que aponta a suíte E2E para o stub |
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+Banco e dados de referência:
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+```sh
+bun run db:generate   # gera SQL a partir de db/schema.ts (só ao mudar o schema)
+bun run db:migrate    # aplica as migrations
+bun run db:seed       # faz upsert dos dois imóveis de referência (idempotente)
+```
 
-## Feedback and issues
+Desenvolvimento e verificação:
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+```sh
+bun run dev           # http://localhost:3000
+bun run lint          # Biome (lint + format)
+bun run typecheck     # tsc --noEmit
+bun run test          # Vitest
+bun run build && bun run test:e2e   # Playwright contra o build de produção
+```
 
-## More Supabase examples
+O `bun run test:e2e` **não precisa de chave da OpenRouter**: a configuração do
+Playwright sobe um stub local compatível com a API
+(`test/e2e/stub-openrouter.ts`) e aponta o app para ele com
+`OPENROUTER_BASE_URL`, então o streaming é determinístico e nenhum teste
+depende de um modelo gratuito estar disponível. O banco, esse sim, é o real —
+os testes só leem, nunca escrevem.
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+## CI
+
+```
+push (main) + pull_request
+  quality:   bun install → biome ci → tsc --noEmit → vitest → next build
+  e2e:       precisa de quality → Playwright (LLM stubado) → sobe report e traces como artefato
+  ai-review: precisa de e2e → diff do push + resultado dos testes → OpenRouter → comentário no commit
+```
+
+O revisor de IA roda só em `push`, é consultivo e nunca bloqueia: ele comenta
+no commit (inclusive em build vermelho, quando uma segunda opinião vale mais) e
+está marcado como `continue-on-error`, com cadeia de fallback de modelos — um
+modelo gratuito no limite de rate não pode travar o CI. Deploy é a integração
+Git da Vercel, não um job do Actions.
+
+## Estrutura de pastas
+
+```
+app/
+  page.tsx                   # índice dos imóveis (só para avaliação)
+  [code]/page.tsx            # guia do hóspede (RSC): busca os dados e compõe as seções
+  [code]/not-found.tsx       # 404 próprio para código inexistente
+  api/guides/[code]/route.ts # geração idempotente do guia (lock pending)
+  api/chat/route.ts          # chat com streaming SSE
+  api/locale/route.ts        # troca de idioma (cookie)
+components/
+  ui/                        # átomos: Button, Card, Badge, CopyField, SectionHeading…
+  guide/                     # seções do guia: Hero, Arrival, Rules, Amenities,
+                             # Experience (+ skeleton), Host, ChatWidget, TocNav
+  home/                      # cartão de imóvel do índice
+lib/
+  env.ts                     # ambiente validado por Zod (falha no boot)
+  domain/                    # schemas Zod + dicionários de exibição (regras, comodidades)
+  repositories/              # acesso a properties e experience_guides
+  supabase/server.ts         # client server-side com a chave secreta
+  ai/                        # client OpenRouter, prompts, pipeline do guia, grounding OSM
+  i18n/                      # catálogos pt-BR/en/es + resolução do idioma
+db/
+  schema.ts, migrations/, seed.ts
+test/
+  e2e/                       # Playwright + stub da OpenRouter
+  fixtures/                  # dados de imóvel para os testes unitários
+scripts/ai-review.ts         # revisor de IA do CI
+docs/PLAN.md                 # plano de trabalho
+mockup/                      # design system aprovado que originou os tokens
+```
+
+## Deploy
+
+A Vercel detecta o Bun pelo `bun.lock` e o Next 16 sem configuração extra —
+não há `vercel.json` no projeto de propósito. Os dois handlers que chamam o LLM
+declaram `export const maxDuration = 60` no próprio arquivo, que é o teto do
+plano Hobby, então não há nada para configurar fora do código. Basta apontar o
+repositório e definir `SUPABASE_URL`, `SUPABASE_SECRET_KEY` e
+`OPENROUTER_API_KEY` nas variáveis de ambiente do projeto.
+
+## Limitações e próximos passos
+
+Honestamente, o que ficou de fora ou merece atenção:
+
+- **Sem camada de cache.** Cada request busca o imóvel e o guia no Supabase.
+  Para dois imóveis é irrelevante; num catálogo real, o guia persistido é
+  conteúdo imutável e pediria cache com invalidação por código.
+- **Modelos gratuitos têm rate limit sem aviso.** A geração tem orçamento de
+  tempo, limite de tentativas e fallback para o conhecimento do modelo, e o
+  chat degrada para uma mensagem que encaminha ao anfitrião — mas em produção
+  o caminho é modelo pago com fallback, não gratuito com paciência.
+- **O QR do Wi-Fi só funciona apontando a câmera de outro aparelho**, já que o
+  hóspede tende a abrir o guia no próprio celular. Conectar direto pelo toque
+  exigiria integração nativa.
+- **A regeneração do guia só acontece a partir de uma linha `failed`** (o botão
+  de tentar novamente a apaga antes de gerar de novo). Não existe painel para
+  forçar a regeneração de um guia `ready` — proposital, dado o requisito de não
+  regenerar, mas um ambiente real precisaria de uma rota administrativa.
+- **Sem autenticação.** Quem tem o código tem o guia. É o modelo do produto
+  (link na confirmação da reserva), mas o código é curto e adivinhável; um
+  identificador longo por reserva seria o passo seguinte.
+- **A geração do guia é coberta por teste unitário, não E2E.** Os dois imóveis
+  semeados já têm guia `ready` e a suíte E2E não deve alterar o banco para
+  forçar o estado `pending`.
+- **Acessibilidade e performance não foram medidas.** Navegação por teclado,
+  landmarks e contraste foram cuidados à mão, sem verificação automatizada.

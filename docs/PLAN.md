@@ -260,14 +260,18 @@ Conventional Commits, small steps, committed as we go.
   still generated only once and persisted.
 
 **E7 — Polish & delivery**
-32. `docs: add readme with architecture and decisions (pt-br)`
-33. `feat(home): list available properties for reviewers` — home page shows all
-    seeded property codes as links so the reviewer can pick one quickly, with a
-    visible note that this index is a test-only page (a real guest would only
-    ever receive a direct /CODE link).
-34. **Manual gate:** mobile design review pass by Thomaz on the deployed app
-    before delivery.
-35. `chore: verify vercel deploy configuration`
+32. ~~`docs: add readme with architecture and decisions (pt-br)`~~
+33. ~~`feat(home): list available properties for reviewers`~~ — home page shows
+    all seeded property codes as links so the reviewer can pick one quickly,
+    with a visible note that this index is a test-only page (a real guest would
+    only ever receive a direct /CODE link).
+34. ~~**Manual gate:** mobile design review pass on the deployed app before
+    delivery~~ — reviewed against production: PASS. Done in review, still
+    pending Thomaz's own validation.
+35. ~~`chore: verify vercel deploy configuration`~~ — nothing to add: Bun is
+    detected from `bun.lock`, both LLM handlers export `maxDuration = 60`
+    (the Hobby ceiling) and no `next/image` remote host is needed, since photo
+    URLs come from the database. Recorded in the README's Deploy section.
 
 ## 10. Decisions
 

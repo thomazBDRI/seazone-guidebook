@@ -35,28 +35,46 @@ export type GeneratedGuide = { content: GuideContent; model: string };
 /** Hard ceiling on model calls, whatever mix of failures we hit. */
 const MAX_ATTEMPTS = 3;
 /**
- * Stop starting new attempts past this point. The route handler has 60s and
- * grounding has already spent some of it, so a late retry would be killed
- * mid-flight and persist nothing.
+ * Whole-pipeline budget, grounding included, kept under the route handler's
+ * 60s so a slow free endpoint is abandoned by us rather than killed
+ * mid-flight — a killed function leaves the lock row pending forever.
  */
-const ATTEMPT_BUDGET_MS = 40_000;
+const BUDGET_MS = 52_000;
+/** Below this, a fresh attempt cannot finish, so it is not worth starting. */
+const MIN_ATTEMPT_MS = 10_000;
 
 export async function generateGuide(
   property: Property,
 ): Promise<GeneratedGuide> {
+  const deadline = Date.now() + BUDGET_MS;
+
   const pois = await groundOnOsm(property);
   let messages = buildGuideMessages({ property, pois });
 
-  const deadline = Date.now() + ATTEMPT_BUDGET_MS;
   let corrected = false;
   let lastError: GenerationError | undefined;
 
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    const hasBudget = attempt < MAX_ATTEMPTS && Date.now() < deadline;
+    const remaining = deadline - Date.now();
+    if (remaining < MIN_ATTEMPT_MS) {
+      throw (
+        lastError ??
+        new GenerationError(
+          "llm",
+          "generation ran out of time before answering",
+        )
+      );
+    }
+    // another attempt only if one could still fit in what is left
+    const hasBudget = attempt < MAX_ATTEMPTS && remaining > MIN_ATTEMPT_MS * 2;
 
     let completion: Awaited<ReturnType<typeof createCompletion>>;
     try {
-      completion = await createCompletion({ messages, json: true });
+      completion = await createCompletion({
+        messages,
+        json: true,
+        timeoutMs: remaining,
+      });
     } catch (cause) {
       lastError = new GenerationError("llm", (cause as Error).message, {
         cause,

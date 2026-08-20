@@ -62,15 +62,7 @@ export async function createCompletion({
       signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (cause) {
-    const timedOut =
-      cause instanceof Error &&
-      (cause.name === "TimeoutError" || cause.name === "AbortError");
-    throw new OpenRouterError(
-      timedOut ? "timeout" : "network",
-      timedOut
-        ? `openrouter timed out after ${timeoutMs}ms`
-        : `openrouter request failed: ${(cause as Error).message}`,
-    );
+    throw asAbortOrNetworkError(cause, timeoutMs);
   }
 
   if (!response.ok) {
@@ -83,10 +75,38 @@ export async function createCompletion({
     );
   }
 
-  const payload = (await response
-    .json()
-    .catch(() => null)) as ChatCompletionPayload | null;
-  const choice = payload?.choices?.[0];
+  // the body is read as text first: OpenRouter pads long-running requests
+  // with whitespace to hold the connection open, and reading can time out
+  // well after the headers arrived — json() would report that as a parse
+  // failure and hide a plainly retryable timeout
+  let raw: string;
+  try {
+    raw = await response.text();
+  } catch (cause) {
+    throw asAbortOrNetworkError(cause, timeoutMs);
+  }
+
+  let payload: ChatCompletionPayload;
+  try {
+    payload = JSON.parse(raw) as ChatCompletionPayload;
+  } catch {
+    throw new OpenRouterError(
+      "empty",
+      `openrouter sent an unparseable body: ${raw.trim().slice(0, 200)}`,
+    );
+  }
+
+  // errors also arrive inside a 200 body, where response.ok says nothing
+  if (payload.error) {
+    const status = payload.error.code ?? response.status;
+    throw new OpenRouterError(
+      "http",
+      `openrouter returned an error payload: ${payload.error.message ?? "unknown"}`,
+      typeof status === "number" ? status : undefined,
+    );
+  }
+
+  const choice = payload.choices?.[0];
   const text = choice?.message?.content?.trim();
 
   if (!text) {
@@ -95,15 +115,32 @@ export async function createCompletion({
     // failed row says only "no content" for several different causes
     throw new OpenRouterError(
       "empty",
-      `model ${model} returned no content (finish_reason=${choice?.finish_reason ?? "none"}, reasoning_chars=${choice?.message?.reasoning?.length ?? 0}, completion_tokens=${payload?.usage?.completion_tokens ?? 0})`,
+      `model ${model} returned no content (finish_reason=${choice?.finish_reason ?? "none"}, reasoning_chars=${choice?.message?.reasoning?.length ?? 0}, completion_tokens=${payload.usage?.completion_tokens ?? 0})`,
     );
   }
-  return { text, model: payload?.model ?? model };
+  return { text, model: payload.model ?? model };
+}
+
+function asAbortOrNetworkError(
+  cause: unknown,
+  timeoutMs: number,
+): OpenRouterError {
+  const timedOut =
+    cause instanceof Error &&
+    (cause.name === "TimeoutError" || cause.name === "AbortError");
+
+  return new OpenRouterError(
+    timedOut ? "timeout" : "network",
+    timedOut
+      ? `openrouter timed out after ${timeoutMs}ms`
+      : `openrouter request failed: ${(cause as Error).message}`,
+  );
 }
 
 type ChatCompletionPayload = {
   model?: string;
   usage?: { completion_tokens?: number };
+  error?: { message?: string; code?: number | string };
   choices?: {
     finish_reason?: string;
     message?: { content?: string | null; reasoning?: string | null };

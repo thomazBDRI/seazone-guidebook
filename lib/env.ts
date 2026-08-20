@@ -13,10 +13,16 @@ const EnvSchema = z.object({
   SUPABASE_URL: z.url(),
   SUPABASE_SECRET_KEY: z.string().min(1),
   OPENROUTER_API_KEY: z.string().min(1),
+  /** Swappable so a rate-limited free model can be replaced without a deploy. */
+  OPENROUTER_GUIDE_MODEL: z
+    .string()
+    .min(1)
+    .default("nvidia/nemotron-3-ultra-550b-a55b:free"),
 });
 
 export const env = EnvSchema.parse({
   SUPABASE_URL: process.env.SUPABASE_URL,
   SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY,
   OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+  OPENROUTER_GUIDE_MODEL: process.env.OPENROUTER_GUIDE_MODEL,
 });

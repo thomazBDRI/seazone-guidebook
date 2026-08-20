@@ -37,6 +37,7 @@ describe("buildGuideMessages", () => {
     const messages = buildGuideMessages({
       property: fln001,
       pois: poisFixture(),
+      locale: "pt-BR",
     });
 
     expect(messages).toHaveLength(2);
@@ -46,7 +47,11 @@ describe("buildGuideMessages", () => {
 
   it("describes the property and its location", () => {
     const text = promptText(
-      buildGuideMessages({ property: fln001, pois: poisFixture() }),
+      buildGuideMessages({
+        property: fln001,
+        pois: poisFixture(),
+        locale: "pt-BR",
+      }),
     );
 
     expect(text).toContain("Apartamento Beira-Mar Florianópolis");
@@ -60,6 +65,7 @@ describe("buildGuideMessages", () => {
       buildGuideMessages({
         property: fln001,
         pois: poisFixture(),
+        locale: "pt-BR",
         now: new Date("2026-08-19T12:00:00Z"),
       }),
     );
@@ -69,7 +75,11 @@ describe("buildGuideMessages", () => {
 
   it("defaults to the actual current month", () => {
     const text = promptText(
-      buildGuideMessages({ property: fln001, pois: poisFixture() }),
+      buildGuideMessages({
+        property: fln001,
+        pois: poisFixture(),
+        locale: "pt-BR",
+      }),
     );
 
     expect(text).toContain(`Mês atual: ${monthName(new Date())}`);
@@ -77,7 +87,9 @@ describe("buildGuideMessages", () => {
 
   it("always spells out the json contract", () => {
     for (const pois of [poisFixture(), null]) {
-      const text = promptText(buildGuideMessages({ property: fln001, pois }));
+      const text = promptText(
+        buildGuideMessages({ property: fln001, pois, locale: "pt-BR" }),
+      );
 
       expect(text).toContain(JSON_CONTRACT);
       expect(text).toContain("welcome_message");
@@ -89,7 +101,11 @@ describe("buildGuideMessages", () => {
   describe("grounded on OSM candidates", () => {
     it("lists every candidate with its pre-computed distance", () => {
       const text = promptText(
-        buildGuideMessages({ property: fln001, pois: poisFixture() }),
+        buildGuideMessages({
+          property: fln001,
+          pois: poisFixture(),
+          locale: "pt-BR",
+        }),
       );
 
       expect(text).toContain("- Box 32 | ≈ 1,2 km");
@@ -102,7 +118,11 @@ describe("buildGuideMessages", () => {
 
     it("forbids inventing places outside the list and rewriting distances", () => {
       const text = promptText(
-        buildGuideMessages({ property: fln001, pois: poisFixture() }),
+        buildGuideMessages({
+          property: fln001,
+          pois: poisFixture(),
+          locale: "pt-BR",
+        }),
       );
 
       expect(text).toContain("Use SOMENTE nomes que aparecem na lista acima");
@@ -112,7 +132,9 @@ describe("buildGuideMessages", () => {
 
     it("omits categories OSM found nothing for", () => {
       const pois = { ...poisFixture(), hospitals: [] };
-      const text = promptText(buildGuideMessages({ property: fln001, pois }));
+      const text = promptText(
+        buildGuideMessages({ property: fln001, pois, locale: "pt-BR" }),
+      );
 
       expect(text).not.toContain("Hospitais e clínicas");
       expect(text).toContain("Farmácias");
@@ -120,7 +142,11 @@ describe("buildGuideMessages", () => {
 
     it("asks for the counts the experiences section renders", () => {
       const text = promptText(
-        buildGuideMessages({ property: fln001, pois: poisFixture() }),
+        buildGuideMessages({
+          property: fln001,
+          pois: poisFixture(),
+          locale: "pt-BR",
+        }),
       );
 
       expect(text).toContain("4 a 5 opções DA LISTA");
@@ -131,7 +157,11 @@ describe("buildGuideMessages", () => {
   describe("fallback without OSM grounding", () => {
     it("treats an empty candidate set as no grounding at all", () => {
       const text = promptText(
-        buildGuideMessages({ property: fln001, pois: emptyPois() }),
+        buildGuideMessages({
+          property: fln001,
+          pois: emptyPois(),
+          locale: "pt-BR",
+        }),
       );
 
       expect(text).toContain("Não há lista de lugares mapeados");
@@ -139,7 +169,7 @@ describe("buildGuideMessages", () => {
 
     it("restricts the model to famous, verifiable places in that city", () => {
       const text = promptText(
-        buildGuideMessages({ property: grm001, pois: null }),
+        buildGuideMessages({ property: grm001, pois: null, locale: "pt-BR" }),
       );
 
       expect(text).toContain("apenas o seu conhecimento sobre Gramado");
@@ -150,7 +180,7 @@ describe("buildGuideMessages", () => {
 
     it("asks for honest approximate distances from the neighbourhood", () => {
       const text = promptText(
-        buildGuideMessages({ property: grm001, pois: null }),
+        buildGuideMessages({ property: grm001, pois: null, locale: "pt-BR" }),
       );
 
       expect(text).toContain(
@@ -161,7 +191,7 @@ describe("buildGuideMessages", () => {
 
     it("carries no candidate list", () => {
       const text = promptText(
-        buildGuideMessages({ property: fln001, pois: null }),
+        buildGuideMessages({ property: fln001, pois: null, locale: "pt-BR" }),
       );
 
       expect(text).not.toContain("Lugares reais mapeados");
@@ -171,7 +201,11 @@ describe("buildGuideMessages", () => {
 });
 
 describe("buildCorrectionMessages", () => {
-  const base = buildGuideMessages({ property: fln001, pois: poisFixture() });
+  const base = buildGuideMessages({
+    property: fln001,
+    pois: poisFixture(),
+    locale: "pt-BR",
+  });
   const corrected = buildCorrectionMessages(
     base,
     '{"welcome_message": 42}',

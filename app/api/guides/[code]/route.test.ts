@@ -58,7 +58,7 @@ describe("POST /api/guides/[code]", () => {
     const response = await POST(request, context("FLN001"));
 
     expect(await body(response)).toEqual({ status: "ready" });
-    expect(generateGuide).toHaveBeenCalledWith(fln001);
+    expect(generateGuide).toHaveBeenCalledWith(fln001, "pt-BR");
     expect(markGuideReady).toHaveBeenCalledWith(
       fln001.id,
       "pt-BR",
@@ -124,6 +124,7 @@ describe("POST /api/guides/[code]", () => {
 
     expect(getGuideByPropertyId).toHaveBeenCalledWith(fln001.id, "en");
     expect(tryAcquireGenerationLock).toHaveBeenCalledWith(fln001.id, "en");
+    expect(generateGuide).toHaveBeenCalledWith(fln001, "en");
     expect(markGuideReady).toHaveBeenCalledWith(
       fln001.id,
       "en",

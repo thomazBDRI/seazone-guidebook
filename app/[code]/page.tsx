@@ -132,6 +132,7 @@ export default async function GuidePage({ params }: PageProps) {
         propertyName={property.name}
         hostName={property.host_name}
         hostPhoneDigits={phoneDigits(property.host_phone)}
+        locale={locale}
       />
     </>
   );

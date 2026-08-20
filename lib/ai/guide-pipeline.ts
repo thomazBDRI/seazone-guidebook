@@ -12,6 +12,7 @@ import { createCompletion } from "@/lib/ai/openrouter";
 import { mapAddress } from "@/lib/domain/display";
 import { type GuideContent, GuideContentSchema } from "@/lib/domain/guide";
 import type { Property } from "@/lib/domain/property";
+import type { Locale } from "@/lib/i18n/locales";
 
 /**
  * Guide generation: ground on OpenStreetMap when possible, let the LLM curate
@@ -45,11 +46,12 @@ const MIN_ATTEMPT_MS = 10_000;
 
 export async function generateGuide(
   property: Property,
+  locale: Locale,
 ): Promise<GeneratedGuide> {
   const deadline = Date.now() + BUDGET_MS;
 
   const pois = await groundOnOsm(property);
-  let messages = buildGuideMessages({ property, pois });
+  let messages = buildGuideMessages({ property, pois, locale });
 
   let corrected = false;
   let lastError: GenerationError | undefined;

@@ -56,7 +56,7 @@ export async function POST(_request: NextRequest, context: Context) {
   }
 
   try {
-    const { content, model } = await generateGuide(property);
+    const { content, model } = await generateGuide(property, locale);
     await markGuideReady(property.id, locale, content, model);
     return Response.json({ status: "ready" });
   } catch (cause) {

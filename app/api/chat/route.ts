@@ -4,6 +4,7 @@ import { buildChatMessages } from "@/lib/ai/chat-prompt";
 import { streamCompletion } from "@/lib/ai/openrouter";
 import { GuideContentSchema } from "@/lib/domain/guide";
 import { env } from "@/lib/env";
+import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n/server";
 import { getGuideByPropertyId } from "@/lib/repositories/guides";
 import { getPropertyByCode } from "@/lib/repositories/properties";
@@ -46,9 +47,6 @@ const RequestSchema = z.object({
       message: "the last message must come from the guest",
     }),
 });
-
-const APOLOGY =
-  "\n\n(Desculpe, minha resposta foi interrompida. Pode perguntar de novo?)";
 
 export async function POST(request: NextRequest) {
   const payload = RequestSchema.safeParse(
@@ -115,7 +113,7 @@ export async function POST(request: NextRequest) {
         // the answer is already on screen: close it with an apology rather
         // than an error the guest cannot act on
         console.error(`chat stream broke for ${property.code}:`, cause);
-        controller.enqueue(encoder.encode(APOLOGY));
+        controller.enqueue(encoder.encode(getMessages(locale).chat.apology));
       }
       controller.close();
     },

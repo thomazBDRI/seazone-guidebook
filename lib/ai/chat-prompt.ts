@@ -1,4 +1,5 @@
 import type { ChatMessage } from "@/lib/ai/openrouter";
+import { PROMPT_LANGUAGE } from "@/lib/ai/prompt-language";
 import {
   accessTypeDisplay,
   addressLine,
@@ -62,7 +63,7 @@ function systemPrompt(
     `Você é o assistente virtual do imóvel ${property.name} (código ${property.code}) da Seazone, plataforma de aluguel por temporada. Você conversa com o hóspede desta estadia e ajuda com chegada, acesso, Wi-Fi, regras, comodidades e dicas da região.`,
     dataBlock(property, locale),
     guideContent ? guideBlock(guideContent) : missingGuideNote(host),
-    answerRules(host),
+    answerRules(host, locale),
     SAFETY_RULES,
   ].join("\n\n");
 }
@@ -147,9 +148,9 @@ function missingGuideNote(host: string): string {
   return `Observação: o guia da região deste imóvel ainda não foi gerado, então você NÃO tem nomes de restaurantes, atrações ou serviços próximos. Se o hóspede perguntar sobre a região, diga que as dicas do bairro ainda estão sendo preparadas e que ${host} pode indicar lugares agora mesmo. Nunca cite estabelecimentos de memória.`;
 }
 
-function answerRules(host: string): string {
+function answerRules(host: string, locale: Locale): string {
   return `Como responder:
-- Antes de escrever, identifique o idioma da última mensagem do hóspede e responda inteiramente nesse idioma (mensagem em inglês → resposta em inglês; em espanhol → em espanhol). Só use português do Brasil quando o hóspede escrever em português ou quando o idioma não estiver claro.
+- O hóspede está lendo o guia em ${PROMPT_LANGUAGE[locale]}: responda nesse idioma por padrão. Se a última mensagem dele estiver claramente em outro idioma, responda inteiramente no idioma dela (mensagem em inglês → resposta em inglês; em espanhol → em espanhol).
 - Responda SOMENTE com informações que estejam entre os marcadores acima. Nunca invente, deduza ou complete dados que não estão ali (nomes, preços, horários, códigos, telefones, serviços do prédio).
 - Quando a informação não estiver nos dados, diga isso com franqueza em uma frase e oriente o hóspede a falar com ${host}.
 - Seja curto e concreto: 2 a 4 frases, tom acolhedor de anfitrião.

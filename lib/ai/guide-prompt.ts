@@ -1,7 +1,9 @@
 import type { NearbyPois, Poi, PoiCategory } from "@/lib/ai/geo";
 import { hasPois } from "@/lib/ai/geo";
 import type { ChatMessage } from "@/lib/ai/openrouter";
+import { PROMPT_LANGUAGE } from "@/lib/ai/prompt-language";
 import type { Property } from "@/lib/domain/property";
+import type { Locale } from "@/lib/i18n/locales";
 
 /**
  * Prompt assembly for the experiences guide. Pure functions — no network, no
@@ -17,6 +19,8 @@ export type GuidePromptInput = {
   property: PromptProperty;
   /** Null or empty when OSM grounding was unavailable. */
   pois: NearbyPois | null;
+  /** Language the guide is written in (one guide per locale is persisted). */
+  locale: Locale;
   /** Injected for deterministic tests; defaults to now. */
   now?: Date;
 };
@@ -30,30 +34,33 @@ export const JSON_CONTRACT = `{
   "seasonal_tip": "string"
 }`;
 
-const SYSTEM_PROMPT = `Você é um concierge local brasileiro que escreve guias de bairro para hóspedes de aluguel por temporada.
+function systemPrompt(locale: Locale): string {
+  return `Você é um concierge local brasileiro que escreve guias de bairro para hóspedes de aluguel por temporada.
 
 Regras invioláveis:
-- Escreva sempre em português do Brasil, com tom acolhedor, direto e sem clichês de folheto turístico.
+- Escreva sempre em ${PROMPT_LANGUAGE[locale]}, com tom acolhedor, direto e sem clichês de folheto turístico.
 - Responda APENAS com um único objeto JSON válido. Sem markdown, sem cercas de código, sem comentários, sem texto antes ou depois.
 - Nunca invente nomes de estabelecimentos. Se não tiver certeza de que um lugar existe, não o inclua.
 - Descrições de uma única frase, específicas (o que o hóspede encontra ali), nunca genéricas.`;
+}
 
 export function buildGuideMessages({
   property,
   pois,
+  locale,
   now = new Date(),
 }: GuidePromptInput): ChatMessage[] {
   const grounded = pois !== null && hasPois(pois);
 
   return [
-    { role: "system", content: SYSTEM_PROMPT },
+    { role: "system", content: systemPrompt(locale) },
     {
       role: "user",
       content: [
         propertyBlock(property, now),
         grounded ? candidatesBlock(pois) : "",
         grounded ? groundedRules(property) : fallbackRules(property),
-        contractBlock(),
+        contractBlock(locale),
       ]
         .filter(Boolean)
         .join("\n\n"),
@@ -157,9 +164,11 @@ Restrições:
 - As distâncias são aproximadas a partir do bairro ${property.neighborhood}: seja honesto, use faixas plausíveis no formato "≈ 800 m" ou "≈ 3,5 km" e nunca precise mais do que sabe.`;
 }
 
-function contractBlock(): string {
+function contractBlock(locale: Locale): string {
   return `Formato da resposta (JSON estrito, exatamente estas chaves):
-${JSON_CONTRACT}`;
+${JSON_CONTRACT}
+
+Todo o texto dentro do JSON deve estar em ${PROMPT_LANGUAGE[locale]}. A única exceção é o campo "type" de essentials: ele é um dado do sistema e usa sempre os valores em português (farmácia, supermercado ou hospital), qualquer que seja o idioma do resto.`;
 }
 
 /** "agosto" — lowercase, as it appears mid-sentence in the prompt. */

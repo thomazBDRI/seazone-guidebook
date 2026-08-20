@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { OPEN_CHAT_EVENT } from "@/components/guide/chat-events";
 import { Icon } from "@/components/guide/icon";
+import { getMessages } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 import { cn } from "@/lib/utils";
 
 /**
@@ -15,13 +17,6 @@ import { cn } from "@/lib/utils";
 const MAX_HISTORY = 12;
 const MAX_CONTENT = 1000;
 
-const SUGGESTIONS = [
-  "Qual a senha do WiFi?",
-  "Posso trazer meu cachorro?",
-  "A que horas posso fazer check-in?",
-  "Que restaurantes tem perto?",
-];
-
 type Turn = {
   role: "user" | "assistant" | "error";
   content: string;
@@ -33,6 +28,7 @@ type ChatWidgetProps = {
   hostName: string;
   /** Digits only, ready for a wa.me link. */
   hostPhoneDigits: string;
+  locale: Locale;
 };
 
 export function ChatWidget({
@@ -40,7 +36,9 @@ export function ChatWidget({
   propertyName,
   hostName,
   hostPhoneDigits,
+  locale,
 }: ChatWidgetProps) {
+  const messages = getMessages(locale).chat;
   const [open, setOpen] = useState(false);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
@@ -117,7 +115,7 @@ export function ChatWidget({
     <>
       <div
         role="dialog"
-        aria-label="Assistente virtual"
+        aria-label={messages.dialogLabel}
         aria-hidden={!open}
         onKeyDown={(event) => {
           if (event.key === "Escape") setOpen(false);
@@ -132,15 +130,15 @@ export function ChatWidget({
             <Icon name="sparkles" className="size-[18px]" />
           </span>
           <span className="min-w-0 flex-1">
-            <b className="block text-[14.5px]">Assistente Seazone</b>
+            <b className="block text-[14.5px]">{messages.title}</b>
             <span className="flex items-center gap-[5px] text-[11.5px] text-[hsl(152_70%_65%)] before:size-1.5 before:rounded-full before:bg-[hsl(152_70%_55%)] before:content-['']">
-              Online · conhece o {code}
+              {messages.online(code)}
             </span>
           </span>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            aria-label="Fechar chat"
+            aria-label={messages.close}
             className="p-1.5 text-white/70 transition-colors hover:text-white"
           >
             <Icon name="x" className="size-[18px]" />
@@ -153,8 +151,8 @@ export function ChatWidget({
           className="flex flex-1 flex-col gap-3 overflow-y-auto bg-sea-mist px-4 py-[18px]"
         >
           <Bubble kind="assistant">
-            Oi! 👋 Sou o assistente do <b>{propertyName}</b>. Posso ajudar com
-            Wi-Fi, regras, horários e dicas da região. O que você precisa?
+            {messages.greetingLead} <b>{propertyName}</b>
+            {messages.greetingTail}
           </Bubble>
 
           {turns.map((turn, index) => {
@@ -162,15 +160,14 @@ export function ChatWidget({
             if (turn.role === "error") {
               return (
                 <Bubble key={key} kind="error">
-                  Não consegui responder agora. Tente de novo em instantes ou
-                  fale com {hostName} no{" "}
+                  {messages.errorLead(hostName)}{" "}
                   <a
                     className="font-semibold text-primary-strong underline"
                     href={`https://wa.me/${hostPhoneDigits}`}
                     target="_blank"
                     rel="noreferrer"
                   >
-                    WhatsApp
+                    {messages.errorLink}
                   </a>
                   .
                 </Bubble>
@@ -179,7 +176,7 @@ export function ChatWidget({
             return (
               <Bubble key={key} kind={turn.role}>
                 {turn.content === "" ? (
-                  <TypingDots />
+                  <TypingDots label={messages.typing} />
                 ) : (
                   <span className="whitespace-pre-wrap">{turn.content}</span>
                 )}
@@ -189,7 +186,7 @@ export function ChatWidget({
         </div>
 
         <div className="flex flex-none flex-wrap gap-[7px] bg-sea-mist px-4 pb-2.5">
-          {SUGGESTIONS.map((suggestion) => (
+          {messages.suggestions.map((suggestion) => (
             <button
               key={suggestion}
               type="button"
@@ -215,14 +212,14 @@ export function ChatWidget({
             onChange={(event) => setInput(event.target.value)}
             maxLength={MAX_CONTENT}
             autoComplete="off"
-            aria-label="Pergunte sobre o imóvel"
-            placeholder="Pergunte sobre o imóvel…"
+            aria-label={messages.inputLabel}
+            placeholder={messages.inputPlaceholder}
             className="flex-1 rounded-full border border-border px-[18px] py-[11px] text-sm outline-none transition-[border-color,box-shadow] focus:border-primary focus:shadow-[0_0_0_3px_hsla(220,100%,50%,.14)]"
           />
           <button
             type="submit"
             disabled={busy || input.trim() === ""}
-            aria-label="Enviar"
+            aria-label={messages.send}
             className="grid size-11 flex-none place-items-center rounded-full bg-gradient-sea text-white transition-transform hover:scale-[1.07] disabled:opacity-60 disabled:hover:scale-100"
           >
             <Icon name="send" className="size-[17px]" />
@@ -233,9 +230,7 @@ export function ChatWidget({
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        aria-label={
-          open ? "Fechar assistente virtual" : "Abrir assistente virtual"
-        }
+        aria-label={open ? messages.closeLauncher : messages.openLauncher}
         className="fixed bottom-5 right-5 z-[60] grid size-[60px] place-items-center rounded-full bg-gradient-sea text-white shadow-[0_10px_30px_-6px_hsla(220,100%,40%,.55)] transition-transform hover:scale-[1.06]"
       >
         <Icon name={open ? "x" : "message-circle"} className="size-[26px]" />
@@ -270,10 +265,10 @@ function Bubble({
   );
 }
 
-function TypingDots() {
+function TypingDots({ label }: { label: string }) {
   return (
     <span className="inline-flex items-center gap-1 px-0.5 py-1">
-      <span className="sr-only">Digitando…</span>
+      <span className="sr-only">{label}</span>
       <i className="size-1.5 animate-blink rounded-full bg-[hsl(220_20%_70%)]" />
       <i className="size-1.5 animate-blink rounded-full bg-[hsl(220_20%_70%)] [animation-delay:.18s]" />
       <i className="size-1.5 animate-blink rounded-full bg-[hsl(220_20%_70%)] [animation-delay:.36s]" />

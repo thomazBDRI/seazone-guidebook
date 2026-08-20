@@ -81,7 +81,7 @@ beforeEach(() => {
 
 describe("generateGuide", () => {
   it("grounds on OSM and returns the validated content with its model", async () => {
-    const result = await generateGuide(fln001);
+    const result = await generateGuide(fln001, "pt-BR");
 
     expect(result.content).toEqual(VALID_GUIDE);
     expect(result.model).toBe("test-model");
@@ -93,7 +93,7 @@ describe("generateGuide", () => {
   });
 
   it("asks for json mode and feeds the candidates into the prompt", async () => {
-    await generateGuide(fln001);
+    await generateGuide(fln001, "pt-BR");
 
     expect(createCompletion.mock.calls[0][0].json).toBe(true);
     expect(sentPrompts()).toContain("- Box 32 | ≈ 1,2 km");
@@ -105,7 +105,7 @@ describe("generateGuide", () => {
       model: "chatty-model",
     });
 
-    const result = await generateGuide(fln001);
+    const result = await generateGuide(fln001, "pt-BR");
 
     expect(result.content).toEqual(VALID_GUIDE);
     expect(createCompletion).toHaveBeenCalledTimes(1);
@@ -119,7 +119,7 @@ describe("generateGuide", () => {
         model: "m",
       });
 
-    const result = await generateGuide(fln001);
+    const result = await generateGuide(fln001, "pt-BR");
 
     expect(result.content).toEqual(VALID_GUIDE);
     expect(createCompletion).toHaveBeenCalledTimes(2);
@@ -143,7 +143,7 @@ describe("generateGuide", () => {
         model: "m",
       });
 
-    await generateGuide(fln001);
+    await generateGuide(fln001, "pt-BR");
 
     expect(createCompletion.mock.calls[1][0].messages.at(-1).content).toContain(
       "restaurants",
@@ -153,8 +153,10 @@ describe("generateGuide", () => {
   it("gives up after the correction turn also fails validation", async () => {
     createCompletion.mockResolvedValue({ text: "{}", model: "m" });
 
-    await expect(generateGuide(fln001)).rejects.toThrow(GenerationError);
-    await expect(generateGuide(fln001)).rejects.toMatchObject({
+    await expect(generateGuide(fln001, "pt-BR")).rejects.toThrow(
+      GenerationError,
+    );
+    await expect(generateGuide(fln001, "pt-BR")).rejects.toMatchObject({
       stage: "validation",
     });
     // one correction turn per call, never a third pass
@@ -173,7 +175,7 @@ describe("generateGuide", () => {
         model: "m",
       });
 
-    const result = await generateGuide(fln001);
+    const result = await generateGuide(fln001, "pt-BR");
 
     expect(result.content).toEqual(VALID_GUIDE);
     expect(createCompletion).toHaveBeenCalledTimes(2);
@@ -196,7 +198,7 @@ describe("generateGuide", () => {
         model: "m",
       });
 
-      await expect(generateGuide(fln001)).resolves.toMatchObject({
+      await expect(generateGuide(fln001, "pt-BR")).resolves.toMatchObject({
         content: VALID_GUIDE,
       });
       expect(createCompletion).toHaveBeenCalledTimes(2);
@@ -208,7 +210,7 @@ describe("generateGuide", () => {
       Object.assign(new Error("model returned no content"), { kind: "empty" }),
     );
 
-    await expect(generateGuide(fln001)).rejects.toMatchObject({
+    await expect(generateGuide(fln001, "pt-BR")).rejects.toMatchObject({
       name: "GenerationError",
       stage: "llm",
     });
@@ -223,7 +225,7 @@ describe("generateGuide", () => {
       }),
     );
 
-    await expect(generateGuide(fln001)).rejects.toMatchObject({
+    await expect(generateGuide(fln001, "pt-BR")).rejects.toMatchObject({
       name: "GenerationError",
       stage: "llm",
       message: "openrouter returned 401: invalid key",
@@ -235,7 +237,7 @@ describe("generateGuide", () => {
     it("falls back to the city when the street cannot be geocoded", async () => {
       geocodeAddress.mockResolvedValueOnce(null).mockResolvedValueOnce(POINT);
 
-      await generateGuide(fln001);
+      await generateGuide(fln001, "pt-BR");
 
       expect(geocodeAddress).toHaveBeenLastCalledWith(
         "Florianópolis, SC, Brasil",
@@ -246,7 +248,7 @@ describe("generateGuide", () => {
     it("uses the knowledge-only prompt when geocoding fails entirely", async () => {
       geocodeAddress.mockResolvedValue(null);
 
-      const result = await generateGuide(fln001);
+      const result = await generateGuide(fln001, "pt-BR");
 
       expect(result.content).toEqual(VALID_GUIDE);
       expect(fetchNearbyPois).not.toHaveBeenCalled();
@@ -259,7 +261,7 @@ describe("generateGuide", () => {
     it("uses the knowledge-only prompt when Overpass returns nothing", async () => {
       fetchNearbyPois.mockResolvedValue(emptyPois());
 
-      await generateGuide(fln001);
+      await generateGuide(fln001, "pt-BR");
 
       expect(sentPrompts()).toContain("Não há lista de lugares mapeados");
       expect(sentPrompts()).not.toContain("Lugares reais mapeados");

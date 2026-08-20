@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { requestOpenChat } from "@/components/guide/chat-events";
 import { Icon } from "@/components/guide/icon";
 import { cn } from "@/lib/utils";
 
@@ -77,6 +78,7 @@ export function Hero({
         <div className="mt-7 flex animate-rise flex-wrap gap-3 [animation-delay:.38s]">
           <button
             type="button"
+            onClick={requestOpenChat}
             className="inline-flex items-center gap-[9px] rounded-full bg-gradient-warm px-[22px] py-3.5 text-[14.5px] font-bold text-white shadow-[0_10px_32px_-6px_hsla(2,80%,50%,.65)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[0_16px_38px_-6px_hsla(2,80%,50%,.75)] sm:px-7 sm:py-[15px] sm:text-[15.5px]"
           >
             <Icon name="sparkles" className="size-[19px] animate-sparkle" />

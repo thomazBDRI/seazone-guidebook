@@ -26,11 +26,13 @@ import {
   type LucideIcon,
   type LucideProps,
   MapPin,
+  MessageCircle,
   PartyPopper,
   PawPrint,
   PersonStanding,
   Phone,
   RotateCw,
+  Send,
   Snowflake,
   Sofa,
   Sparkles,
@@ -42,6 +44,7 @@ import {
   WashingMachine,
   Waves,
   Wifi,
+  X,
 } from "lucide-react";
 
 /**
@@ -76,11 +79,13 @@ const ICONS: Record<string, LucideIcon> = {
   "log-in": LogIn,
   "log-out": LogOut,
   "map-pin": MapPin,
+  "message-circle": MessageCircle,
   "party-popper": PartyPopper,
   "paw-print": PawPrint,
   "person-standing": PersonStanding,
   phone: Phone,
   "rotate-cw": RotateCw,
+  send: Send,
   snowflake: Snowflake,
   sofa: Sofa,
   sparkles: Sparkles,
@@ -92,6 +97,7 @@ const ICONS: Record<string, LucideIcon> = {
   "washing-machine": WashingMachine,
   waves: Waves,
   wifi: Wifi,
+  x: X,
 };
 
 export type IconProps = Omit<LucideProps, "ref"> & { name: string };

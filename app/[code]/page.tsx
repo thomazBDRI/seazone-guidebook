@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import { cache } from "react";
 import { AmenitiesSection } from "@/components/guide/amenities-section";
 import { ArrivalSection } from "@/components/guide/arrival-section";
+import { ChatWidget } from "@/components/guide/chat-widget";
 import { ExperienceLoader } from "@/components/guide/experience-loader";
 import { ExperienceSection } from "@/components/guide/experience-section";
 import { Hero } from "@/components/guide/hero";
@@ -107,6 +108,12 @@ export default async function GuidePage({ params }: PageProps) {
         />
       </main>
       <SiteFooter />
+      <ChatWidget
+        code={property.code}
+        propertyName={property.name}
+        hostName={property.host_name}
+        hostPhoneDigits={phoneDigits(property.host_phone)}
+      />
     </>
   );
 }

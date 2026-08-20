@@ -14,7 +14,16 @@ exclusivamente o que está no banco.
 |---|---|
 | [`/FLN001`](https://seazone-guidebook.vercel.app/FLN001) | Apartamento Beira-Mar, Florianópolis — SC |
 | [`/GRM001`](https://seazone-guidebook.vercel.app/GRM001) | Chalé Serra, Gramado — RS |
+| [`/BBN001`](https://seazone-guidebook.vercel.app/BBN001) | Casa pé na areia, Bombinhas — SC (pets e eventos liberados) |
+| [`/BCB001`](https://seazone-guidebook.vercel.app/BCB001) | Studio, Balneário Camboriú — SC (sem vaga, não indicado para crianças) |
+| [`/ROS001`](https://seazone-guidebook.vercel.app/ROS001) | Cabana, Praia do Rosa — SC (lareira, cofre de chaves) |
+| [`/JUR001`](https://seazone-guidebook.vercel.app/JUR001) | Apartamento, Jurerê Internacional — SC (acesso via portaria) |
 | [`/`](https://seazone-guidebook.vercel.app/) | Índice dos imóveis — página que existe **só** para a avaliação técnica |
+
+Cada imóvel também declara **serviços sob demanda** (early check-in, late
+check-out, extensão de estadia com o time Seazone, limpeza extra, guarda de
+bagagem, transfer) — renderizados na seção "Precisa de algo?" e respondidos
+pelo assistente, inclusive quando o serviço **não** é oferecido.
 
 O hóspede real nunca vê uma listagem: ele recebe na confirmação da reserva um
 link direto para o guia da sua hospedagem (`/FLN001`). A home existe para quem
@@ -168,7 +177,7 @@ Banco e dados de referência:
 ```sh
 bun run db:generate   # gera SQL a partir de db/schema.ts (só ao mudar o schema)
 bun run db:migrate    # aplica as migrations
-bun run db:seed       # faz upsert dos dois imóveis de referência (idempotente)
+bun run db:seed       # faz upsert dos seis imóveis de exemplo (idempotente)
 ```
 
 Desenvolvimento e verificação:
@@ -249,7 +258,7 @@ repositório e definir `SUPABASE_URL`, `SUPABASE_SECRET_KEY` e
 Honestamente, o que ficou de fora ou merece atenção:
 
 - **Sem camada de cache.** Cada request busca o imóvel e o guia no Supabase.
-  Para dois imóveis é irrelevante; num catálogo real, o guia persistido é
+  Para seis imóveis é irrelevante; num catálogo real, o guia persistido é
   conteúdo imutável e pediria cache com invalidação por código.
 - **Modelos gratuitos têm rate limit sem aviso.** A geração tem orçamento de
   tempo, limite de tentativas e fallback para o conhecimento do modelo, e o
@@ -265,8 +274,8 @@ Honestamente, o que ficou de fora ou merece atenção:
 - **Sem autenticação.** Quem tem o código tem o guia. É o modelo do produto
   (link na confirmação da reserva), mas o código é curto e adivinhável; um
   identificador longo por reserva seria o passo seguinte.
-- **A geração do guia é coberta por teste unitário, não E2E.** Os dois imóveis
-  semeados já têm guia `ready` e a suíte E2E não deve alterar o banco para
+- **A geração do guia é coberta por teste unitário, não E2E.** Os imóveis
+  semeados já têm guia `ready` em pt-BR e a suíte E2E não deve alterar o banco para
   forçar o estado `pending`.
 - **Acessibilidade e performance não foram medidas.** Navegação por teclado,
   landmarks e contraste foram cuidados à mão, sem verificação automatizada.

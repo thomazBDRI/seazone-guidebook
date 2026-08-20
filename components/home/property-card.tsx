@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Icon } from "@/components/guide/icon";
+import { PendingOverlay } from "@/components/home/pending-overlay";
 import { Card } from "@/components/ui/card";
 import type { PropertySummary } from "@/lib/domain/property";
 import { getMessages } from "@/lib/i18n";
@@ -13,7 +14,7 @@ export function PropertyCard({ property, locale }: PropertyCardProps) {
 
   return (
     <Link href={`/${property.code}`} className="group block">
-      <Card className="h-full overflow-hidden border-border shadow-soft transition-[transform,box-shadow] group-hover:-translate-y-1 group-hover:shadow-card">
+      <Card className="relative h-full overflow-hidden border-border shadow-soft transition-[transform,box-shadow] group-hover:-translate-y-1 group-hover:shadow-card">
         <div className="relative aspect-[16/10] overflow-hidden bg-sea-light">
           {property.image ? (
             // biome-ignore lint/performance/noImgElement: photo hosts come from the database, so next/image would need a wildcard remote allowlist
@@ -70,6 +71,7 @@ export function PropertyCard({ property, locale }: PropertyCardProps) {
             />
           </span>
         </div>
+        <PendingOverlay />
       </Card>
     </Link>
   );

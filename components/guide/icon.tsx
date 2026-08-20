@@ -25,6 +25,7 @@ import {
   Flame,
   Instagram,
   KeyRound,
+  LoaderCircle,
   LockKeyhole,
   LogIn,
   LogOut,
@@ -64,6 +65,7 @@ import {
 const ICONS: Record<string, LucideIcon> = {
   "arrow-down": ArrowDown,
   "arrow-right": ArrowRight,
+  "loader-circle": LoaderCircle,
   "arrow-up-down": ArrowUpDown,
   baby: Baby,
   bath: Bath,

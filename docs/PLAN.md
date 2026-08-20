@@ -231,7 +231,13 @@ Conventional Commits, small steps, committed as we go.
 
 **E7 — Polish & delivery**
 32. `docs: add readme with architecture and decisions (pt-br)`
-33. `chore: verify vercel deploy configuration`
+33. `feat(home): list available properties for reviewers` — home page shows all
+    seeded property codes as links so the reviewer can pick one quickly, with a
+    visible note that this index is a test-only page (a real guest would only
+    ever receive a direct /CODE link).
+34. **Manual gate:** mobile design review pass by Thomaz on the deployed app
+    before delivery.
+35. `chore: verify vercel deploy configuration`
 
 ## 10. Open decisions
 

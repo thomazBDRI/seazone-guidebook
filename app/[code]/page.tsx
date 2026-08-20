@@ -4,10 +4,8 @@ import QRCode from "qrcode";
 import { cache } from "react";
 import { AmenitiesSection } from "@/components/guide/amenities-section";
 import { ArrivalSection } from "@/components/guide/arrival-section";
-import {
-  ExperienceSection,
-  ExperienceSkeleton,
-} from "@/components/guide/experience-section";
+import { ExperienceLoader } from "@/components/guide/experience-loader";
+import { ExperienceSection } from "@/components/guide/experience-section";
 import { Hero } from "@/components/guide/hero";
 import { HostSection } from "@/components/guide/host-section";
 import { RulesSection } from "@/components/guide/rules-section";
@@ -97,7 +95,8 @@ export default async function GuidePage({ params }: PageProps) {
             generatedAt={guide?.generated_at ?? null}
           />
         ) : (
-          <ExperienceSkeleton
+          <ExperienceLoader
+            code={property.code}
             neighborhood={property.neighborhood}
             city={property.city}
           />

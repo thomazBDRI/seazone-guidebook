@@ -9,7 +9,7 @@ type ShellProps = {
 };
 
 /** Dark full-bleed section with the mockup's radial glows. */
-function ExperienceShell({ neighborhood, city, children }: ShellProps) {
+export function ExperienceShell({ neighborhood, city, children }: ShellProps) {
   return (
     <section
       id="experiencias"

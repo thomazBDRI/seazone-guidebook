@@ -14,8 +14,12 @@ const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
 const USER_AGENT =
   "seazone-guest-guide/1.0 (+https://github.com/seazone/guest-guide)";
 const NOMINATIM_TIMEOUT_MS = 8_000;
-/** Overpass is slower than Nominatim, especially under load. */
-const OVERPASS_TIMEOUT_MS = 12_000;
+/**
+ * The public Overpass instance takes 10-15s for a 2.5 km multi-category query,
+ * so this is generous on purpose — the route handler budget is 60s and losing
+ * the grounding costs more than waiting for it.
+ */
+const OVERPASS_TIMEOUT_MS = 20_000;
 const SEARCH_RADIUS_M = 2500;
 
 export type GeoPoint = { lat: number; lon: number };
@@ -83,7 +87,8 @@ export async function fetchNearbyPois(
   const payload = await fetchJson<OverpassResponse>(
     OVERPASS_URL,
     OVERPASS_TIMEOUT_MS,
-    { method: "POST", body: overpassQuery(lat, lon) },
+    // Overpass rejects a raw request body; the query goes in a `data` field
+    { method: "POST", form: { data: overpassQuery(lat, lon) } },
   );
 
   const elements = payload?.elements;
@@ -118,7 +123,14 @@ export async function fetchNearbyPois(
   return grouped;
 }
 
-/** Single union query so one round trip covers every category. */
+/**
+ * Single union query so one round trip covers every category.
+ *
+ * Two details are load-bearing for it to complete at all:
+ * `nw` rather than `nwr` (relations cost seconds and add almost no venues),
+ * and no `["name"]` pre-filter — leading with it makes Overpass scan every
+ * named object on earth and time out. Unnamed results are dropped locally.
+ */
 function overpassQuery(lat: number, lon: number): string {
   const around = `(around:${SEARCH_RADIUS_M},${lat},${lon})`;
   const filters = [
@@ -130,11 +142,9 @@ function overpassQuery(lat: number, lon: number): string {
     '["shop"="supermarket"]',
     '["amenity"~"^(hospital|clinic)$"]',
   ];
-  const body = filters
-    .map((filter) => `  nwr["name"]${filter}${around};`)
-    .join("\n");
+  const body = filters.map((filter) => `  nw${filter}${around};`).join("\n");
 
-  return `[out:json][timeout:${Math.floor(OVERPASS_TIMEOUT_MS / 1000)}];\n(\n${body}\n);\nout tags center;`;
+  return `[out:json][timeout:25];\n(\n${body}\n);\nout tags center;`;
 }
 
 /** Essentials win over food/leisure tags so a pharmacy is never a restaurant. */
@@ -197,7 +207,7 @@ function coordsOf(element: OverpassElement): GeoPoint | null {
 async function fetchJson<T>(
   url: string,
   timeoutMs: number,
-  init?: { method: "POST"; body: string },
+  init?: { method: "POST"; form: Record<string, string> },
 ): Promise<T | null> {
   try {
     const response = await fetch(url, {
@@ -205,9 +215,11 @@ async function fetchJson<T>(
       headers: {
         "User-Agent": USER_AGENT,
         Accept: "application/json",
-        ...(init ? { "Content-Type": "text/plain;charset=UTF-8" } : {}),
+        ...(init
+          ? { "Content-Type": "application/x-www-form-urlencoded" }
+          : {}),
       },
-      body: init?.body,
+      body: init ? new URLSearchParams(init.form).toString() : undefined,
       signal: AbortSignal.timeout(timeoutMs),
     });
     if (!response.ok) return null;

@@ -18,6 +18,12 @@ function northOf(meters: number) {
   };
 }
 
+/** The Overpass QL the module actually put on the wire. */
+function overpassQueryOf(fetchMock: ReturnType<typeof vi.fn>): string {
+  const body = fetchMock.mock.calls[0][1].body as string;
+  return new URLSearchParams(body).get("data") ?? "";
+}
+
 function mockFetch(payload: unknown, ok = true) {
   const fetchMock = vi.fn().mockResolvedValue({
     ok,
@@ -223,11 +229,35 @@ describe("fetchNearbyPois", () => {
     const fetchMock = mockFetch({ elements: [] });
     await fetchNearbyPois(ORIGIN.lat, ORIGIN.lon);
 
-    const body = fetchMock.mock.calls[0][1].body as string;
-    expect(body).toContain("restaurant|cafe|bar");
-    expect(body).toContain("pharmacy");
-    expect(body).toContain("supermarket");
-    expect(body).toContain("hospital|clinic");
-    expect(body).toContain(`around:2500,${ORIGIN.lat},${ORIGIN.lon}`);
+    const query = overpassQueryOf(fetchMock);
+    expect(query).toContain("restaurant|cafe|bar");
+    expect(query).toContain("attraction|museum|viewpoint|artwork");
+    expect(query).toContain("pharmacy");
+    expect(query).toContain("supermarket");
+    expect(query).toContain("hospital|clinic");
+    expect(query).toContain(`around:2500,${ORIGIN.lat},${ORIGIN.lon}`);
+  });
+
+  it("sends the query form-encoded, the only shape Overpass accepts", async () => {
+    const fetchMock = mockFetch({ elements: [] });
+    await fetchNearbyPois(ORIGIN.lat, ORIGIN.lon);
+
+    const [, init] = fetchMock.mock.calls[0];
+    expect(init.method).toBe("POST");
+    expect(init.headers["Content-Type"]).toBe(
+      "application/x-www-form-urlencoded",
+    );
+    expect(overpassQueryOf(fetchMock)).toContain("[out:json]");
+  });
+
+  it("keeps the query cheap enough for Overpass to answer it", async () => {
+    const fetchMock = mockFetch({ elements: [] });
+    await fetchNearbyPois(ORIGIN.lat, ORIGIN.lon);
+
+    const query = overpassQueryOf(fetchMock);
+    // leading with ["name"] makes Overpass scan every named object and time
+    // out; relations cost seconds and add virtually no named venues
+    expect(query).not.toContain('["name"]');
+    expect(query).not.toContain("nwr");
   });
 });

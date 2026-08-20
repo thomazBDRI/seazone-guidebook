@@ -101,6 +101,10 @@ export default {
           from: { opacity: "0", transform: "translateY(8px)" },
           to: { opacity: "1", transform: "none" },
         },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-7px)" },
+        },
       },
       animation: {
         rise: "rise .7s both",
@@ -108,6 +112,8 @@ export default {
         orbpulse: "orbpulse 1.8s ease-in-out infinite",
         shimmer: "shimmer 1.6s infinite",
         msgin: "msgin .25s both",
+        float: "float 4s ease-in-out infinite",
+        "float-slow": "float 5s ease-in-out infinite",
       },
     },
   },

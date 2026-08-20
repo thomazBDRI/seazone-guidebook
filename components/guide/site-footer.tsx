@@ -1,5 +1,12 @@
 import { WaveLogoCompact } from "@/components/guide/brand";
 
+/**
+ * Fixed on purpose: reading the clock while rendering makes the page
+ * unprerenderable under cacheComponents, and a guest guide has no reason to
+ * be dynamic over a copyright line.
+ */
+export const COPYRIGHT = "© 2026 Seazone Serviços Ltda. · Guia do Hóspede";
+
 export function SiteFooter() {
   return (
     <footer
@@ -16,9 +23,7 @@ export function SiteFooter() {
             Gestão inteligente de imóveis por temporada
           </div>
         </div>
-        <div className="text-xs opacity-70">
-          © {new Date().getFullYear()} Seazone Serviços Ltda. · Guia do Hóspede
-        </div>
+        <div className="text-xs opacity-70">{COPYRIGHT}</div>
       </div>
     </footer>
   );

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { openChat } from "./helpers";
 
 /** The three deltas the stub streams for a Wi-Fi question, concatenated. */
 const FULL_ANSWER = "A senha do Wi-Fi é floripa2024.";
@@ -21,7 +22,7 @@ test("streams the assistant answer through the app's own endpoint", async ({
   page.on("request", (request) => requested.push(request.url()));
 
   await page.goto("/FLN001");
-  await page.getByRole("button", { name: "Abrir assistente virtual" }).click();
+  await openChat(page);
 
   // Polling innerText from the test would race the stream on a loaded machine,
   // so the intermediate states are recorded in the page instead: every paint
@@ -75,7 +76,7 @@ test("keeps the question and the answer in the transcript", async ({
   page,
 }) => {
   await page.goto("/FLN001");
-  await page.getByRole("button", { name: "Abrir assistente virtual" }).click();
+  await openChat(page);
   await page
     .getByRole("button", { name: "A que horas posso fazer check-in?" })
     .click();

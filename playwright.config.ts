@@ -21,10 +21,15 @@ export default defineConfig({
   outputDir: "./test-results",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
+  // the suite reads a live Supabase project, which occasionally rejects a
+  // request with a clock-skew error ("JWT issued at future"); a real failure
+  // still fails every attempt
+  retries: process.env.CI ? 2 : 1,
   reporter: [
     ["list"],
     ["html", { outputFolder: "playwright-report", open: "never" }],
+    // machine-readable sibling of the HTML report, read by scripts/ai-review.ts
+    ["json", { outputFile: "playwright-report/results.json" }],
   ],
   use: {
     baseURL: BASE_URL,

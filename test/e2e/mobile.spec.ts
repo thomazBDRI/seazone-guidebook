@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { openChat } from "./helpers";
 
 /**
  * Phone-only layout checks. The guide is delivered as a link in a booking
@@ -20,19 +21,19 @@ test.describe("mobile layout", () => {
       }),
     ).toBeVisible();
 
+    // doubles as the hydration gate for the taps below
+    const chat = await openChat(page);
+    await expect(
+      chat.getByPlaceholder("Pergunte sobre o imóvel…"),
+    ).toBeVisible();
+    await chat.getByRole("button", { name: "Fechar chat" }).tap();
+
     // the side rail collapses into a sticky "Seção" bar below 1400px
     const sectionBar = page.getByText("Seção", { exact: true });
     await expect(sectionBar).toBeVisible();
     await sectionBar.tap();
     await expect(
       page.getByRole("link", { name: "Explore a região" }),
-    ).toBeVisible();
-
-    const fab = page.getByRole("button", { name: "Abrir assistente virtual" });
-    await expect(fab).toBeVisible();
-    await fab.tap();
-    await expect(
-      page.getByPlaceholder("Pergunte sobre o imóvel…"),
     ).toBeVisible();
 
     await testInfo.attach("guide-mobile-full-page", {

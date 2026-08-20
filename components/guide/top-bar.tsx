@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { BrandLockup, WhatsAppIcon } from "@/components/guide/brand";
+import { LanguageSwitcher } from "@/components/guide/language-switcher";
 import { getMessages } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
 import { cn } from "@/lib/utils";
@@ -47,15 +48,18 @@ export function TopBar({ hostPhoneDigits, locale }: TopBarProps) {
       )}
     >
       <BrandLockup locale={locale} />
-      <a
-        className="inline-flex items-center gap-2 rounded-full border border-white/[.25] bg-white/[.12] px-[11px] py-[9px] text-[13.5px] font-semibold text-white backdrop-blur-[8px] transition-colors hover:bg-white/[.22] sm:px-4"
-        href={`https://wa.me/${hostPhoneDigits}`}
-        target="_blank"
-        rel="noopener"
-      >
-        <WhatsAppIcon className="size-[15px]" />
-        <span className="hidden sm:inline">{messages.topBar.talkToHost}</span>
-      </a>
+      <div className="flex items-center gap-3.5 sm:gap-[18px]">
+        <LanguageSwitcher locale={locale} />
+        <a
+          className="inline-flex items-center gap-2 rounded-full border border-white/[.25] bg-white/[.12] px-[11px] py-[9px] text-[13.5px] font-semibold text-white backdrop-blur-[8px] transition-colors hover:bg-white/[.22] sm:px-4"
+          href={`https://wa.me/${hostPhoneDigits}`}
+          target="_blank"
+          rel="noopener"
+        >
+          <WhatsAppIcon className="size-[15px]" />
+          <span className="hidden sm:inline">{messages.topBar.talkToHost}</span>
+        </a>
+      </div>
     </header>
   );
 }

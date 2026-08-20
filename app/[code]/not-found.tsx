@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BrandLockup, WhatsAppIcon } from "@/components/guide/brand";
 import { Icon } from "@/components/guide/icon";
+import { LanguageSwitcher } from "@/components/guide/language-switcher";
 import { ActionLink } from "@/components/ui/action-link";
 import { getMessages } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n/server";
@@ -17,10 +18,11 @@ export default async function PropertyNotFound() {
 
   return (
     <div className="flex min-h-screen flex-col overflow-x-hidden bg-sea-deep text-white">
-      <header className="flex items-center px-[clamp(16px,4vw,40px)] py-[18px]">
+      <header className="flex items-center justify-between px-[clamp(16px,4vw,40px)] py-[18px]">
         <Link href="/">
           <BrandLockup locale={locale} />
         </Link>
+        <LanguageSwitcher locale={locale} />
       </header>
 
       <main className="relative flex flex-1 items-center justify-center px-[clamp(16px,4vw,40px)] pb-20 pt-10">

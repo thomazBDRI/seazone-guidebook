@@ -4,6 +4,7 @@ import {
   addressLine,
   amenityDisplay,
   amenityList,
+  essentialTypeLabel,
   formatPhone,
   formatTime,
   hostInitials,
@@ -12,6 +13,7 @@ import {
   phoneDigits,
   ruleLines,
 } from "@/lib/domain/display";
+import { LOCALES } from "@/lib/i18n/locales";
 import { fln001, grm001 } from "@/test/fixtures/property";
 
 describe("formatTime", () => {
@@ -27,7 +29,7 @@ describe("formatTime", () => {
 
 describe("ruleLines", () => {
   it("writes the FLN001 sentences (pets/smoking/events forbidden)", () => {
-    const sentences = ruleLines(fln001).map((r) => r.sentence);
+    const sentences = ruleLines(fln001, "pt-BR").map((r) => r.sentence);
     expect(sentences).toEqual([
       "Máximo de 4 hóspedes",
       "Não é permitido animais de estimação",
@@ -39,7 +41,9 @@ describe("ruleLines", () => {
   });
 
   it("flips sentences for GRM001 (pets ok, no babies)", () => {
-    const byKey = Object.fromEntries(ruleLines(grm001).map((r) => [r.key, r]));
+    const byKey = Object.fromEntries(
+      ruleLines(grm001, "pt-BR").map((r) => [r.key, r]),
+    );
     expect(byKey.guests.sentence).toBe("Máximo de 6 hóspedes");
     expect(byKey.pets.sentence).toBe("Animais de estimação são bem-vindos");
     expect(byKey.pets.allowed).toBe(true);
@@ -48,7 +52,9 @@ describe("ruleLines", () => {
   });
 
   it("marks forbidden plain icons for the slash, except cigarette-off", () => {
-    const byKey = Object.fromEntries(ruleLines(fln001).map((r) => [r.key, r]));
+    const byKey = Object.fromEntries(
+      ruleLines(fln001, "pt-BR").map((r) => [r.key, r]),
+    );
     expect(byKey.pets.allowed).toBe(false);
     expect(byKey.events.allowed).toBe(false);
     // lucide's cigarette-off already draws its own slash
@@ -59,15 +65,15 @@ describe("ruleLines", () => {
 
 describe("amenityDisplay", () => {
   it("translates known keys", () => {
-    expect(amenityDisplay("air_conditioning")).toEqual({
+    expect(amenityDisplay("air_conditioning", "pt-BR")).toEqual({
       icon: "snowflake",
       label: "Ar-condicionado",
     });
-    expect(amenityDisplay("bbq_grill").label).toBe("Churrasqueira");
+    expect(amenityDisplay("bbq_grill", "pt-BR").label).toBe("Churrasqueira");
   });
 
   it("humanizes unknown keys instead of breaking", () => {
-    expect(amenityDisplay("heated_pool")).toEqual({
+    expect(amenityDisplay("heated_pool", "pt-BR")).toEqual({
       icon: "check",
       label: "Heated pool",
     });
@@ -76,12 +82,12 @@ describe("amenityDisplay", () => {
 
 describe("amenityList", () => {
   it("keeps only truthy amenities", () => {
-    const list = amenityList({ wifi: true, tv: false, kitchen: true });
+    const list = amenityList({ wifi: true, tv: false, kitchen: true }, "pt-BR");
     expect(list.map((a) => a.key)).toEqual(["wifi", "kitchen"]);
   });
 
   it("puts known amenities before unknown ones", () => {
-    const list = amenityList({ zzz_custom: true, wifi: true });
+    const list = amenityList({ zzz_custom: true, wifi: true }, "pt-BR");
     expect(list[0].key).toBe("wifi");
     expect(list[1].label).toBe("Zzz custom");
   });
@@ -89,13 +95,76 @@ describe("amenityList", () => {
 
 describe("accessTypeDisplay", () => {
   it("translates known access types", () => {
-    expect(accessTypeDisplay("smart_lock").label).toBe("Fechadura eletrônica");
-    expect(accessTypeDisplay("keybox").label).toBe("Cofre de chaves");
+    expect(accessTypeDisplay("smart_lock", "pt-BR").label).toBe(
+      "Fechadura eletrônica",
+    );
+    expect(accessTypeDisplay("keybox", "pt-BR").label).toBe("Cofre de chaves");
   });
 
   it("falls back for unknown or missing types", () => {
-    expect(accessTypeDisplay("retina_scanner").label).toBe("Retina scanner");
-    expect(accessTypeDisplay(null).label).toBe("Acesso ao imóvel");
+    expect(accessTypeDisplay("retina_scanner", "pt-BR").label).toBe(
+      "Retina scanner",
+    );
+    expect(accessTypeDisplay(null, "pt-BR").label).toBe("Acesso ao imóvel");
+  });
+});
+
+describe("localized dictionaries", () => {
+  it("writes the rule sentences in english and spanish", () => {
+    const english = Object.fromEntries(
+      ruleLines(fln001, "en").map((r) => [r.key, r.sentence]),
+    );
+    expect(english.guests).toBe("Up to 4 guests");
+    expect(english.pets).toBe("Pets are not allowed");
+    expect(english.smoking).toBe("No smoking indoors");
+    expect(english.babies).toBe("Suitable for babies");
+
+    const spanish = Object.fromEntries(
+      ruleLines(grm001, "es").map((r) => [r.key, r.sentence]),
+    );
+    expect(spanish.guests).toBe("Máximo de 6 huéspedes");
+    expect(spanish.pets).toBe("Se admiten mascotas");
+    expect(spanish.babies).toBe("No apto para bebés");
+  });
+
+  it("keeps the icon while translating the label", () => {
+    expect(amenityDisplay("air_conditioning", "en")).toEqual({
+      icon: "snowflake",
+      label: "Air conditioning",
+    });
+    expect(amenityDisplay("air_conditioning", "es").label).toBe(
+      "Aire acondicionado",
+    );
+  });
+
+  it("humanizes an unknown amenity in every locale, without inventing words", () => {
+    for (const locale of LOCALES) {
+      expect(amenityDisplay("heated_pool", locale)).toEqual({
+        icon: "check",
+        label: "Heated pool",
+      });
+    }
+  });
+
+  it("orders known amenities first whatever the locale", () => {
+    const list = amenityList({ zzz_custom: true, wifi: true }, "es");
+    expect(list.map((a) => a.key)).toEqual(["wifi", "zzz_custom"]);
+    expect(list[0].label).toBe("Wifi");
+  });
+
+  it("translates access types and their fallback", () => {
+    expect(accessTypeDisplay("smart_lock", "en").label).toBe("Smart lock");
+    expect(accessTypeDisplay("keybox", "es").label).toBe("Caja de llaves");
+    expect(accessTypeDisplay(null, "en").label).toBe("Property access");
+  });
+
+  it("translates the essentials type literals, accents and case aside", () => {
+    expect(essentialTypeLabel("farmácia", "pt-BR")).toBe("Farmácia");
+    expect(essentialTypeLabel("Farmácia", "en")).toBe("Pharmacy");
+    expect(essentialTypeLabel("farmacia", "es")).toBe("Farmacia");
+    expect(essentialTypeLabel("supermercado", "en")).toBe("Supermarket");
+    // anything the model made up survives instead of disappearing
+    expect(essentialTypeLabel("padaria", "en")).toBe("padaria");
   });
 });
 

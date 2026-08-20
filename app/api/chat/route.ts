@@ -4,6 +4,7 @@ import { buildChatMessages } from "@/lib/ai/chat-prompt";
 import { streamCompletion } from "@/lib/ai/openrouter";
 import { GuideContentSchema } from "@/lib/domain/guide";
 import { env } from "@/lib/env";
+import { getLocale } from "@/lib/i18n/server";
 import { getGuideByPropertyId } from "@/lib/repositories/guides";
 import { getPropertyByCode } from "@/lib/repositories/properties";
 
@@ -70,10 +71,15 @@ export async function POST(request: NextRequest) {
       ? GuideContentSchema.safeParse(guide.content)
       : null;
 
+  // server-side, never a body field: the locale decides what the assistant
+  // says, so a client must not be able to set it per request
+  const locale = await getLocale();
+
   const messages = buildChatMessages({
     property,
     guideContent: parsed?.success ? parsed.data : null,
     history: payload.data.messages,
+    locale,
   });
 
   let first: IteratorResult<string>;

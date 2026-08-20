@@ -212,8 +212,8 @@ const es: Messages = {
       smart_lock: "Cerradura electrónica",
       keybox: "Caja de llaves",
       doorman: "Recepción",
-      fallback: "Acceso al alojamiento",
     },
+    accessTypeFallback: "Acceso al alojamiento",
     essentialTypes: {
       farmacia: "Farmacia",
       supermercado: "Supermercado",

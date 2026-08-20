@@ -222,8 +222,8 @@ const ptBR = {
       smart_lock: "Fechadura eletrônica",
       keybox: "Cofre de chaves",
       doorman: "Portaria",
-      fallback: "Acesso ao imóvel",
     },
+    accessTypeFallback: "Acesso ao imóvel",
     /**
      * Essentials `type` values are schema literals persisted in the guide
      * ("farmácia | supermercado | hospital"); keys are accent-free so a model

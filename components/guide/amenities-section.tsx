@@ -3,12 +3,15 @@ import { GuideSection } from "@/components/guide/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { amenityList } from "@/lib/domain/display";
 import type { Property } from "@/lib/domain/property";
+import type { Locale } from "@/lib/i18n/locales";
 
 function plural(count: number, one: string, many: string): string {
   return count === 1 ? one : many;
 }
 
-export function AmenitiesSection({ property }: { property: Property }) {
+type AmenitiesSectionProps = { property: Property; locale: Locale };
+
+export function AmenitiesSection({ property, locale }: AmenitiesSectionProps) {
   return (
     <GuideSection id="comodidades">
       <SectionHeading
@@ -33,7 +36,7 @@ export function AmenitiesSection({ property }: { property: Property }) {
         />
       </div>
       <div className="grid grid-cols-4 gap-3 max-[880px]:grid-cols-2">
-        {amenityList(property.amenities).map((amenity) => (
+        {amenityList(property.amenities, locale).map((amenity) => (
           <div
             key={amenity.key}
             className="flex items-center gap-[13px] rounded-lg border border-border bg-white px-[18px] py-[17px] shadow-soft transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-card"

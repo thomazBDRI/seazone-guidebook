@@ -4,9 +4,12 @@ import { Card } from "@/components/ui/card";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { formatTime, ruleLines } from "@/lib/domain/display";
 import type { Property } from "@/lib/domain/property";
+import type { Locale } from "@/lib/i18n/locales";
 import { cn } from "@/lib/utils";
 
-export function RulesSection({ property }: { property: Property }) {
+type RulesSectionProps = { property: Property; locale: Locale };
+
+export function RulesSection({ property, locale }: RulesSectionProps) {
   return (
     <GuideSection id="regras">
       <SectionHeading eyebrow="Boa convivência" title="Regras da estadia" />
@@ -35,7 +38,7 @@ export function RulesSection({ property }: { property: Property }) {
           <h3 className="mb-3.5 text-[11.5px] font-bold uppercase tracking-[.15em] text-muted-foreground">
             Durante sua estadia
           </h3>
-          {ruleLines(property).map((rule) => (
+          {ruleLines(property, locale).map((rule) => (
             <p
               key={rule.key}
               className="flex items-center gap-[15px] py-[9px] text-[15px] font-medium"

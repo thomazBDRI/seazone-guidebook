@@ -6,6 +6,7 @@ import { fln001 } from "@/test/fixtures/property";
 const streamCompletion = vi.fn();
 const getPropertyByCode = vi.fn();
 const getGuideByPropertyId = vi.fn();
+const getLocale = vi.fn();
 
 vi.mock("@/lib/env", () => ({
   env: { OPENROUTER_CHAT_MODEL: "test/chat-model:free" },
@@ -22,6 +23,8 @@ vi.mock("@/lib/repositories/properties", () => ({
 vi.mock("@/lib/repositories/guides", () => ({
   getGuideByPropertyId: (...args: unknown[]) => getGuideByPropertyId(...args),
 }));
+
+vi.mock("@/lib/i18n/server", () => ({ getLocale: () => getLocale() }));
 
 const { POST } = await import("@/app/api/chat/route");
 
@@ -68,6 +71,7 @@ beforeEach(() => {
     status: "ready",
     content: GUIDE_CONTENT,
   });
+  getLocale.mockResolvedValue("pt-BR");
   respondWith(["A senha é ", "floripa2024."]);
 });
 
@@ -94,6 +98,22 @@ describe("POST /api/chat", () => {
     expect(streamCompletion.mock.calls[0][0].model).toBe(
       "test/chat-model:free",
     );
+  });
+
+  it("grounds the prompt in the locale from the cookie, not from the body", async () => {
+    getLocale.mockResolvedValue("en");
+
+    await POST(
+      request({
+        code: "FLN001",
+        locale: "es",
+        messages: [{ role: "user", content: "Can I bring my dog?" }],
+      }),
+    );
+
+    const system = sentMessages()[0].content;
+    expect(system).toContain("Pets are not allowed");
+    expect(system).not.toContain("Não é permitido animais de estimação");
   });
 
   it("still answers when the guide is missing or unreadable", async () => {

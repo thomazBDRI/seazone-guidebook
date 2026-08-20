@@ -11,16 +11,22 @@ import {
   mapAddress,
 } from "@/lib/domain/display";
 import type { Property } from "@/lib/domain/property";
+import type { Locale } from "@/lib/i18n/locales";
 
 type ArrivalSectionProps = {
   property: Property;
+  locale: Locale;
   /** Wi-Fi join QR as a data URL, rendered server-side (null when there is no password) */
   wifiQr: string | null;
 };
 
-export function ArrivalSection({ property, wifiQr }: ArrivalSectionProps) {
+export function ArrivalSection({
+  property,
+  locale,
+  wifiQr,
+}: ArrivalSectionProps) {
   const query = encodeURIComponent(mapAddress(property));
-  const access = accessTypeDisplay(property.property_access_type);
+  const access = accessTypeDisplay(property.property_access_type, locale);
 
   return (
     <GuideSection id="acesso">

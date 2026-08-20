@@ -10,6 +10,7 @@ import {
 } from "@/lib/domain/display";
 import type { GuideContent } from "@/lib/domain/guide";
 import type { Property } from "@/lib/domain/property";
+import type { Locale } from "@/lib/i18n/locales";
 
 /**
  * Prompt assembly for the guest assistant. Pure functions — no network, no env
@@ -29,6 +30,8 @@ export type ChatPromptInput = {
   guideContent: GuideContent | null;
   /** Oldest first, ending on the question being answered. */
   history: ChatTurn[];
+  /** Language the assistant answers in unless the guest writes in another. */
+  locale: Locale;
 };
 
 const DATA_OPEN = "=== DADOS DO IMÓVEL (única fonte de verdade) ===";
@@ -40,9 +43,10 @@ export function buildChatMessages({
   property,
   guideContent,
   history,
+  locale,
 }: ChatPromptInput): ChatMessage[] {
   return [
-    { role: "system", content: systemPrompt(property, guideContent) },
+    { role: "system", content: systemPrompt(property, guideContent, locale) },
     ...history.map((turn) => ({ role: turn.role, content: turn.content })),
   ];
 }
@@ -50,19 +54,20 @@ export function buildChatMessages({
 function systemPrompt(
   property: Property,
   guideContent: GuideContent | null,
+  locale: Locale,
 ): string {
   const host = `${property.host_name} (WhatsApp ${formatPhone(property.host_phone)})`;
 
   return [
     `Você é o assistente virtual do imóvel ${property.name} (código ${property.code}) da Seazone, plataforma de aluguel por temporada. Você conversa com o hóspede desta estadia e ajuda com chegada, acesso, Wi-Fi, regras, comodidades e dicas da região.`,
-    dataBlock(property),
+    dataBlock(property, locale),
     guideContent ? guideBlock(guideContent) : missingGuideNote(host),
     answerRules(host),
     SAFETY_RULES,
   ].join("\n\n");
 }
 
-function dataBlock(property: Property): string {
+function dataBlock(property: Property, locale: Locale): string {
   const lines = [
     `Nome: ${property.name}`,
     `Tipo: ${property.property_type} · ${property.bedroom_quantity} quarto(s) · ${property.bathroom_quantity} banheiro(s) · até ${property.guest_capacity} hóspedes`,
@@ -74,7 +79,7 @@ function dataBlock(property: Property): string {
       : "Wi-Fi: não informado",
     `Check-in: a partir das ${formatTime(property.check_in_time)}`,
     `Check-out: até as ${formatTime(property.check_out_time)}`,
-    `Entrada: ${property.is_self_checkin ? "self check-in (o hóspede entra sozinho, sem esperar ninguém)" : "com recepção do anfitrião ou da portaria"} — ${accessTypeDisplay(property.property_access_type).label}`,
+    `Entrada: ${property.is_self_checkin ? "self check-in (o hóspede entra sozinho, sem esperar ninguém)" : "com recepção do anfitrião ou da portaria"} — ${accessTypeDisplay(property.property_access_type, locale).label}`,
     property.property_access_instructions
       ? `Instruções de acesso: ${property.property_access_instructions}`
       : null,
@@ -82,10 +87,10 @@ function dataBlock(property: Property): string {
       ? `Código de acesso: ${property.property_password}`
       : null,
     parkingLine(property),
-    `Regras da estadia:\n${ruleLines(property)
+    `Regras da estadia:\n${ruleLines(property, locale)
       .map((rule) => `- ${rule.sentence}`)
       .join("\n")}`,
-    `Comodidades: ${amenityList(property.amenities)
+    `Comodidades: ${amenityList(property.amenities, locale)
       .map((amenity) => amenity.label)
       .join(", ")}`,
     `Anfitrião(ã) responsável: ${property.host_name} — WhatsApp ${formatPhone(property.host_phone)}`,

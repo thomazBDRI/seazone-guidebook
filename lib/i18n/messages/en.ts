@@ -210,8 +210,8 @@ const en: Messages = {
       smart_lock: "Smart lock",
       keybox: "Key box",
       doorman: "Front desk",
-      fallback: "Property access",
     },
+    accessTypeFallback: "Property access",
     essentialTypes: {
       farmacia: "Pharmacy",
       supermercado: "Supermarket",

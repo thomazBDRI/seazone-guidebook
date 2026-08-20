@@ -21,6 +21,8 @@ import {
 } from "@/lib/domain/display";
 import { GuideContentSchema } from "@/lib/domain/guide";
 import { wifiQrPayload } from "@/lib/domain/wifi";
+import { getMessages } from "@/lib/i18n";
+import { getLocale } from "@/lib/i18n/server";
 import { getGuideByPropertyId } from "@/lib/repositories/guides";
 import { getPropertyByCode } from "@/lib/repositories/properties";
 
@@ -33,19 +35,28 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { code } = await params;
-  const property = await loadProperty(code);
+  const [property, messages] = await Promise.all([
+    loadProperty(code),
+    getLocale().then(getMessages),
+  ]);
   if (!property) {
-    return { title: "Imóvel não encontrado · Guia do Hóspede — Seazone" };
+    return { title: messages.metadata.notFoundTitle };
   }
   return {
-    title: `${property.name} · Guia do Hóspede — Seazone`,
-    description: `Guia da hospedagem ${property.code}: chegada, acesso, Wi-Fi, regras da estadia e dicas em ${property.city}.`,
+    title: messages.metadata.propertyTitle(property.name),
+    description: messages.metadata.propertyDescription(
+      property.code,
+      property.city,
+    ),
   };
 }
 
 export default async function GuidePage({ params }: PageProps) {
   const { code } = await params;
-  const property = await loadProperty(code);
+  const [property, locale] = await Promise.all([
+    loadProperty(code),
+    getLocale(),
+  ]);
   if (!property) notFound();
 
   const guide = await getGuideByPropertyId(property.id);
@@ -80,14 +91,14 @@ export default async function GuidePage({ params }: PageProps) {
         entry={
           property.is_self_checkin
             ? "Self check-in"
-            : accessTypeDisplay(property.property_access_type).label
+            : accessTypeDisplay(property.property_access_type, locale).label
         }
       />
       <TocNav />
       <main>
-        <ArrivalSection property={property} wifiQr={wifiQr} />
-        <RulesSection property={property} />
-        <AmenitiesSection property={property} />
+        <ArrivalSection property={property} locale={locale} wifiQr={wifiQr} />
+        <RulesSection property={property} locale={locale} />
+        <AmenitiesSection property={property} locale={locale} />
         {guideContent ? (
           <ExperienceSection
             content={guideContent}

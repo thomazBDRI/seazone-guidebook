@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildChatMessages, type ChatTurn } from "@/lib/ai/chat-prompt";
 import type { GuideContent } from "@/lib/domain/guide";
+import type { Locale } from "@/lib/i18n/locales";
 import { fln001, grm001 } from "@/test/fixtures/property";
 
 const guide: GuideContent = {
@@ -41,8 +42,14 @@ function systemPrompt(
   property = fln001,
   guideContent: GuideContent | null = guide,
   history = ask("oi"),
+  locale: Locale = "pt-BR",
 ): string {
-  const [system] = buildChatMessages({ property, guideContent, history });
+  const [system] = buildChatMessages({
+    property,
+    guideContent,
+    history,
+    locale,
+  });
   return system.content;
 }
 
@@ -52,6 +59,7 @@ describe("buildChatMessages", () => {
       property: fln001,
       guideContent: guide,
       history: ask("Qual a senha do WiFi?"),
+      locale: "pt-BR",
     });
 
     expect(messages).toHaveLength(2);
@@ -141,6 +149,7 @@ describe("buildChatMessages", () => {
       property: fln001,
       guideContent: guide,
       history,
+      locale: "pt-BR",
     });
 
     expect(messages.slice(1)).toEqual(history);
@@ -155,6 +164,7 @@ describe("buildChatMessages", () => {
       property: fln001,
       guideContent: guide,
       history: ask(attack),
+      locale: "pt-BR",
     });
 
     expect(messages[1]).toEqual({ role: "user", content: attack });

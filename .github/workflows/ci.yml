@@ -73,3 +73,38 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 7
+
+  ai-review:
+    needs: e2e
+    # reviews red builds too — that is when a second opinion is worth most —
+    # and never blocks: the reviewer is a free model behind a rate limit
+    if: always() && github.event_name == 'push'
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # commit comments
+    steps:
+      # full history so the push range (before..sha) can be diffed
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .tool-versions
+
+      # the test summary is optional context; a missing artifact is fine
+      - name: Download e2e report
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-report
+          path: artifacts
+
+      - name: Review the push
+        run: bun run scripts/ai-review.ts
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DIFF_BASE: ${{ github.event.before }}
+          E2E_OUTCOME: ${{ needs.e2e.result }}

@@ -28,7 +28,7 @@ export function PropertyCard({ property, locale }: PropertyCardProps) {
               <Icon name="waves" className="size-10" />
             </span>
           )}
-          <span className="absolute left-3.5 top-3.5 rounded-full bg-navy/[.82] px-3 py-1.5 text-[11px] font-bold tracking-[.16em] text-white backdrop-blur-[6px]">
+          <span className="absolute left-3.5 top-3.5 rounded-full bg-navy px-3 py-1.5 text-[11px] font-bold tracking-[.16em] text-white">
             {property.code}
           </span>
         </div>

@@ -15,7 +15,7 @@ export function PendingOverlay() {
   return (
     <span
       aria-hidden="true"
-      className={`pointer-events-none absolute inset-0 grid place-items-center bg-white/[.65] backdrop-blur-[1px] transition-opacity duration-200 ${
+      className={`pointer-events-none absolute inset-0 grid place-items-center bg-white/[.72] transition-opacity duration-200 ${
         pending ? "opacity-100" : "opacity-0"
       }`}
     >

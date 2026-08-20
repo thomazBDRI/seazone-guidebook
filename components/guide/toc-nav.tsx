@@ -149,7 +149,7 @@ export function TocNav({ locale, hasServices }: TocNavProps) {
 
       <nav
         aria-label={messages.toc.label}
-        className="sticky top-[var(--topbar-h,62px)] z-40 border-b border-border bg-sea-mist/[.92] backdrop-blur-[14px] min-[1400px]:hidden"
+        className="sticky top-[var(--topbar-h,62px)] z-40 border-b border-border bg-sea-mist min-[1400px]:hidden"
       >
         <button
           type="button"
@@ -172,7 +172,7 @@ export function TocNav({ locale, hasServices }: TocNavProps) {
           />
         </button>
         {open ? (
-          <div className="border-t border-border bg-[hsla(225,70%,99%,.98)]">
+          <div className="border-t border-border bg-[hsl(225_70%_99%)]">
             <div className="mx-auto flex max-w-[1080px] flex-col px-[clamp(16px,4vw,40px)] pb-3.5 pt-2">
               {sections.map((section) => (
                 <a

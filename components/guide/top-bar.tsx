@@ -51,7 +51,7 @@ export function TopBar({ hostPhoneDigits, locale }: TopBarProps) {
       <div className="flex items-center gap-3.5 sm:gap-[18px]">
         <LanguageSwitcher locale={locale} />
         <a
-          className="inline-flex items-center gap-2 rounded-full border border-white/[.25] bg-white/[.12] px-[11px] py-[9px] text-[13.5px] font-semibold text-white backdrop-blur-[8px] transition-colors hover:bg-white/[.22] sm:px-4"
+          className="inline-flex items-center gap-2 rounded-full border border-white bg-white px-[11px] py-[9px] text-[13.5px] font-semibold text-navy transition-colors hover:border-sea-light hover:bg-sea-light sm:px-4"
           href={`https://wa.me/${hostPhoneDigits}`}
           target="_blank"
           rel="noopener"

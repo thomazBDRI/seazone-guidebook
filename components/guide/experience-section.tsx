@@ -251,7 +251,7 @@ function PlaceCard({
       ) : null}
       <div className="mb-1.5 flex items-center justify-between gap-2.5">
         <h4 className="text-[15.5px] font-bold tracking-[-.01em]">{name}</h4>
-        <span className="flex-none whitespace-nowrap rounded-full border border-white/[.28] bg-white/[.13] px-[11px] py-[3px] text-[11.5px] font-bold text-white">
+        <span className="flex-none whitespace-nowrap rounded-full border border-white bg-white px-[11px] py-[3px] text-[11.5px] font-bold text-navy">
           {distanceLabel(distance)}
         </span>
       </div>
@@ -292,7 +292,7 @@ function PlaceLink({
       href={href}
       target="_blank"
       rel="noopener"
-      className="inline-flex items-center gap-1.5 rounded-full border border-white/[.38] bg-white/10 px-[13px] py-1.5 text-xs font-semibold text-white transition-colors hover:border-white hover:bg-white hover:text-navy"
+      className="inline-flex items-center gap-1.5 rounded-full border border-white bg-white px-[13px] py-1.5 text-xs font-semibold text-navy transition-colors hover:border-sea-light hover:bg-sea-light"
     >
       <Icon name={icon} className="size-[13px]" />
       {children}

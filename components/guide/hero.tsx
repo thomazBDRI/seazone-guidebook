@@ -68,7 +68,7 @@ export function Hero({
       <div className="absolute inset-0 bg-hero-overlay" />
 
       <div className="relative mx-auto w-full max-w-[1080px] px-[clamp(16px,4vw,40px)] pb-[clamp(64px,8vh,96px)] pt-[120px]">
-        <span className="inline-flex animate-rise items-center gap-[7px] rounded-full border border-white/30 bg-white/[.14] px-3.5 py-1.5 text-xs font-bold tracking-[.16em] backdrop-blur-[6px] [animation-delay:.05s] before:size-[7px] before:rounded-full before:bg-[hsl(152_70%_55%)] before:shadow-[0_0_8px_hsl(152_70%_55%)] before:content-['']">
+        <span className="inline-flex animate-rise items-center gap-[7px] rounded-full border border-white/10 bg-navy/[.85] px-3.5 py-1.5 text-xs font-bold tracking-[.16em] [animation-delay:.05s] before:size-[7px] before:rounded-full before:bg-[hsl(152_70%_55%)] before:shadow-[0_0_8px_hsl(152_70%_55%)] before:content-['']">
           {messages.hero.propertyBadge(code)}
         </span>
         <h1 className="my-3 max-w-[14ch] animate-rise font-display text-[clamp(34px,6.2vw,64px)] font-medium leading-[1.04] tracking-[-.015em] [animation-delay:.15s] mt-[18px]">
@@ -90,7 +90,7 @@ export function Hero({
             {messages.hero.askAi}
           </button>
           <a
-            className="inline-flex items-center gap-[9px] rounded-full border border-white/[.32] bg-white/10 px-[18px] py-3 text-[13.5px] font-semibold text-white backdrop-blur-[10px] transition-colors hover:bg-white/20 sm:px-6 sm:py-[13px] sm:text-[14.5px]"
+            className="inline-flex items-center gap-[9px] rounded-full border border-white bg-white px-[18px] py-3 text-[13.5px] font-semibold text-navy transition-colors hover:border-sea-light hover:bg-sea-light sm:px-6 sm:py-[13px] sm:text-[14.5px]"
             href="#acesso"
           >
             <Icon name="arrow-down" className="size-[17px]" />
@@ -98,7 +98,7 @@ export function Hero({
           </a>
         </div>
 
-        <dl className="mt-[30px] grid max-w-[620px] animate-rise grid-cols-3 rounded-[18px] border border-white/[.32] bg-white/10 backdrop-blur-[10px] [animation-delay:.5s]">
+        <dl className="mt-[30px] grid max-w-[620px] animate-rise grid-cols-3 rounded-[18px] border border-white/10 bg-sea-deep [animation-delay:.5s]">
           <Essential
             label={messages.hero.checkIn}
             value={checkIn}

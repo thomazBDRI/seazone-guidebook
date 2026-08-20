@@ -27,9 +27,26 @@ const es: Messages = {
   },
 
   home: {
-    title: "Guía del Huésped — Seazone",
-    hint: "Entra en la guía de tu alojamiento con el enlace que recibiste al confirmar la reserva",
-    example: "p. ej.:",
+    eyebrow: "Guía del Huésped",
+    titleLead: "Todo sobre tu",
+    titleEmphasis: "alojamiento",
+    subtitle:
+      "Llegada, acceso, Wi-Fi, normas y comodidades del alojamiento — más una guía de la zona creada por IA y un asistente para resolver dudas a cualquier hora.",
+    notice: {
+      title: "Este listado existe solo para la evaluación técnica",
+      body: (example: string) =>
+        `Está aquí para que quien evalúa esta prueba pueda abrir cualquier alojamiento rápidamente. El huésped real recibe un enlace directo a su alojamiento (${example}) y nunca ve un listado.`,
+    },
+    list: {
+      eyebrow: "Alojamientos registrados",
+      title: "Elige un alojamiento",
+      description:
+        "Las tarjetas de abajo vienen de la base de datos: nada en esta página está escrito en el código.",
+    },
+    guests: (count: number): string => (count === 1 ? "huésped" : "huéspedes"),
+    openGuide: "Abrir la guía",
+    empty:
+      "No hay alojamientos en la base de datos. Ejecuta `bun run db:seed` para cargar los alojamientos de referencia.",
   },
 
   notFound: {

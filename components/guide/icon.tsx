@@ -1,5 +1,6 @@
 import {
   ArrowDown,
+  ArrowRight,
   ArrowUpDown,
   Baby,
   Bath,
@@ -55,6 +56,7 @@ import {
  */
 const ICONS: Record<string, LucideIcon> = {
   "arrow-down": ArrowDown,
+  "arrow-right": ArrowRight,
   "arrow-up-down": ArrowUpDown,
   baby: Baby,
   bath: Bath,

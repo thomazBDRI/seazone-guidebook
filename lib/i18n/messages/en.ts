@@ -27,9 +27,26 @@ const en: Messages = {
   },
 
   home: {
-    title: "Guest Guide — Seazone",
-    hint: "Open your stay guide using the link sent in your booking confirmation",
-    example: "e.g.",
+    eyebrow: "Guest Guide",
+    titleLead: "Everything about your",
+    titleEmphasis: "stay",
+    subtitle:
+      "Arrival, access, Wi-Fi, house rules and amenities — plus an AI-written guide to the neighbourhood and an assistant ready to answer anything, any time.",
+    notice: {
+      title: "This listing is here only for the technical review",
+      body: (example: string) =>
+        `It exists so whoever is reviewing this test can open any property quickly. A real guest gets a direct link to their own stay (${example}) and never sees a list of properties.`,
+    },
+    list: {
+      eyebrow: "Properties on record",
+      title: "Pick a property",
+      description:
+        "The cards below come from the database: nothing on this page is hardcoded.",
+    },
+    guests: (count: number): string => (count === 1 ? "guest" : "guests"),
+    openGuide: "Open the guide",
+    empty:
+      "No properties in the database. Run `bun run db:seed` to load the reference properties.",
   },
 
   notFound: {

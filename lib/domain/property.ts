@@ -48,3 +48,25 @@ export const PropertySchema = z.object({
 });
 
 export type Property = z.infer<typeof PropertySchema>;
+
+/**
+ * What a listing needs from a property, nothing more: the index on `/` shows
+ * one card per unit and links to the full guide. `images` collapses to the
+ * single cover photo here — the slideshow belongs to the guide page.
+ */
+export const PropertySummarySchema = PropertySchema.pick({
+  code: true,
+  name: true,
+  property_type: true,
+  city: true,
+  state: true,
+  bedroom_quantity: true,
+  bathroom_quantity: true,
+  guest_capacity: true,
+  images: true,
+}).transform(({ images, ...rest }) => ({
+  ...rest,
+  image: images.at(0) ?? null,
+}));
+
+export type PropertySummary = z.infer<typeof PropertySummarySchema>;

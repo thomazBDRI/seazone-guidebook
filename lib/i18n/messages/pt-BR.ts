@@ -33,9 +33,27 @@ const ptBR = {
   },
 
   home: {
-    title: "Guia do Hóspede — Seazone",
-    hint: "Acesse o guia do seu imóvel pelo link enviado na confirmação da reserva",
-    example: "ex.:",
+    eyebrow: "Guia do Hóspede",
+    titleLead: "Tudo sobre a sua",
+    titleEmphasis: "hospedagem",
+    subtitle:
+      "Chegada, acesso, Wi-Fi, regras e comodidades do imóvel — mais um guia da região criado por IA e um assistente para tirar dúvidas a qualquer hora.",
+    notice: {
+      title: "Esta listagem é só para a avaliação técnica",
+      body: (example: string) =>
+        `Ela existe para quem está avaliando este teste poder abrir qualquer imóvel rapidamente. O hóspede real recebe um link direto para a sua hospedagem (${example}) e nunca vê uma lista de imóveis.`,
+    },
+    list: {
+      eyebrow: "Imóveis cadastrados",
+      title: "Escolha um imóvel",
+      description:
+        "Os cartões abaixo vêm do banco de dados: nada nesta página está escrito no código.",
+    },
+    // amenities.guests reads "hóspedes no máximo", too long for a card row
+    guests: (count: number): string => (count === 1 ? "hóspede" : "hóspedes"),
+    openGuide: "Abrir o guia",
+    empty:
+      "Nenhum imóvel no banco de dados. Rode `bun run db:seed` para carregar os imóveis de referência.",
   },
 
   notFound: {

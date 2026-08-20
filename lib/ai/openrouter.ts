@@ -86,17 +86,28 @@ export async function createCompletion({
   const payload = (await response
     .json()
     .catch(() => null)) as ChatCompletionPayload | null;
-  const text = payload?.choices?.[0]?.message?.content?.trim();
+  const choice = payload?.choices?.[0];
+  const text = choice?.message?.content?.trim();
 
   if (!text) {
-    throw new OpenRouterError("empty", `model ${model} returned no content`);
+    // reasoning models can spend the whole token budget thinking and return
+    // an empty message, so the diagnosis goes in the message: without it the
+    // failed row says only "no content" for several different causes
+    throw new OpenRouterError(
+      "empty",
+      `model ${model} returned no content (finish_reason=${choice?.finish_reason ?? "none"}, reasoning_chars=${choice?.message?.reasoning?.length ?? 0}, completion_tokens=${payload?.usage?.completion_tokens ?? 0})`,
+    );
   }
   return { text, model: payload?.model ?? model };
 }
 
 type ChatCompletionPayload = {
   model?: string;
-  choices?: { message?: { content?: string | null } }[];
+  usage?: { completion_tokens?: number };
+  choices?: {
+    finish_reason?: string;
+    message?: { content?: string | null; reasoning?: string | null };
+  }[];
 };
 
 export { parseJsonObject } from "@/lib/ai/json";

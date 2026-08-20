@@ -115,11 +115,15 @@ Route handler sets `maxDuration = 60`.
 
 ### 4.3 CI AI reviewer
 
-- GitHub Actions job after tests: collects the push/PR diff + Playwright report
-  summary + screenshots, sends to an OpenRouter free model (vision-capable when
-  attaching screenshots), posts the review as a PR comment / commit comment.
+- GitHub Actions job after the tests (`scripts/ai-review.ts`): collects the
+  push diff (capped at 60KB) plus the E2E outcome and the failing test titles
+  from the Playwright json report, sends it to an OpenRouter free model and
+  posts the answer as a commit comment. Text only — screenshots were dropped:
+  the failure titles carry the same signal for a fraction of the tokens.
 - Uses the same `OPENROUTER_API_KEY` secret; failures are non-blocking
-  (`continue-on-error`) so a flaky free model never blocks CI.
+  (`continue-on-error`, plus a fallback model chain and guarded errors) so a
+  rate-limited free model never blocks CI. Runs on `push` only, since a commit
+  comment is what it posts.
 
 ## 5. Frontend structure (Atomic-ish, pragmatic)
 
@@ -151,11 +155,17 @@ Wi-Fi QR — generated locally with the `qrcode` lib, copy buttons, chat widget)
 - **Unit (Vitest)**: domain mappers (rules/amenities dictionaries), Zod schemas,
   prompt builders, guide pipeline (OSM + LLM mocked), lock/idempotency logic,
   key UI components (RulesCard, CopyField) with Testing Library.
-- **E2E (Playwright)**: `/FLN001` shows all required data; unknown code → 404
-  page; guide loading state → generated content (LLM stubbed via local mock
-  server for determinism); chat opens and streams an answer for the four
-  canonical questions (stubbed stream). Screenshots + trace on failure,
-  uploaded as CI artifacts (consumed by the AI reviewer).
+- **E2E (Playwright)**: runs against a production build and the real seeded
+  database (read-only), with only the LLM replaced by a local stub server
+  (`test/e2e/stub-openrouter.ts`, wired through `OPENROUTER_BASE_URL`) so
+  streaming is deterministic. Covers: `/FLN001` shows all required data,
+  lowercase `/grm001`, unknown code → 404 page, and the chat widget streaming
+  a stubbed answer progressively through `/api/chat`. Two projects, desktop
+  and phone-sized. Screenshots + trace on failure, uploaded as CI artifacts
+  (consumed by the AI reviewer).
+  The generation flow (loading state → persisted content) is covered by unit
+  tests instead: both seeded properties already hold a `ready` guide and the
+  E2E suite must not mutate the database to force the `pending` state.
 
 ## 7. CI pipeline (GitHub Actions)
 
@@ -164,7 +174,8 @@ on: push (main) + pull_request
 jobs:
   quality:   bun install → biome ci → tsc --noEmit → vitest run
   e2e:       needs quality → playwright (stubbed LLM) → upload artifacts
-  ai-review: needs e2e → diff + artifacts → OpenRouter → comment (non-blocking)
+  ai-review: needs e2e → diff + report → OpenRouter → commit comment
+             (push only, if: always(), continue-on-error)
 ```
 
 Deploy is Vercel's Git integration (no deploy job in Actions).
@@ -180,6 +191,10 @@ Deploy is Vercel's Git integration (no deploy job in Actions).
 
 No `NEXT_PUBLIC_*` secrets. `lib/env.ts` Zod-validates presence at boot.
 `.env.example` documents the names without values.
+
+Optional, non-secret knobs: `OPENROUTER_GUIDE_MODEL` / `OPENROUTER_CHAT_MODEL`
+(swap a rate-limited free model without a deploy), `OPENROUTER_BASE_URL` (the
+E2E suite points it at its stub) and `OPENROUTER_REVIEW_MODEL` (CI reviewer).
 
 ## 9. Work breakdown (small commits, every step)
 
@@ -217,17 +232,19 @@ Conventional Commits, small steps, committed as we go.
 22. `feat(guide): wire experience section to generation flow with skeleton state`
 23. `test(ai): cover pipeline, lock and failure fallbacks`
 
-**E5 — Chat assistant**
-24. `feat(ai): add grounded chat prompt with injection guardrails`
-25. `feat(chat): add streaming chat endpoint`
-26. `feat(chat): add chat widget with streaming ui`
-27. `test(chat): cover prompt assembly and canonical questions`
+**E5 — Chat assistant** ✅
+24. ~~`feat(ai): add grounded chat prompt with injection guardrails`~~
+25. ~~`feat(chat): add streaming chat endpoint`~~
+26. ~~`feat(chat): add chat widget with streaming ui`~~
+27. ~~`test(chat): cover prompt assembly and canonical questions`~~ (landed
+    inside the commits above)
 
-**E6 — E2E & CI completion**
-28. `test(e2e): add playwright setup with llm stub server`
-29. `test(e2e): cover guide rendering, 404, generation and chat flows`
-30. `ci: add e2e job with artifact upload`
-31. `ci: add ai reviewer job over diff and e2e artifacts`
+**E6 — E2E & CI completion** ✅
+28. ~~`test(e2e): add playwright setup with llm stub server`~~
+29. ~~`test(e2e): cover guide rendering, 404, generation and chat flows`~~
+    (generation stayed on unit tests — see §6)
+30. ~~`ci: add e2e job with artifact upload`~~
+31. ~~`ci: add ai reviewer job over diff and e2e artifacts`~~
 
 **E6.5 — i18n (pt-BR / en / es)**
 - `feat(i18n): extract ui strings to locale dictionaries` — no hardcoded
@@ -252,12 +269,18 @@ Conventional Commits, small steps, committed as we go.
     before delivery.
 35. `chore: verify vercel deploy configuration`
 
-## 10. Open decisions
+## 10. Decisions
 
-- Free model picks (swappable env/config): a strong free instruct model for
-  guide+chat (e.g. Llama 3.3 70B free / Gemini flash free tier on OpenRouter)
-  and a vision-capable free model for the CI reviewer. Final choice after a
-  quick quality test at implementation time.
+Nothing is open here anymore; both entries were open questions at planning time.
+
+Decided: free model picks, all overridable by env. Guide generation runs on
+`nvidia/nemotron-3-ultra-550b-a55b:free`, chat on the much faster
+`nvidia/nemotron-3-nano-30b-a3b:free` (the guest watches it type), and the CI
+reviewer on `z-ai/glm-5.2:free` — picked after probing four free models with a
+diff carrying a planted missing `await` and a leaked secret key: it caught both,
+tersely, in ~5s. `poolside/laguna-s-2.1:free` and
+`nvidia/nemotron-3-super-120b-a12b:free` also caught both and are kept as the
+fallback chain, since free models are rate-limited without warning.
 
 Decided: hybrid OSM-grounded generation (Nominatim + Overpass feeding the LLM),
 with pure-LLM fallback when OSM is unavailable (see §4.1).

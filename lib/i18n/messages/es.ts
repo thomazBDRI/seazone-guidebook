@@ -12,7 +12,7 @@ const es: Messages = {
     notFoundTitle: "Alojamiento no encontrado · Guía del Huésped — Seazone",
   },
 
-  brand: { tagline: "Guía del Huésped" },
+  brand: { name: "Seazone", tagline: "Guía del Huésped" },
 
   language: {
     label: "Idioma",

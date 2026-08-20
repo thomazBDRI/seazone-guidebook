@@ -18,7 +18,7 @@ const ptBR = {
     notFoundTitle: "Imóvel não encontrado · Guia do Hóspede — Seazone",
   },
 
-  brand: { tagline: "Guia do Hóspede" },
+  brand: { name: "Seazone", tagline: "Guia do Hóspede" },
 
   language: {
     label: "Idioma",

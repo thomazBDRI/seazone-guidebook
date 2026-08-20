@@ -12,7 +12,7 @@ const en: Messages = {
     notFoundTitle: "Property not found · Guest Guide — Seazone",
   },
 
-  brand: { tagline: "Guest Guide" },
+  brand: { name: "Seazone", tagline: "Guest Guide" },
 
   language: {
     label: "Language",

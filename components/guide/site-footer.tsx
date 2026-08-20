@@ -1,4 +1,4 @@
-import { WaveLogoCompact } from "@/components/guide/brand";
+import { SeazoneWordmark } from "@/components/guide/brand";
 import { getMessages } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
 
@@ -17,9 +17,8 @@ export function SiteFooter({ locale }: { locale: Locale }) {
     >
       <div className="mx-auto flex max-w-[1080px] flex-wrap items-center justify-between gap-[18px]">
         <div>
-          <div className="flex items-center gap-[9px] text-white">
-            <WaveLogoCompact />
-            <b className="text-base tracking-[-.02em]">seazone</b>
+          <div className="flex items-center text-white">
+            <SeazoneWordmark className="h-[17px]" label={messages.brand.name} />
           </div>
           <div className="text-[13px]">{messages.footer.tagline}</div>
         </div>
